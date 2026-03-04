@@ -85,7 +85,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Login Button
             AppButton(text: "Log in", onPressed: () {
-              Get.toNamed('/user_forgot');
+              Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
             }),
 
             const SizedBox(height: 24),

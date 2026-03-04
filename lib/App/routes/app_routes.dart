@@ -18,6 +18,6 @@ abstract class AppRoutes {
   static const RESET_PASSWORD = '/reset_password';
 
 
-  static const USER_BOTTOM_NAV = '/user-bottom-nav';
+  static const USER_BOTTOM_NAV = '/navigation_bar';
 
 }

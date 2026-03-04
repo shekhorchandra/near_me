@@ -17,6 +17,8 @@ import '../modules/auth/forget/reset_password/bindings/reset_password_binding.da
 import '../modules/auth/forget/reset_password/views/reset_password_view.dart';
 import '../modules/auth/user/user_verify/bindings/verify_account_binding.dart';
 import '../modules/auth/user/user_verify/views/verify_account_view.dart';
+import '../modules/user/bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
+import '../modules/user/bottom_nav_bar/views/bottom_nav_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -83,6 +85,13 @@ class AppPages {
       name: AppRoutes.RESET_PASSWORD,
       page: () => const ResetPasswordView(),
       binding: ResetPasswordBinding(),
+    ),
+
+    /// User Bottom Nav Bar
+    GetPage(
+      name: AppRoutes.USER_BOTTOM_NAV,
+      page: () => const UserNavigationBarPage(),
+      binding: UserNavigationBinding(),
     ),
 
   ];

@@ -21,11 +21,11 @@ class AppAssets {
   // // Menu page
   // static const vendor = 'assets/icons/vendor.png';
   //
-  // // bottom nav bar icons
-  // static const discover = 'assets/icons/discover.svg';
-  // static const category = 'assets/icons/category.svg';
-  // static const saved = 'assets/icons/saved.svg';
-  // static const menu = 'assets/icons/menu.svg';
+  // bottom nav bar icons
+  static const home = 'assets/icons/home.svg';
+  static const category = 'assets/icons/category.svg';
+  static const chat = 'assets/icons/chat.svg';
+  static const menu = 'assets/icons/menu.svg';
   //
   // // Deal details
   // static const shopMapMarker = 'assets/icons/shop_map_marker.png';
