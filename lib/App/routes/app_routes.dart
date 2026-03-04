@@ -20,4 +20,11 @@ abstract class AppRoutes {
 
   static const USER_BOTTOM_NAV = '/navigation_bar';
 
+  static const CHANGE_PASSWORD = '/change-password';
+  static const ABOUT = '/about';
+  static const CONTACT_US = '/contact-us';
+  static const HELP_SUPPORT = '/help-support';
+  static const TERMS_CONDITION = '/terms-condition';
+  static const PRIVACY_POLICY = '/privacy-policy';
+
 }

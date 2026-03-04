@@ -6,7 +6,8 @@ import '../../chat/controller/chat_controller.dart';
 import '../../chat/views/chat_view.dart';
 import '../../home/controller/home_controller.dart';
 import '../../home/views/home_view.dart';
-import '../../menu/views/menu_view.dart';
+import '../../menu/menu_bar/controller/menu_controller.dart';
+import '../../menu/menu_bar/views/menu_view.dart';
 
 
 class UserNavigationBarController extends GetxController {
@@ -44,6 +45,6 @@ class UserNavigationBarController extends GetxController {
     Get.lazyPut<HomeController>(() => HomeController());
     Get.lazyPut<CategoriesController>(() => CategoriesController());
     Get.lazyPut<ChatController>(() => ChatController());
-    Get.lazyPut<MenuController>(() => MenuController());
+    Get.lazyPut<UserMenuController>(() => UserMenuController());
   }
 }

@@ -65,11 +65,11 @@ abstract class AppText {
 
     headlineLarge: AppText.h1.semiBold,
     headlineMedium: AppText.h2.semiBold,
-    headlineSmall: AppText.h3.semiBold,
+    headlineSmall: AppText.h5.semiBold,
 
     titleLarge: AppText.h4.semiBold,
     titleMedium: AppText.h5.medium,
-    titleSmall: AppText.body1.medium,
+    titleSmall: AppText.body2.medium,
 
     bodyLarge: AppText.body1.regular,
     bodyMedium: AppText.body2.regular,

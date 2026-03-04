@@ -19,6 +19,15 @@ import '../modules/auth/user/user_verify/bindings/verify_account_binding.dart';
 import '../modules/auth/user/user_verify/views/verify_account_view.dart';
 import '../modules/user/bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/bottom_nav_bar/views/bottom_nav_view.dart';
+import '../modules/user/menu/about_us/views/About_View.dart';
+import '../modules/user/menu/change_password/bindings/change_password_binding.dart';
+import '../modules/user/menu/change_password/views/change_password_view.dart';
+import '../modules/user/menu/contact_us/contact_view/contact_us_view.dart';
+import '../modules/user/menu/help_support/help_support_view/Help_Support_View.dart';
+import '../modules/user/menu/menu_bar/bindings/menu_binding.dart';
+import '../modules/user/menu/menu_bar/views/menu_view.dart';
+import '../modules/user/menu/privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
+import '../modules/user/menu/terms_condition/terms_condition_view/Terms_Condition_View.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -53,6 +62,7 @@ class AppPages {
       page: () => const VerifyAccountView(),
       binding: VerifyAccountBinding(),
     ),
+
     /// verify Servicer account
     // GetPage(
     //   name: AppRoutes.SERVICER_VERIFY_ACCOUNT,
@@ -94,5 +104,37 @@ class AppPages {
       binding: UserNavigationBinding(),
     ),
 
+    GetPage(name: '/menu', page: () => const MenuView(), binding: MenuBinding()),
+
+    GetPage(
+      name: AppRoutes.ABOUT,
+      page: () => const AboutView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.CONTACT_US,
+      page: () => const ContactUsView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.HELP_SUPPORT,
+      page: () => const HelpSupportView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.TERMS_CONDITION,
+      page: () => const TermsConditionView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.PRIVACY_POLICY,
+      page: () => const PrivacyPolicyView(),
+    ),
+
+    GetPage(
+      name: AppRoutes.CHANGE_PASSWORD,
+      page: () => const ChangePasswordView(),
+      binding: ChangePasswordBinding(),
+    ),
   ];
 }
