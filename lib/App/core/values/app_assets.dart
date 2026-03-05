@@ -13,6 +13,10 @@ class AppAssets {
 
   //User verify account
   static const verifyAccount = 'assets/images/userVerifyAccount.png';
+
+  // user categories image icon
+  static const usercat = 'assets/images/usercategory.png';
+
   //
   // // discover_bar images
   // static const makeup = 'assets/icons/makeup.jpg';

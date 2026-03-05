@@ -8,17 +8,20 @@ import 'package:near_me/App/modules/common/onboarding/views/onboarding_view.dart
 import 'package:near_me/App/modules/common/splash/bindings/splash_binding.dart';
 import 'package:near_me/App/modules/common/splash/views/splash_view.dart';
 
-import '../modules/auth/forget/forget_password/bindings/forgot_binding.dart';
-import '../modules/auth/forget/forget_password/controllers/forgot_controller.dart';
-import '../modules/auth/forget/forget_password/views/forgot_view.dart';
-import '../modules/auth/forget/otp_verification/bindings/otp_binding.dart';
-import '../modules/auth/forget/otp_verification/views/otp_verification_view.dart';
-import '../modules/auth/forget/reset_password/bindings/reset_password_binding.dart';
-import '../modules/auth/forget/reset_password/views/reset_password_view.dart';
-import '../modules/auth/user/user_verify/bindings/verify_account_binding.dart';
-import '../modules/auth/user/user_verify/views/verify_account_view.dart';
-import '../modules/user/bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
-import '../modules/user/bottom_nav_bar/views/bottom_nav_view.dart';
+import '../modules/auth/user/user_verify/bindings/user_verify_account_binding.dart';
+import '../modules/auth/user/user_verify/views/user_verify_account_view.dart';
+import '../modules/auth/user_forget/forget_password/bindings/forgot_binding.dart';
+import '../modules/auth/user_forget/forget_password/controllers/forgot_controller.dart';
+import '../modules/auth/user_forget/forget_password/views/forgot_view.dart';
+import '../modules/auth/user_forget/otp_verification/bindings/otp_binding.dart';
+import '../modules/auth/user_forget/otp_verification/views/otp_verification_view.dart';
+import '../modules/auth/user_forget/reset_password/bindings/reset_password_binding.dart';
+import '../modules/auth/user_forget/reset_password/views/reset_password_view.dart';
+import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
+import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
+
+import '../modules/user/home/bindings/home_binding.dart';
+import '../modules/user/home/views/home_view.dart';
 import '../modules/user/menu/about_us/views/About_View.dart';
 import '../modules/user/menu/change_password/bindings/change_password_binding.dart';
 import '../modules/user/menu/change_password/views/change_password_view.dart';
@@ -28,6 +31,10 @@ import '../modules/user/menu/menu_bar/bindings/menu_binding.dart';
 import '../modules/user/menu/menu_bar/views/menu_view.dart';
 import '../modules/user/menu/privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
 import '../modules/user/menu/terms_condition/terms_condition_view/Terms_Condition_View.dart';
+import '../modules/user/user_category_details/bindings/user_category_details_binding.dart';
+import '../modules/user/user_category_details/views/user_category_details_view.dart';
+import '../modules/user/user_category_service_details/bindings/ServiceDetailsBinding.dart';
+import '../modules/user/user_category_service_details/views/ServiceDetailsView.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -59,8 +66,8 @@ class AppPages {
     /// verify user account
     GetPage(
       name: AppRoutes.USER_VERIFY_ACCOUNT,
-      page: () => const VerifyAccountView(),
-      binding: VerifyAccountBinding(),
+      page: () => const UserVerifyAccountView(),
+      binding: UserVerifyAccountBinding(),
     ),
 
     /// verify Servicer account
@@ -73,28 +80,29 @@ class AppPages {
     /// verify user forget password
     GetPage(
       name: '/user_forgot',
-      page: () => const ForgotPasswordView(),
-      binding: ForgotPasswordBinding(role: UserRole.user),
+      page: () => const UserForgotPasswordView(),
+      binding: UserForgotPasswordBinding(role: UserRole.user),
     ),
 
     /// verify servicer forget password
-    GetPage(
-      name: '/service_forgot',
-      page: () => const ForgotPasswordView(),
-      binding: ForgotPasswordBinding(role: UserRole.service),
-    ),
+    // GetPage(
+    //   name: '/service_forgot',
+    //   page: () => const ForgotPasswordView(),
+    //   binding: ForgotPasswordBinding(role: UserRole.service),
+    // ),
 
+    /// User forget password otp verification
     GetPage(
       name: AppRoutes.OTP_VERIFICATION,
-      page: () => const OtpVerificationView(),
-      binding: OtpBinding(),
+      page: () => const UserOtpVerificationView(),
+      binding: UserOtpBinding(),
     ),
 
-    // Reset Password Page (static for now)
+    /// User Reset Password Page
     GetPage(
       name: AppRoutes.RESET_PASSWORD,
-      page: () => const ResetPasswordView(),
-      binding: ResetPasswordBinding(),
+      page: () => const UserResetPasswordView(),
+      binding: UserResetPasswordBinding(),
     ),
 
     /// User Bottom Nav Bar
@@ -104,37 +112,37 @@ class AppPages {
       binding: UserNavigationBinding(),
     ),
 
+    /// User Home page
+    GetPage(name: AppRoutes.HOME, page: () => const HomeView(), binding: HomeBinding()),
+
+    // User Category Details page
+    GetPage(
+      name: AppRoutes.USER_CATEGORY_DETAILS,
+      page: () => const UserCategoryDetailsView(),
+      binding: UserCategoryDetailsBinding(),
+    ),
+
+    // Service Details page
+    GetPage(
+      name: AppRoutes.SERVICE_DETAILS,
+      page: () => const ServiceDetailsView(),
+      binding: ServiceDetailsBinding(),
+    ),
+
+
+    /// User menu page
     GetPage(name: '/menu', page: () => const MenuView(), binding: MenuBinding()),
-
-    GetPage(
-      name: AppRoutes.ABOUT,
-      page: () => const AboutView(),
-    ),
-
-    GetPage(
-      name: AppRoutes.CONTACT_US,
-      page: () => const ContactUsView(),
-    ),
-
-    GetPage(
-      name: AppRoutes.HELP_SUPPORT,
-      page: () => const HelpSupportView(),
-    ),
-
-    GetPage(
-      name: AppRoutes.TERMS_CONDITION,
-      page: () => const TermsConditionView(),
-    ),
-
-    GetPage(
-      name: AppRoutes.PRIVACY_POLICY,
-      page: () => const PrivacyPolicyView(),
-    ),
-
+    GetPage(name: AppRoutes.ABOUT, page: () => const AboutView()),
+    GetPage(name: AppRoutes.CONTACT_US, page: () => const ContactUsView()),
+    GetPage(name: AppRoutes.HELP_SUPPORT, page: () => const HelpSupportView()),
+    GetPage(name: AppRoutes.TERMS_CONDITION, page: () => const TermsConditionView()),
+    GetPage(name: AppRoutes.PRIVACY_POLICY, page: () => const PrivacyPolicyView()),
     GetPage(
       name: AppRoutes.CHANGE_PASSWORD,
       page: () => const ChangePasswordView(),
       binding: ChangePasswordBinding(),
     ),
+
+    ///
   ];
 }

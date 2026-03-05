@@ -20,6 +20,14 @@ abstract class AppRoutes {
 
   static const USER_BOTTOM_NAV = '/navigation_bar';
 
+
+  static const HOME = '/home';
+
+  static const USER_CATEGORY_DETAILS = '/user-category-details';
+  // Service Details page
+  static const SERVICE_DETAILS = '/user-service-details';
+
+
   static const CHANGE_PASSWORD = '/change-password';
   static const ABOUT = '/about';
   static const CONTACT_US = '/contact-us';

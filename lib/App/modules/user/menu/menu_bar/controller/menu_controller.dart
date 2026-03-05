@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../../routes/app_routes.dart';
-import '../../../bottom_nav_bar/controllers/bottom_nav_controller.dart';
+import '../../../User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
+
 
 class UserMenuController extends GetxController {
   late final UserNavigationBarController navController;
@@ -76,6 +77,7 @@ class UserMenuController extends GetxController {
   void onRateAppTap() {}
   void onInviteFriendsTap() {}
   void onLogoutTap() {
+    Get.deleteAll();
     Get.offAllNamed(AppRoutes.USER_LOGIN);
   }
 }

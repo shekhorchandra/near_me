@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 
-import '../../../bottom_nav_bar/controllers/bottom_nav_controller.dart';
 import '../controller/menu_controller.dart';
 
 
