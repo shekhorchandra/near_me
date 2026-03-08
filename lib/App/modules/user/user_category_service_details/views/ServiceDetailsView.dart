@@ -20,9 +20,15 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
               ElevatedButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.chat, color: Colors.white),
-                label: const Text('Chat', style: TextStyle(color: Colors.white)),
+                label: const Text(
+                  'Chat',
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black, // black background
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
               ElevatedButton.icon(
@@ -31,6 +37,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                 label: const Text('Call', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
               ElevatedButton.icon(
@@ -39,6 +48,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                 label: const Text('Website', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ],
@@ -212,11 +224,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                           onPressed: () {
                             // navigate to full reviews page
                           },
-                          child: const Text('View All'),
+                          child: const Text('View All (45)', style: TextStyle(color: Colors.black),),
                         )
                       ],
                     ),
-                    const SizedBox(height: 8),
 
                     ...controller.reviews.map((review) {
                       return Card(
@@ -245,7 +256,6 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               Text(review.review),
 
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   IconButton(
                                     onPressed: () {},
@@ -255,6 +265,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     onPressed: () {},
                                     icon: const Icon(Icons.share),
                                   ),
+
+                                  const Spacer(), // pushes the next widget to the right
+
                                   TextButton(
                                     onPressed: () {
                                       showDialog(
@@ -262,10 +275,20 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                         builder: (context) => const ReplyDialogView(),
                                       );
                                     },
-                                    child: const Text('View Replies'),
-                                  ),
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: const Color(0xFF555555),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'View Replies',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
                                 ],
-                              ),
+                              )
                             ],
                           ),
                         ),

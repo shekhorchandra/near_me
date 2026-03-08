@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:near_me/App/core/widgets/App_button.dart';
+import 'package:near_me/App/core/widgets/custom_text_field.dart';
 
 class ReplyDialogView extends StatelessWidget {
   const ReplyDialogView({super.key});
@@ -8,23 +10,22 @@ class ReplyDialogView extends StatelessWidget {
     final TextEditingController replyController = TextEditingController();
 
     return AlertDialog(
-      title: const Text("Write a Reply"),
-      content: TextField(
+      title: const Text("Write your Review Comment"),
+      content: CustomTextField(
         controller: replyController,
         maxLines: 3,
-        decoration: const InputDecoration(
-          hintText: "Type your reply...",
-          border: OutlineInputBorder(),
-        ),
+        hint: "Type your reply...",
       ),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("Cancel"),
+          child: const Text("Cancel", style: TextStyle(color: Colors.black),),
         ),
-        ElevatedButton(
+        AppButton(
+          width: 100,
+          height: 50,
           onPressed: () {
             String reply = replyController.text;
 
@@ -35,7 +36,7 @@ class ReplyDialogView extends StatelessWidget {
 
             Navigator.pop(context);
           },
-          child: const Text("Send"),
+          text: 'Send',
         ),
       ],
     );
