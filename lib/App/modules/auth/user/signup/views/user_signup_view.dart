@@ -36,7 +36,7 @@ class UserSignupView extends GetView<UserSignupController> {
 
             // Subtitle
             Text(
-              "Please enter your details to Sign up",
+              "Please enter your details to Create an account",
               textAlign: TextAlign.center,
               style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
             ),
@@ -97,7 +97,7 @@ class UserSignupView extends GetView<UserSignupController> {
 
             // Sign Up Button
             AppButton(
-              text: "Sign Up",
+              text: "Create an account",
               onPressed: () {
                 // Navigate to Verify Account after sign up
                 Get.toNamed(AppRoutes.USER_VERIFY_ACCOUNT);

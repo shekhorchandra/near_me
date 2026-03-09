@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../routes/app_routes.dart';
 import '../controller/chat_controller.dart';
 
 class ChatView extends GetView<ChatController> {
@@ -9,6 +10,13 @@ class ChatView extends GetView<ChatController> {
 
   Widget chatItem(chat) {
     return ListTile(
+      onTap: () {
+        // Navigate using GetX
+        Get.toNamed(AppRoutes.CONVERSATION);
+
+        // OR, if using named routes:
+        // Get.toNamed(Routes.CONVERSATION, arguments: chat);
+      },
       leading: Stack(
         children: [
           CircleAvatar(radius: 25, backgroundImage: NetworkImage(chat.image)),
@@ -30,18 +38,13 @@ class ChatView extends GetView<ChatController> {
             ),
         ],
       ),
-
       title: Text(chat.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-
       subtitle: Text(chat.lastMessage, maxLines: 1, overflow: TextOverflow.ellipsis),
-
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(chat.time, style: const TextStyle(fontSize: 12)),
-
           const SizedBox(height: 5),
-
           if (chat.unread > 0)
             Container(
               padding: const EdgeInsets.all(6),

@@ -36,7 +36,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Subtitle
             Text(
-              "Please enter your details to Sign In",
+              "Please enter your details to Log In",
               textAlign: TextAlign.center,
               style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
             ),
@@ -145,7 +145,7 @@ class UserLoginView extends GetView<UserLoginController> {
                   style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
                   children: [
                     TextSpan(
-                      text: "Sign Up",
+                      text: "Create an account",
                       style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
