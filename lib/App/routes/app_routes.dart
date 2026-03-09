@@ -27,6 +27,9 @@ abstract class AppRoutes {
   // Service Details page
   static const SERVICE_DETAILS = '/user-service-details';
 
+  /// SERVICE REVIEW
+  static const REVIEWS = '/reviews';
+
 
   static const CHANGE_PASSWORD = '/change-password';
   static const ABOUT = '/about';

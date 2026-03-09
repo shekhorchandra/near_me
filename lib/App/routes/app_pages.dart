@@ -33,6 +33,8 @@ import '../modules/user/menu/privacy_policy/privacy_policy_view/Privacy_Policy_V
 import '../modules/user/menu/terms_condition/terms_condition_view/Terms_Condition_View.dart';
 import '../modules/user/user_category_details/bindings/user_category_details_binding.dart';
 import '../modules/user/user_category_details/views/user_category_details_view.dart';
+import '../modules/user/user_category_serivce_review/bindings/reviews_binding.dart';
+import '../modules/user/user_category_serivce_review/views/reviews_view.dart';
 import '../modules/user/user_category_service_details/bindings/ServiceDetailsBinding.dart';
 import '../modules/user/user_category_service_details/views/ServiceDetailsView.dart';
 import 'app_routes.dart';
@@ -127,6 +129,13 @@ class AppPages {
       name: AppRoutes.SERVICE_DETAILS,
       page: () => const ServiceDetailsView(),
       binding: ServiceDetailsBinding(),
+    ),
+
+    /// service review
+    GetPage(
+      name: AppRoutes.REVIEWS,
+      page: () => const ReviewsView(),
+      binding: ReviewsBinding(),
     ),
 
 
