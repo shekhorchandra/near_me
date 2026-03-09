@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../category/controller/categories_controller.dart';
-import '../../category/views/categories_view.dart';
-import '../../chat/controller/chat_controller.dart';
-import '../../chat/views/chat_view.dart';
+
+import '../../category/user_category/views/categories_view.dart';
+
+import '../../chat/user_chat/views/chat_view.dart';
 import '../../home/controller/home_controller.dart';
 import '../../home/views/home_view.dart';
-import '../../menu/menu_bar/controller/menu_controller.dart';
-import '../../menu/menu_bar/views/menu_view.dart';
+import '../../menu/user_menu_bar/views/menu_view.dart';
+
 
 
 class UserNavigationBarController extends GetxController {

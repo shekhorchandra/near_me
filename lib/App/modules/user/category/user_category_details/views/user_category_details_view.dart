@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
-import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../routes/app_routes.dart';
+import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../routes/app_routes.dart';
 import '../../user_category_service_details/models/ReviewModel.dart';
 import '../controller/user_category_details_controller.dart';
 
@@ -136,7 +136,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
 
                   /// Right column: services
                   Expanded(
@@ -160,59 +160,37 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                     fit: BoxFit.cover,
                                   ),
                                   const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          service.title,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          softWrap: true,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.black, size: 18),
-                                      Text(service.rating.toString()),
-                                    ],
+                                  Text(
+                                    service.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    softWrap: true,
                                   ),
                                   const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.location_on, size: 16, color: Colors.black),
-                                      const SizedBox(width: 4),
-                                      Text('${service.distance} km'),
-                                    ],
+                                  InfoRow(
+                                    icon: Icons.star,
+                                    text: service.rating.toString(),
                                   ),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.schedule, size: 16, color: Colors.black),
-                                      const SizedBox(width: 4),
-                                      Text(service.schedule),
-                                    ],
+                                  InfoRow(
+                                    icon: Icons.location_on,
+                                    text: '${service.distance} km',
                                   ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.location_city,
-                                        size: 16,
-                                        color: Colors.black,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(service.location),
-                                    ],
+                                  InfoRow(
+                                    icon: Icons.schedule,
+                                    text: service.schedule,
+                                  ),
+                                  InfoRow(
+                                    icon: Icons.location_city,
+                                    text: service.location,
                                   ),
                                   const SizedBox(height: 8),
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: AppButton(
                                       width: double.infinity,
-                                      height: 35,
+                                      height: 30,
                                       onPressed: () {
                                         Get.toNamed(
                                           AppRoutes.SERVICE_DETAILS,
@@ -271,6 +249,48 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Helper widget inside the same file
+class InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final double iconSize;
+  final double fontSize;
+  final Color iconColor;
+  final Color textColor;
+  final double spacing;
+
+  const InfoRow({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.iconSize = 12,
+    this.fontSize = 12,
+    this.iconColor = Colors.black,
+    this.textColor = Colors.black,
+    this.spacing = 4,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: iconSize, color: iconColor),
+        SizedBox(width: spacing),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: fontSize,
+              color: textColor,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
-import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../routes/app_routes.dart';
+import '../../../../../core/widgets/custom_text_field.dart';
+
+import '../../../../../routes/app_routes.dart';
 import '../controller/categories_controller.dart';
 
 class CategoriesView extends GetView<CategoriesController> {

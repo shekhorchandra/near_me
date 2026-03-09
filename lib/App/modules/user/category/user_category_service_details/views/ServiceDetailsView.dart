@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:near_me/App/modules/user/user_category_service_details/views/reply_dialog_view.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../../../../routes/app_routes.dart';
+import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
+import '../../../../../core/widgets/common_app_bar.dart';
+import '../../../../../routes/app_routes.dart';
+
+import '../../../chat/user_chat_conversation/views/conversation_view.dart';
 import '../controller/ServiceDetailsController.dart';
 
 class ServiceDetailsView extends GetView<ServiceDetailsController> {
@@ -19,7 +21,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Get.toNamed(AppRoutes.CONVERSATION);
+                },
                 icon: const Icon(Icons.chat, color: Colors.white),
                 label: const Text(
                   'Chat',

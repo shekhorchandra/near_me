@@ -23,7 +23,6 @@ class UserCategoryDetailsController extends GetxController {
   var electricalOptions = <String, bool>{
     'General Electrician': false,
     'Leak Detection & Repair': false,
-    'Maker': false,
   }.obs;
 
   // Services list

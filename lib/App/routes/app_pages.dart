@@ -20,6 +20,14 @@ import '../modules/auth/user_forget/reset_password/views/reset_password_view.dar
 import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
 
+import '../modules/user/category/user_category_details/bindings/user_category_details_binding.dart';
+import '../modules/user/category/user_category_details/views/user_category_details_view.dart';
+import '../modules/user/category/user_category_serivce_review/bindings/reviews_binding.dart';
+import '../modules/user/category/user_category_serivce_review/views/reviews_view.dart';
+import '../modules/user/category/user_category_service_details/bindings/ServiceDetailsBinding.dart';
+import '../modules/user/category/user_category_service_details/views/ServiceDetailsView.dart';
+import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart';
+import '../modules/user/chat/user_chat_conversation/views/conversation_view.dart';
 import '../modules/user/home/bindings/home_binding.dart';
 import '../modules/user/home/views/home_view.dart';
 import '../modules/user/menu/about_us/views/About_View.dart';
@@ -27,16 +35,10 @@ import '../modules/user/menu/change_password/bindings/change_password_binding.da
 import '../modules/user/menu/change_password/views/change_password_view.dart';
 import '../modules/user/menu/contact_us/contact_view/contact_us_view.dart';
 import '../modules/user/menu/help_support/help_support_view/Help_Support_View.dart';
-import '../modules/user/menu/menu_bar/bindings/menu_binding.dart';
-import '../modules/user/menu/menu_bar/views/menu_view.dart';
 import '../modules/user/menu/privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
 import '../modules/user/menu/terms_condition/terms_condition_view/Terms_Condition_View.dart';
-import '../modules/user/user_category_details/bindings/user_category_details_binding.dart';
-import '../modules/user/user_category_details/views/user_category_details_view.dart';
-import '../modules/user/user_category_serivce_review/bindings/reviews_binding.dart';
-import '../modules/user/user_category_serivce_review/views/reviews_view.dart';
-import '../modules/user/user_category_service_details/bindings/ServiceDetailsBinding.dart';
-import '../modules/user/user_category_service_details/views/ServiceDetailsView.dart';
+import '../modules/user/menu/user_menu_bar/bindings/menu_binding.dart';
+import '../modules/user/menu/user_menu_bar/views/menu_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -136,6 +138,13 @@ class AppPages {
       name: AppRoutes.REVIEWS,
       page: () => const ReviewsView(),
       binding: ReviewsBinding(),
+    ),
+
+    ///user chat conversion
+    GetPage(
+      name: AppRoutes.CONVERSATION,
+      page: () => const ConversationView(),
+      binding: ConversationBinding(),
     ),
 
 

@@ -30,6 +30,9 @@ abstract class AppRoutes {
   /// SERVICE REVIEW
   static const REVIEWS = '/reviews';
 
+  ///user chat conversion
+  static const CONVERSATION = '/conversation';
+
 
   static const CHANGE_PASSWORD = '/change-password';
   static const ABOUT = '/about';
