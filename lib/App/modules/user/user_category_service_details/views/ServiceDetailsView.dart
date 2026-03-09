@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/modules/user/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../core/widgets/common_app_bar.dart';
+import '../../../../routes/app_routes.dart';
 import '../controller/ServiceDetailsController.dart';
 
 class ServiceDetailsView extends GetView<ServiceDetailsController> {
@@ -223,14 +224,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                         TextButton(
                           onPressed: () {
                             // navigate to full reviews page
+                            Get.toNamed(AppRoutes.REVIEWS);
                           },
-                          child: const Text('View All (45)', style: TextStyle(color: Colors.black),),
+                          child: const Text('View All(45) ≫', style: TextStyle(color: Colors.black),),
                         )
                       ],
                     ),
 
                     ...controller.reviews.map((review) {
                       return Card(
+                        color: Colors.white,
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -276,15 +279,15 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       );
                                     },
                                     style: TextButton.styleFrom(
-                                      backgroundColor: const Color(0xFF555555),
+                                      // backgroundColor: const Color(0xFF555555),
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
                                     child: const Text(
-                                      'View Replies',
-                                      style: TextStyle(color: Colors.white),
+                                      'View Replies ➤',
+                                      style: TextStyle(color: Colors.black),
                                     ),
                                   )
                                 ],

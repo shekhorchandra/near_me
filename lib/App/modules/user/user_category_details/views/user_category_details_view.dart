@@ -13,9 +13,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
   @override
   Widget build(BuildContext context) {
     final filterOptions = {
-      'Rating': ['Rating', "All" , '5', '4+', '3+'],
+      'Rating': ['Rating', "All", '5', '4+', '3+'],
       'Radius': ['Radius', "All", '1km', '3km', '5km'],
-      'Availability': ['Availability', "All" , 'Available', 'Busy'],
+      'Availability': ['Availability', "All", 'Available', 'Busy'],
     };
     final args = Get.arguments as Map<String, dynamic>?;
 
@@ -24,12 +24,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
         : 'Category Details';
 
     return Scaffold(
-      appBar: CommonAppBar(title: categoryName,),
+      appBar: CommonAppBar(title: categoryName),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-
             // Search bar
             CustomTextField(
               onChanged: (value) => controller.searchText.value = value,
@@ -39,29 +38,37 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
             const SizedBox(height: 10),
 
             // Dropdown filters
-            Obx(() => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Rating
-                DropdownButton<String>(
-                  value: controller.selectedRating.value,
-                  items: filterOptions['Rating']!.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (v) => controller.selectedRating.value = v!,
-                ),
-                // Radius
-                DropdownButton<String>(
-                  value: controller.selectedRadius.value,
-                  items: filterOptions['Radius']!.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (v) => controller.selectedRadius.value = v!,
-                ),
-                // Availability
-                DropdownButton<String>(
-                  value: controller.selectedAvailability.value,
-                  items: filterOptions['Availability']!.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                  onChanged: (v) => controller.selectedAvailability.value = v!,
-                ),
-              ],
-            )),
+            Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Rating
+                  DropdownButton<String>(
+                    value: controller.selectedRating.value,
+                    items: filterOptions['Rating']!
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => controller.selectedRating.value = v!,
+                  ),
+                  // Radius
+                  DropdownButton<String>(
+                    value: controller.selectedRadius.value,
+                    items: filterOptions['Radius']!
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => controller.selectedRadius.value = v!,
+                  ),
+                  // Availability
+                  DropdownButton<String>(
+                    value: controller.selectedAvailability.value,
+                    items: filterOptions['Availability']!
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (v) => controller.selectedAvailability.value = v!,
+                  ),
+                ],
+              ),
+            ),
 
             const SizedBox(height: 10),
 
@@ -76,7 +83,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                       width: MediaQuery.of(context).size.width * 0.35,
                       color: Colors.grey.shade100,
                       child: Obx(
-                            () => SingleChildScrollView(
+                        () => SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
@@ -87,21 +94,16 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                   'Plumbing',
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
-                                initiallyExpanded: false, // start expanded if you want
+                                initiallyExpanded: false,
                                 children: controller.plumbingOptions.keys.map((option) {
                                   return Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Checkbox(
                                         value: controller.plumbingOptions[option],
                                         onChanged: (v) => controller.plumbingOptions[option] = v!,
                                       ),
-                                      Expanded(
-                                        child: Text(
-                                          option,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
+                                      Expanded(child: Text(option, softWrap: true)),
                                     ],
                                   );
                                 }).toList(),
@@ -116,18 +118,13 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                 initiallyExpanded: false,
                                 children: controller.electricalOptions.keys.map((option) {
                                   return Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Checkbox(
                                         value: controller.electricalOptions[option],
                                         onChanged: (v) => controller.electricalOptions[option] = v!,
                                       ),
-                                      Expanded(
-                                        child: Text(
-                                          option,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
+                                      Expanded(child: Text(option, softWrap: true)),
                                     ],
                                   );
                                 }).toList(),
@@ -144,7 +141,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                   /// Right column: services
                   Expanded(
                     child: Obx(
-                          () => ListView.builder(
+                      () => ListView.builder(
                         itemCount: controller.filteredServices.length,
                         itemBuilder: (context, index) {
                           final service = controller.filteredServices[index];
@@ -156,8 +153,12 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Image.asset(service.image,
-                                      width: double.infinity, height: 150, fit: BoxFit.cover),
+                                  Image.asset(
+                                    service.image,
+                                    width: double.infinity,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  ),
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
@@ -168,8 +169,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                          softWrap: true,
                                         ),
                                       ),
                                     ],
@@ -198,7 +198,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                   const SizedBox(height: 2),
                                   Row(
                                     children: [
-                                      const Icon(Icons.location_city, size: 16, color: Colors.black),
+                                      const Icon(
+                                        Icons.location_city,
+                                        size: 16,
+                                        color: Colors.black,
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(service.location),
                                     ],
@@ -243,7 +247,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                                 userName: 'Haris',
                                                 userImage: 'assets/images/trade&service.png',
                                                 review:
-                                                'Excellent service! Blissful Spa was prompt, professional, and fixed everything perfectly.',
+                                                    'Excellent service! Blissful Spa was prompt, professional, and fixed everything perfectly.',
                                                 daysAgo: 2,
                                               ),
                                             ],
@@ -264,8 +268,6 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                 ],
               ),
             ),
-
-
           ],
         ),
       ),
