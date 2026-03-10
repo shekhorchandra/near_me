@@ -104,7 +104,29 @@ class UserSignupView extends GetView<UserSignupController> {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            // Already have account
+            Center(
+              child: RichText(
+                text: TextSpan(
+                  text: "Already have an account? ",
+                  style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
+                  children: [
+                    TextSpan(
+                      text: "Log In",
+                      style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.toNamed(AppRoutes.USER_LOGIN);
+                        },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             // Divider with text
             Row(
@@ -139,27 +161,7 @@ class UserSignupView extends GetView<UserSignupController> {
               ),
             ),
 
-            const SizedBox(height: 24),
 
-            // Already have account
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  text: "Already have an account? ",
-                  style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
-                  children: [
-                    TextSpan(
-                      text: "Log In",
-                      style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Get.toNamed(AppRoutes.USER_LOGIN);
-                        },
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
             const SizedBox(height: 40),
           ],

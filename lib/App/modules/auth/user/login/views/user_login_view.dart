@@ -88,7 +88,28 @@ class UserLoginView extends GetView<UserLoginController> {
               Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
             }),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+            // Sign Up RichText
+            Center(
+              child: RichText(
+                text: TextSpan(
+                  text: "Don't have an account? ",
+                  style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
+                  children: [
+                    TextSpan(
+                      text: "Create an account",
+                      style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.toNamed(AppRoutes.USER_SIGNUP);
+                        },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             // Divider with text
             Row(
@@ -127,7 +148,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Login as a Service button (if needed, e.g., vendor or admin)
             AppButton(
-              text: "Login as a Service",
+              text: "Login as a Service Provider",
               backgroundColor: AppColor.secondary,
               textColor: AppColor.onColor(AppColor.secondary),
               onPressed: () {
@@ -137,25 +158,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             const SizedBox(height: 24),
 
-            // Sign Up RichText
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  text: "Don't have an account? ",
-                  style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
-                  children: [
-                    TextSpan(
-                      text: "Create an account",
-                      style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Get.toNamed(AppRoutes.USER_SIGNUP);
-                        },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
 
             const SizedBox(height: 40),
           ],
