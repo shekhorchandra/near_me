@@ -126,14 +126,14 @@ class AppPages {
       binding: UserCategoryDetailsBinding(),
     ),
 
-    // Service Details page
+    /// user category Service Details page
     GetPage(
       name: AppRoutes.SERVICE_DETAILS,
       page: () => const ServiceDetailsView(),
       binding: ServiceDetailsBinding(),
     ),
 
-    /// service review
+    /// user category service review
     GetPage(
       name: AppRoutes.REVIEWS,
       page: () => const ReviewsView(),

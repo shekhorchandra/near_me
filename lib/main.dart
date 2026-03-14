@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'App/core/theme/checkbox_theme.dart';
+import 'App/core/values/app_strings.dart';
 import 'App/modules/user/User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
 import 'App/routes/app_pages.dart';
 import 'App/routes/app_routes.dart';
@@ -18,7 +19,7 @@ class NearMeeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      // title: AppStrings.appName,
+      title: AppStrings.appName,
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         checkboxTheme: checkboxTheme,
