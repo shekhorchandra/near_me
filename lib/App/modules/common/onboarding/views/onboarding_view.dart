@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/values/app_text.dart';
+import 'package:near_me/App/core/widgets/App_button.dart';
 import '../../../../core/values/app_color.dart';
 import '../controllers/onboarding_controller.dart';
 
@@ -53,48 +54,38 @@ class OnboardingView extends GetView<OnboardingController> {
                 },
               ),
             ),
-            const SizedBox(height: 50),
-            Obx(
-              () => Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  controller.pages.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: controller.currentPage.value == index ? 34 : 20,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: controller.currentPage.value == index
-                          ? AppColor.primary
-                          : Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // const SizedBox(height: 50),
+            // Obx(
+            //   () => Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: List.generate(
+            //       controller.pages.length,
+            //       (index) => Container(
+            //         margin: const EdgeInsets.symmetric(horizontal: 4),
+            //         width: controller.currentPage.value == index ? 34 : 20,
+            //         height: 4,
+            //         decoration: BoxDecoration(
+            //           color: controller.currentPage.value == index
+            //               ? AppColor.primary
+            //               : Colors.grey.shade300,
+            //           borderRadius: BorderRadius.circular(2),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
 
-            const SizedBox(height: 20),
+            // const SizedBox(height: 20),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: ElevatedButton(
+                child: AppButton(
                   onPressed: controller.nextPage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: Obx(
-                    () => Text(
-                      controller.currentPage.value == controller.pages.length - 1
-                          ? "Get Started"
-                          : "Next",
-                      style: AppText.h5.semiBold.copyWith(color: AppColor.BG),
-                    ),
-                  ),
+                  text: 'Get Started',
+
                 ),
               ),
             ),

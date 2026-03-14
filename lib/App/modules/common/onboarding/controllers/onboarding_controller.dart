@@ -20,7 +20,7 @@ class OnboardingController extends GetxController {
     if (currentPage.value < pages.length - 1) {
       pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     } else {
-      Get.offNamed(AppRoutes.USER_LOGIN);
+      Get.offNamed(AppRoutes.USER_BOTTOM_NAV);
     }
   }
 

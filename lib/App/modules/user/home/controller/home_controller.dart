@@ -6,6 +6,9 @@ import '../model/HomeServiceModel.dart';
 
 class HomeController extends GetxController {
 
+  /// Filtered services list (for search/filter)
+  RxList<HomeServiceModel> filteredServices = <HomeServiceModel>[].obs;
+
   /// Map controller
   GoogleMapController? mapController;
 
@@ -21,10 +24,15 @@ class HomeController extends GetxController {
   /// Loading state
   RxBool isLoading = false.obs;
 
+  RxDouble selectedRating = 0.0.obs;
+  RxDouble selectedRadius = 10.0.obs;
+  RxList<String> selectedCategories = <String>[].obs;
+
   @override
   void onInit() {
     super.onInit();
     loadServices();
+    filteredServices.value = services;
   }
 
   void loadServices() {
@@ -39,6 +47,7 @@ class HomeController extends GetxController {
         available: true,
         lat: 23.8103,
         lng: 90.4125,
+        category: 'Full load',
       ),
       HomeServiceModel(
         id: "2",
@@ -48,6 +57,7 @@ class HomeController extends GetxController {
         available: true,
         lat: 23.8140,
         lng: 90.4170,
+        category: 'Trade and startup',
       ),
       HomeServiceModel(
         id: "3",
@@ -57,10 +67,30 @@ class HomeController extends GetxController {
         available: false,
         lat: 23.8000,
         lng: 90.4200,
+        category: 'car abd bike wash',
       ),
     ];
 
     generateMarkers();
+  }
+
+
+  void applyFilters() {
+    final rating = selectedRating.value;
+    final radius = selectedRadius.value;
+
+    filteredServices.value = services.where((service) {
+
+      final matchRating = service.rating >= rating;
+
+      final matchRadius = service.distance <= radius;
+
+      final matchCategory = selectedCategories.isEmpty ||
+          selectedCategories.contains(service.category);
+
+      return matchRating && matchRadius && matchCategory;
+
+    }).toList();
   }
 
   void generateMarkers() {

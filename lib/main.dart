@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'App/core/theme/checkbox_theme.dart';
 import 'App/core/values/app_strings.dart';
 import 'App/modules/user/User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
