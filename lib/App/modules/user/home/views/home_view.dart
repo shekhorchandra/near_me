@@ -16,11 +16,9 @@ class HomeView extends GetView<HomeController> {
         children: [
           /// MAP (No Obx around GoogleMap!)
           GoogleMap(
-
             initialCameraPosition: const CameraPosition(target: LatLng(23.8103, 90.4125), zoom: 13),
             markers: controller.markers, // RxSet works directly
             onMapCreated: (GoogleMapController map) {
-
               controller.mapController = map;
             },
             myLocationEnabled: true,
@@ -47,7 +45,12 @@ class HomeView extends GetView<HomeController> {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: AppButton(height: 30, onPressed: () {}, text: 'Register Service'),
+                        child: AppButton(
+                            height: 30,
+                            onPressed: () {
+                              Get.toNamed(AppRoutes.SERVICER_LOGIN);
+                            },
+                            text: 'Register Service'),
                       ),
                     ],
                   ),

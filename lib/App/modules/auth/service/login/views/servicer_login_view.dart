@@ -9,10 +9,10 @@ import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../routes/app_routes.dart';
-import '../controllers/user_login_controller.dart';
+import '../controllers/servicer_login_controller.dart';
 
-class UserLoginView extends GetView<UserLoginController> {
-  const UserLoginView({super.key});
+class ServicerLoginView extends GetView<ServicerLoginController> {
+  const ServicerLoginView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Title
             Text(
-              "Welcome",
+              "Login as a Service Provider",
               textAlign: TextAlign.center,
               style: AppText.h1.bold.copyWith(color: AppColor.primary),
             ),
@@ -36,7 +36,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Subtitle
             Text(
-              "Please enter your details to Log In",
+              "Sign in to manage your services and requests.",
               textAlign: TextAlign.center,
               style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
             ),
@@ -71,7 +71,7 @@ class UserLoginView extends GetView<UserLoginController> {
               child: TextButton(
                 onPressed: () {
                   // Navigate to Forgot Password page
-                  Get.toNamed('/user_forgot');
+                  Get.toNamed(AppRoutes.SERVICER_FORGOT_PASSWORD);
 
                 },
                 child: Text(
@@ -85,7 +85,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Login Button
             AppButton(text: "Log in", onPressed: () {
-              Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
+              // Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
             }),
 
             const SizedBox(height: 20),
@@ -97,11 +97,11 @@ class UserLoginView extends GetView<UserLoginController> {
                   style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
                   children: [
                     TextSpan(
-                      text: "Create an account",
+                      text: "Register",
                       style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Get.toNamed(AppRoutes.USER_SIGNUP);
+                          Get.toNamed(AppRoutes.SERVICER_SIGNUP);
                         },
                     ),
                   ],
@@ -148,14 +148,18 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Login as a Service button (if needed, e.g., vendor or admin)
             AppButton(
-              text: "Login as a Service Provider",
+              text: "Login as an User",
               backgroundColor: AppColor.secondary,
               textColor: AppColor.onColor(AppColor.secondary),
               onPressed: () {
                 // TODO: handle service login
-                Get.toNamed(AppRoutes.SERVICER_LOGIN);
+                Get.toNamed(AppRoutes.USER_LOGIN);
               },
             ),
+
+            const SizedBox(height: 24),
+
+
 
             const SizedBox(height: 40),
           ],

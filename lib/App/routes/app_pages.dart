@@ -7,19 +7,29 @@ import 'package:near_me/App/modules/common/onboarding/bindings/onboarding_bindin
 import 'package:near_me/App/modules/common/onboarding/views/onboarding_view.dart';
 import 'package:near_me/App/modules/common/splash/bindings/splash_binding.dart';
 import 'package:near_me/App/modules/common/splash/views/splash_view.dart';
-
+import '../core/enums/user_role.dart';
+import '../modules/auth/service/login/bindings/servicer_login_binding.dart';
+import '../modules/auth/service/login/views/servicer_login_view.dart';
+import '../modules/auth/service/servicer_verify/bindings/servicer_verify_account_binding.dart';
+import '../modules/auth/service/servicer_verify/views/servicer_verify_account_view.dart';
+import '../modules/auth/service/signup/bindings/servicer_signup_binding.dart';
+import '../modules/auth/service/signup/views/servicer_signup_view.dart';
+import '../modules/auth/service_forget/service_otp_verification/bindings/servicer_otp_binding.dart';
+import '../modules/auth/service_forget/service_otp_verification/views/servicer_otp_verification_view.dart';
+import '../modules/auth/service_forget/service_reset_password/bindings/servicer_reset_password_binding.dart';
+import '../modules/auth/service_forget/service_reset_password/views/servicer_reset_password_view.dart';
+import '../modules/auth/service_forget/servicer_forget_password/bindings/servicer_forgot_binding.dart';
+import '../modules/auth/service_forget/servicer_forget_password/views/servicer_forgot_view.dart';
 import '../modules/auth/user/user_verify/bindings/user_verify_account_binding.dart';
 import '../modules/auth/user/user_verify/views/user_verify_account_view.dart';
-import '../modules/auth/user_forget/forget_password/bindings/forgot_binding.dart';
-import '../modules/auth/user_forget/forget_password/controllers/forgot_controller.dart';
-import '../modules/auth/user_forget/forget_password/views/forgot_view.dart';
-import '../modules/auth/user_forget/otp_verification/bindings/otp_binding.dart';
-import '../modules/auth/user_forget/otp_verification/views/otp_verification_view.dart';
-import '../modules/auth/user_forget/reset_password/bindings/reset_password_binding.dart';
-import '../modules/auth/user_forget/reset_password/views/reset_password_view.dart';
+import '../modules/auth/user_forget/user_forget_password/bindings/user_forgot_binding.dart';
+import '../modules/auth/user_forget/user_forget_password/views/user_forgot_view.dart';
+import '../modules/auth/user_forget/user_otp_verification/bindings/user_otp_binding.dart';
+import '../modules/auth/user_forget/user_otp_verification/views/user_otp_verification_view.dart';
+import '../modules/auth/user_forget/user_reset_password/bindings/user_reset_password_binding.dart';
+import '../modules/auth/user_forget/user_reset_password/views/user_reset_password_view.dart';
 import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
-
 import '../modules/user/category/user_category_details/bindings/user_category_details_binding.dart';
 import '../modules/user/category/user_category_details/views/user_category_details_view.dart';
 import '../modules/user/category/user_category_serivce_review/bindings/reviews_binding.dart';
@@ -74,12 +84,7 @@ class AppPages {
       binding: UserVerifyAccountBinding(),
     ),
 
-    /// verify Servicer account
-    // GetPage(
-    //   name: AppRoutes.SERVICER_VERIFY_ACCOUNT,
-    //   page: () => const VerifyAccountView(),
-    //   binding: VerifyAccountBinding(),
-    // ),
+
 
     /// verify user forget password
     GetPage(
@@ -88,23 +93,18 @@ class AppPages {
       binding: UserForgotPasswordBinding(role: UserRole.user),
     ),
 
-    /// verify servicer forget password
-    // GetPage(
-    //   name: '/service_forgot',
-    //   page: () => const ForgotPasswordView(),
-    //   binding: ForgotPasswordBinding(role: UserRole.service),
-    // ),
+
 
     /// User forget password otp verification
     GetPage(
-      name: AppRoutes.OTP_VERIFICATION,
+      name: AppRoutes.USER_OTP_VERIFICATION,
       page: () => const UserOtpVerificationView(),
       binding: UserOtpBinding(),
     ),
 
     /// User Reset Password Page
     GetPage(
-      name: AppRoutes.RESET_PASSWORD,
+      name: AppRoutes.USER_RESET_PASSWORD,
       page: () => const UserResetPasswordView(),
       binding: UserResetPasswordBinding(),
     ),
@@ -161,6 +161,48 @@ class AppPages {
       binding: ChangePasswordBinding(),
     ),
 
-    ///
+    /////////// SERVICER /////////////////
+
+    /// SERVICER Part login
+    GetPage(
+      name: AppRoutes.SERVICER_LOGIN,
+      page: () => const ServicerLoginView(),
+      binding: ServicerLoginBinding(),
+    ),
+
+    /// SERVICER Part SIGNUP
+    GetPage(
+      name: AppRoutes.SERVICER_SIGNUP,
+      page: () => const ServicerSignupView(),
+      binding: ServicerSignupBinding(),
+    ),
+
+    /// verify servicer account
+    GetPage(
+      name: AppRoutes.SERVICER_VERIFY_ACCOUNT,
+      page: () => const ServicerVerifyAccountView(),
+      binding: ServicerVerifyAccountBinding(),
+    ),
+
+    /// verify servicer forget password
+    GetPage(
+      name: AppRoutes.SERVICER_FORGOT_PASSWORD,
+      page: () => const ServicerForgotPasswordView(),
+      binding: ServicerForgotPasswordBinding(role: UserRole.service),
+    ),
+
+    /// Servicer forget password otp verification
+    GetPage(
+      name: AppRoutes.SERVICER_OTP_VERIFICATION,
+      page: () => const ServicerOtpVerificationView(),
+      binding: ServicerOtpBinding(),
+    ),
+
+    /// User Reset Password Page
+    GetPage(
+      name: AppRoutes.SERVICER_RESET_PASSWORD,
+      page: () => const ServicerResetPasswordView(),
+      binding: ServicerResetPasswordBinding(),
+    ),
   ];
 }

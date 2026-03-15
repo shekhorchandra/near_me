@@ -1,18 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:near_me/App/core/widgets/social_button.dart';
 import '../../../../../core/values/app_assets.dart';
 import '../../../../../core/values/app_color.dart';
 import '../../../../../core/values/app_text.dart';
 import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../core/widgets/social_button.dart';
 import '../../../../../routes/app_routes.dart';
-import '../controllers/user_login_controller.dart';
+import '../controllers/servicer_signup_controller.dart';
 
-class UserLoginView extends GetView<UserLoginController> {
-  const UserLoginView({super.key});
+class ServicerSignupView extends GetView<ServicerSignupController> {
+  const ServicerSignupView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,31 +27,42 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Title
             Text(
-              "Welcome",
+              "Become a Service Provider",
               textAlign: TextAlign.center,
-              style: AppText.h1.bold.copyWith(color: AppColor.primary),
+              style: AppText.h2.bold.copyWith(color: AppColor.primary),
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
 
             // Subtitle
             Text(
-              "Please enter your details to Log In",
+              "Grow your business with local customers.",
               textAlign: TextAlign.center,
               style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
             ),
 
             const SizedBox(height: 24),
 
-            // Email TextField
-            const CustomTextField(hint: "Email Address", icon: Icons.email_outlined),
+            // User Name
+            const CustomTextField(
+              hint: "Servicer Name",
+              icon: Icons.person_outline,
+            ),
 
             const SizedBox(height: 12),
 
-            // Password TextField with Obscure toggle
+            // Email
+            const CustomTextField(
+              hint: "Email Address",
+              icon: Icons.email_outlined,
+            ),
+
+            const SizedBox(height: 12),
+
+            // Password
             Obx(
-              () => CustomTextField(
-                hint: "Password",
+                  () => CustomTextField(
+                hint: "Set Password",
                 icon: Icons.lock_outline,
                 obscure: controller.obscurePassword.value,
                 suffix: IconButton(
@@ -63,45 +74,51 @@ class UserLoginView extends GetView<UserLoginController> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
-            // Forgot Password
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  // Navigate to Forgot Password page
-                  Get.toNamed('/user_forgot');
-
-                },
-                child: Text(
-                  "Forgot Password?",
-                  style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+            // Confirm Password
+            Obx(
+                  () => CustomTextField(
+                hint: "Confirm Password",
+                icon: Icons.lock_outline,
+                obscure: controller.obscureConfirmPassword.value,
+                suffix: IconButton(
+                  icon: Icon(
+                    controller.obscureConfirmPassword.value
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: controller.toggleConfirmPassword,
                 ),
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            // Login Button
-            AppButton(text: "Log in", onPressed: () {
-              Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
-            }),
+            // Sign Up Button
+            AppButton(
+              text: "Sign Up",
+              onPressed: () {
+                // Navigate to Verify Account after sign up
+                Get.toNamed(AppRoutes.SERVICER_VERIFY_ACCOUNT);
+              },
+            ),
 
             const SizedBox(height: 20),
-            // Sign Up RichText
+
+            // Already have account
             Center(
               child: RichText(
                 text: TextSpan(
-                  text: "Don't have an account? ",
+                  text: "Already have an account? ",
                   style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
                   children: [
                     TextSpan(
-                      text: "Create an account",
+                      text: "Log In",
                       style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Get.toNamed(AppRoutes.USER_SIGNUP);
+                          Get.toNamed(AppRoutes.SERVICER_LOGIN);
                         },
                     ),
                   ],
@@ -114,15 +131,15 @@ class UserLoginView extends GetView<UserLoginController> {
             // Divider with text
             Row(
               children: [
-                const Expanded(child: Divider()),
+                const Expanded(child: Divider(thickness: 1)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
                     "Or continue with",
-                    style: AppText.body2.regular.copyWith(color: AppColor.neutral.s600),
+                    style: AppText.body2.medium.copyWith(color: AppColor.neutral.s600),
                   ),
                 ),
-                const Expanded(child: Divider()),
+                const Expanded(child: Divider(thickness: 1)),
               ],
             ),
 
@@ -130,7 +147,7 @@ class UserLoginView extends GetView<UserLoginController> {
 
             // Social Buttons
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0), // reduce horizontal padding
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Flexible(
@@ -143,20 +160,6 @@ class UserLoginView extends GetView<UserLoginController> {
                 ],
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // Login as a Service button (if needed, e.g., vendor or admin)
-            AppButton(
-              text: "Login as a Service Provider",
-              backgroundColor: AppColor.secondary,
-              textColor: AppColor.onColor(AppColor.secondary),
-              onPressed: () {
-                // TODO: handle service login
-                Get.toNamed(AppRoutes.SERVICER_LOGIN);
-              },
-            ),
-
             const SizedBox(height: 40),
           ],
         ),
