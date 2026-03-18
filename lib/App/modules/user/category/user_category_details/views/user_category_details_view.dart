@@ -197,7 +197,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                           arguments: {
                                             'image': service.image,
                                             'title': service.title,
-                                            'category': service.category,
+                                            'servicer_highlight': service.category,
                                             'rating': service.rating,
                                             'schedule': service.schedule,
                                             'location': service.location,

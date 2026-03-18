@@ -85,7 +85,7 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
 
             // Login Button
             AppButton(text: "Log in", onPressed: () {
-              // Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
+              Get.toNamed(AppRoutes.SERVICER_BOTTOM_NAV);
             }),
 
             const SizedBox(height: 20),
@@ -148,7 +148,7 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
 
             // Login as a Service button (if needed, e.g., vendor or admin)
             AppButton(
-              text: "Login as an User",
+              text: "Login as a User",
               backgroundColor: AppColor.secondary,
               textColor: AppColor.onColor(AppColor.secondary),
               onPressed: () {
@@ -156,10 +156,6 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                 Get.toNamed(AppRoutes.USER_LOGIN);
               },
             ),
-
-            const SizedBox(height: 24),
-
-
 
             const SizedBox(height: 40),
           ],

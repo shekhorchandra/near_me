@@ -21,7 +21,7 @@ class ServiceDetailsController extends GetxController {
 
     image = args['image'] ?? '';
     title = args['title'] ?? '';
-    category = args['category'] ?? '';
+    category = args['servicer_highlight'] ?? '';
     rating = (args['rating'] ?? 0.0).toDouble();
     schedule = args['schedule'] ?? '';
     location = args['location'] ?? '';

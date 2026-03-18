@@ -20,7 +20,7 @@ class CategoriesView extends GetView<CategoriesController> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: CustomTextField(
-              hint: 'Search category...',
+              hint: 'Search servicer_highlight...',
               icon: Icons.search,
               onChanged: (value) => controller.searchText.value = value,
             ),

@@ -19,11 +19,11 @@ abstract class AppRoutes {
   /// user bottom nav bar
   static const USER_BOTTOM_NAV = '/navigation_bar';
 
-  /// bottom nav bar home page
-  static const HOME = '/home';
+  /// bottom nav bar servicer_dashboard page
+  static const HOME = '/servicer_dashboard';
 
-  /// user category nav bar details
-  static const USER_CATEGORY_DETAILS = '/user-category-details';
+  /// user servicer_highlight nav bar details
+  static const USER_CATEGORY_DETAILS = '/user-servicer_highlight-details';
 
   /// Service Details page
   static const SERVICE_DETAILS = '/user-service-details';
@@ -31,10 +31,11 @@ abstract class AppRoutes {
   /// SERVICE REVIEW
   static const REVIEWS = '/reviews';
 
-  ///user chat conversion
+  ///user servicer_chat conversion
   static const CONVERSATION = '/conversation';
 
-  /// user menu nav bar
+  /// user servicer_menu nav bar
+  static const USER_MENU = '/user_menu';
   static const CHANGE_PASSWORD = '/change-password';
   static const ABOUT = '/about';
   static const CONTACT_US = '/contact-us';
@@ -53,4 +54,32 @@ abstract class AppRoutes {
   /// servicer forget password otp
   static const SERVICER_OTP_VERIFICATION = '/servicer_otp_verification';
   static const SERVICER_RESET_PASSWORD = '/servicer_reset_password';
+
+  /// servicer bottom nav bar
+  static const SERVICER_BOTTOM_NAV = '/servicer-navigation_bar';
+
+  /// servicer highlight
+  static const SERVICER_HIGHLIGHT = '/service-highlight';
+
+  /// servicer dashboard
+  static const SERVICER_DASHBOARD = '/service-dashboard';
+
+  /// servicer CHAT
+  static const SERVICER_CHAT= '/service-chat';
+
+  /// servicer CHAT
+  static const SERVICER_MENU= '/service-menu';
+
+  /// user servicer_menu nav bar
+  static const SERVICER_CHANGE_PASSWORD = '/servicer-change-password';
+  static const SERVICER_ABOUT = '/servicer-about';
+  static const SERVICER_CONTACT_US = '/servicer-contact-us';
+  static const SERVICER_HELP_SUPPORT = '/servicer-help-support';
+  static const SERVICER_TERMS_CONDITION = '/servicer-terms-condition';
+  static const SERVICER_PRIVACY_POLICY = '/servicer-privacy-policy';
+
+  // payment method
+  static const ADD_PAYMENT_METHOD = '/payment_method/add';
+  static const PAYMENT_METHOD = '/payment_method';
+
 }

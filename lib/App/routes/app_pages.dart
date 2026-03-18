@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:near_me/App/modules/auth/user/login/bindings/user_login_binding.dart';
 import 'package:near_me/App/modules/auth/user/login/views/user_login_view.dart';
@@ -28,6 +29,26 @@ import '../modules/auth/user_forget/user_otp_verification/bindings/user_otp_bind
 import '../modules/auth/user_forget/user_otp_verification/views/user_otp_verification_view.dart';
 import '../modules/auth/user_forget/user_reset_password/bindings/user_reset_password_binding.dart';
 import '../modules/auth/user_forget/user_reset_password/views/user_reset_password_view.dart';
+import '../modules/servicer/Servicer_bottom_nav_bar/bindings/servicer_navigation_bar_binding.dart';
+import '../modules/servicer/Servicer_bottom_nav_bar/views/servicer_bottom_nav_view.dart';
+import '../modules/servicer/servicer_chat/binding/servicer_chat_binding.dart';
+import '../modules/servicer/servicer_chat/views/servicer_chat_view.dart';
+import '../modules/servicer/servicer_dashboard/bindings/servicer_dashboard_binding.dart';
+import '../modules/servicer/servicer_dashboard/views/servicer_dashboard_view.dart';
+import '../modules/servicer/servicer_highlight/binding/servicer_highlight_binding.dart';
+import '../modules/servicer/servicer_highlight/views/servicer_highlight_view.dart';
+import '../modules/servicer/servicer_menu/payment_method/bindings/payment_method_binding.dart';
+import '../modules/servicer/servicer_menu/payment_method/view/add_new_card_view.dart';
+import '../modules/servicer/servicer_menu/payment_method/view/payment_methods_view.dart';
+import '../modules/servicer/servicer_menu/servicer_about_us/views/About_View.dart';
+import '../modules/servicer/servicer_menu/servicer_change_password/bindings/servicer_change_password_binding.dart';
+import '../modules/servicer/servicer_menu/servicer_change_password/views/servicer_change_password_view.dart';
+import '../modules/servicer/servicer_menu/servicer_contact_us/contact_view/contact_us_view.dart';
+import '../modules/servicer/servicer_menu/servicer_help_support/help_support_view/Help_Support_View.dart';
+import '../modules/servicer/servicer_menu/servicer_menu_bar/bindings/servicer_menu_binding.dart';
+import '../modules/servicer/servicer_menu/servicer_menu_bar/views/servicer_menu_view.dart';
+import '../modules/servicer/servicer_menu/servicer_privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
+import '../modules/servicer/servicer_menu/servicer_terms_condition/terms_condition_view/Terms_Condition_View.dart';
 import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
 import '../modules/user/category/user_category_details/bindings/user_category_details_binding.dart';
@@ -84,16 +105,12 @@ class AppPages {
       binding: UserVerifyAccountBinding(),
     ),
 
-
-
     /// verify user forget password
     GetPage(
       name: '/user_forgot',
       page: () => const UserForgotPasswordView(),
       binding: UserForgotPasswordBinding(role: UserRole.user),
     ),
-
-
 
     /// User forget password otp verification
     GetPage(
@@ -134,11 +151,7 @@ class AppPages {
     ),
 
     /// user category service review
-    GetPage(
-      name: AppRoutes.REVIEWS,
-      page: () => const ReviewsView(),
-      binding: ReviewsBinding(),
-    ),
+    GetPage(name: AppRoutes.REVIEWS, page: () => const ReviewsView(), binding: ReviewsBinding()),
 
     ///user chat conversion
     GetPage(
@@ -147,9 +160,8 @@ class AppPages {
       binding: ConversationBinding(),
     ),
 
-
     /// User menu page
-    GetPage(name: '/menu', page: () => const MenuView(), binding: MenuBinding()),
+    GetPage(name: AppRoutes.USER_MENU, page: () => const MenuView(), binding: MenuBinding()),
     GetPage(name: AppRoutes.ABOUT, page: () => const AboutView()),
     GetPage(name: AppRoutes.CONTACT_US, page: () => const ContactUsView()),
     GetPage(name: AppRoutes.HELP_SUPPORT, page: () => const HelpSupportView()),
@@ -161,7 +173,7 @@ class AppPages {
       binding: ChangePasswordBinding(),
     ),
 
-    /////////// SERVICER /////////////////
+    ///////////////////////////////////// SERVICER //////////////////////////////////////////////
 
     /// SERVICER Part login
     GetPage(
@@ -204,5 +216,71 @@ class AppPages {
       page: () => const ServicerResetPasswordView(),
       binding: ServicerResetPasswordBinding(),
     ),
+
+    /// Servicer Bottom Nav Bar
+    GetPage(
+      name: AppRoutes.SERVICER_BOTTOM_NAV,
+      page: () => const ServicerNavigationBarPage(),
+      binding: ServicerNavigationBinding(),
+    ),
+
+    /// Servicer Highlight
+    GetPage(
+      name: AppRoutes.SERVICER_HIGHLIGHT,
+      page: () => const ServiceHighlightView(),
+      binding: ServiceHighlightBinding(),
+    ),
+
+    /// Servicer Dashboard
+    GetPage(
+      name: AppRoutes.SERVICER_DASHBOARD,
+      page: () => const ServiceDashboardView(),
+      binding: ServiceDashboardBinding(),
+    ),
+
+    /// Servicer chat
+    GetPage(
+      name: AppRoutes.SERVICER_CHAT,
+      page: () => const ServiceChatView(),
+      binding: ServiceChatBinding(),
+    ),
+
+    /// Servicer Menu
+    GetPage(
+      name: AppRoutes.SERVICER_MENU,
+      page: () => const ServicerMenuView(),
+      binding: ServicerMenuBinding(),
+    ),
+
+    /// service change password
+    GetPage(
+      name: AppRoutes.SERVICER_CHANGE_PASSWORD,
+      page: () => const ServicerChangePasswordView(),
+      binding: ServicerChangePasswordBinding(),
+    ),
+
+    GetPage(name: AppRoutes.SERVICER_ABOUT, page: () => const ServicerAboutView()),
+    GetPage(name: AppRoutes.SERVICER_CONTACT_US, page: () => const ServicerContactUsView()),
+    GetPage(name: AppRoutes.SERVICER_HELP_SUPPORT, page: () => const ServicerHelpSupportView()),
+    GetPage(name: AppRoutes.SERVICER_TERMS_CONDITION, page: () => const ServicerTermsConditionView()),
+    GetPage(name: AppRoutes.SERVICER_PRIVACY_POLICY, page: () => const ServicerPrivacyPolicyView()),
+
+    /// paymernt method
+    GetPage(
+          name: AppRoutes.ADD_PAYMENT_METHOD,
+          page: () => AddNewCardView(),
+          binding: PaymentMethodBinding(),
+        ),
+
+    GetPage(
+      name: AppRoutes.PAYMENT_METHOD,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+
+        return PaymentMethodsView(isSelectable: args['isSelectable'] as bool? ?? false);
+      },
+      binding: PaymentMethodBinding(),
+    ),
+
   ];
 }

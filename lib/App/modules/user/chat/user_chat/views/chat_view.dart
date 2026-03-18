@@ -15,7 +15,7 @@ class ChatView extends GetView<ChatController> {
         Get.toNamed(AppRoutes.CONVERSATION);
 
         // OR, if using named routes:
-        // Get.toNamed(Routes.CONVERSATION, arguments: chat);
+        // Get.toNamed(Routes.CONVERSATION, arguments: servicer_chat);
       },
       leading: Stack(
         children: [

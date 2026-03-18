@@ -34,7 +34,7 @@ class ServiceModel {
       distance: (json['distance'] as num).toDouble(),
       schedule: json['schedule'],
       location: json['location'],
-      category: json['category'] ?? '',
+      category: json['servicer_highlight'] ?? '',
       about: json['about'] ?? '',
       servicesOffered: json['servicesOffered'] ?? '',
       highlights: (json['highlights'] as List<dynamic>?)
@@ -52,7 +52,7 @@ class ServiceModel {
     'distance': distance,
     'schedule': schedule,
     'location': location,
-    'category': category,
+    'servicer_highlight': category,
     'about': about,
     'servicesOffered': servicesOffered,
     'highlights': highlights.map((e) => e.toJson()).toList(),
