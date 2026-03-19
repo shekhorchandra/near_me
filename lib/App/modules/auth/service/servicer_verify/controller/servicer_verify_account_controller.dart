@@ -41,7 +41,7 @@ class ServicerVerifyAccountController extends GetxController {
     isVerifying.value = false;
 
     // TODO: Navigate to next page
-    Get.offAllNamed(AppRoutes.USER_LOGIN);
+    Get.offAllNamed(AppRoutes.SERVICE_CHOOSE_PLAN);
   }
 
   // Resend OTP

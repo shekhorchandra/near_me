@@ -82,4 +82,14 @@ abstract class AppRoutes {
   static const ADD_PAYMENT_METHOD = '/payment_method/add';
   static const PAYMENT_METHOD = '/payment_method';
 
+  // servicer chat conversion
+
+  static const SERVICER_CONVERSATION = '/servicer-conversation';
+
+  // Service highlights details
+  static const SERVICE_HIGHLIGHTS_DETAILS = '/servicer-highlights-details';
+
+  /// servicer plan
+  static const SERVICE_CHOOSE_PLAN = '/choose-plan';
+
 }

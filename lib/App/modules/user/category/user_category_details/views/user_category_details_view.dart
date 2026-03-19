@@ -25,228 +25,230 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
 
     return Scaffold(
       appBar: CommonAppBar(title: categoryName),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            // Search bar
-            CustomTextField(
-              onChanged: (value) => controller.searchText.value = value,
-              hint: 'Search services...',
-              icon: Icons.search,
-            ),
-            const SizedBox(height: 10),
-
-            // Dropdown filters
-            Obx(
-              () => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Rating
-                  DropdownButton<String>(
-                    value: controller.selectedRating.value,
-                    items: filterOptions['Rating']!
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (v) => controller.selectedRating.value = v!,
-                  ),
-                  // Radius
-                  DropdownButton<String>(
-                    value: controller.selectedRadius.value,
-                    items: filterOptions['Radius']!
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (v) => controller.selectedRadius.value = v!,
-                  ),
-                  // Availability
-                  DropdownButton<String>(
-                    value: controller.selectedAvailability.value,
-                    items: filterOptions['Availability']!
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (v) => controller.selectedAvailability.value = v!,
-                  ),
-                ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            children: [
+              // Search bar
+              CustomTextField(
+                onChanged: (value) => controller.searchText.value = value,
+                hint: 'Search services...',
+                icon: Icons.search,
               ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // align top
-                children: [
-                  /// Left column: filters
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.35,
-                      color: Colors.grey.shade100,
-                      child: Obx(
-                        () => SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Plumbing dropdown
-                              ExpansionTile(
-                                title: const Text(
-                                  'Plumbing',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              const SizedBox(height: 10),
+        
+              // Dropdown filters
+              Obx(
+                () => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Rating
+                    DropdownButton<String>(
+                      value: controller.selectedRating.value,
+                      items: filterOptions['Rating']!
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (v) => controller.selectedRating.value = v!,
+                    ),
+                    // Radius
+                    DropdownButton<String>(
+                      value: controller.selectedRadius.value,
+                      items: filterOptions['Radius']!
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (v) => controller.selectedRadius.value = v!,
+                    ),
+                    // Availability
+                    DropdownButton<String>(
+                      value: controller.selectedAvailability.value,
+                      items: filterOptions['Availability']!
+                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (v) => controller.selectedAvailability.value = v!,
+                    ),
+                  ],
+                ),
+              ),
+        
+              const SizedBox(height: 10),
+        
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start, // align top
+                  children: [
+                    /// Left column: filters
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.35,
+                        color: Colors.grey.shade100,
+                        child: Obx(
+                          () => SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Plumbing dropdown
+                                ExpansionTile(
+                                  title: const Text(
+                                    'Plumbing',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  initiallyExpanded: false,
+                                  children: controller.plumbingOptions.keys.map((option) {
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Checkbox(
+                                          value: controller.plumbingOptions[option],
+                                          onChanged: (v) => controller.plumbingOptions[option] = v!,
+                                        ),
+                                        Expanded(child: Text(option, softWrap: true)),
+                                      ],
+                                    );
+                                  }).toList(),
                                 ),
-                                initiallyExpanded: false,
-                                children: controller.plumbingOptions.keys.map((option) {
-                                  return Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Checkbox(
-                                        value: controller.plumbingOptions[option],
-                                        onChanged: (v) => controller.plumbingOptions[option] = v!,
-                                      ),
-                                      Expanded(child: Text(option, softWrap: true)),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-
-                              // Electrical dropdown
-                              ExpansionTile(
-                                title: const Text(
-                                  'Electrical',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        
+                                // Electrical dropdown
+                                ExpansionTile(
+                                  title: const Text(
+                                    'Electrical',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  initiallyExpanded: false,
+                                  children: controller.electricalOptions.keys.map((option) {
+                                    return Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Checkbox(
+                                          value: controller.electricalOptions[option],
+                                          onChanged: (v) => controller.electricalOptions[option] = v!,
+                                        ),
+                                        Expanded(child: Text(option, softWrap: true)),
+                                      ],
+                                    );
+                                  }).toList(),
                                 ),
-                                initiallyExpanded: false,
-                                children: controller.electricalOptions.keys.map((option) {
-                                  return Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Checkbox(
-                                        value: controller.electricalOptions[option],
-                                        onChanged: (v) => controller.electricalOptions[option] = v!,
-                                      ),
-                                      Expanded(child: Text(option, softWrap: true)),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(width: 4),
-
-                  /// Right column: services
-                  Expanded(
-                    child: Obx(
-                      () => ListView.builder(
-                        itemCount: controller.filteredServices.length,
-                        itemBuilder: (context, index) {
-                          final service = controller.filteredServices[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    service.image,
-                                    width: double.infinity,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    service.title,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    softWrap: true,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  InfoRow(
-                                    icon: Icons.star,
-                                    text: service.rating.toString(),
-                                  ),
-                                  InfoRow(
-                                    icon: Icons.location_on,
-                                    text: '${service.distance} km',
-                                  ),
-                                  InfoRow(
-                                    icon: Icons.schedule,
-                                    text: service.schedule,
-                                  ),
-                                  InfoRow(
-                                    icon: Icons.location_city,
-                                    text: service.location,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: AppButton(
+        
+                    const SizedBox(width: 4),
+        
+                    /// Right column: services
+                    Expanded(
+                      child: Obx(
+                        () => ListView.builder(
+                          itemCount: controller.filteredServices.length,
+                          itemBuilder: (context, index) {
+                            final service = controller.filteredServices[index];
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(
+                                      service.image,
                                       width: double.infinity,
-                                      height: 30,
-                                      onPressed: () {
-                                        Get.toNamed(
-                                          AppRoutes.SERVICE_DETAILS,
-                                          arguments: {
-                                            'image': service.image,
-                                            'title': service.title,
-                                            'servicer_highlight': service.category,
-                                            'rating': service.rating,
-                                            'schedule': service.schedule,
-                                            'location': service.location,
-                                            'about': service.about,
-
-                                            // MUST BE LIST
-                                            'servicesOffered': [
-                                              'Accounting & Finance Services',
-                                              'Home Services',
-                                              'Education & Tutoring',
-                                              'Specialist Services',
-                                            ],
-
-                                            // MUST BE LIST
-                                            'highlights': [
-                                              'assets/images/trade&service.png',
-                                              'assets/images/trade&service.png',
-                                              'assets/images/trade&service.png',
-                                              'assets/images/trade&service.png',
-                                            ],
-
-                                            // MUST BE LIST OF ReviewModel
-                                            'reviews': [
-                                              ReviewModel(
-                                                userName: 'Haris',
-                                                userImage: 'assets/images/trade&service.png',
-                                                review:
-                                                    'Excellent service! Blissful Spa was prompt, professional, and fixed everything perfectly.',
-                                                daysAgo: 2,
-                                              ),
-                                            ],
-                                          },
-                                        );
-                                      },
-                                      text: 'View Details',
+                                      height: 150,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      service.title,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      softWrap: true,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    InfoRow(
+                                      icon: Icons.star,
+                                      text: service.rating.toString(),
+                                    ),
+                                    InfoRow(
+                                      icon: Icons.location_on,
+                                      text: '${service.distance} km',
+                                    ),
+                                    InfoRow(
+                                      icon: Icons.schedule,
+                                      text: service.schedule,
+                                    ),
+                                    InfoRow(
+                                      icon: Icons.location_city,
+                                      text: service.location,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: AppButton(
+                                        width: double.infinity,
+                                        height: 30,
+                                        onPressed: () {
+                                          Get.toNamed(
+                                            AppRoutes.SERVICE_DETAILS,
+                                            arguments: {
+                                              'image': service.image,
+                                              'title': service.title,
+                                              'servicer_highlight': service.category,
+                                              'rating': service.rating,
+                                              'schedule': service.schedule,
+                                              'location': service.location,
+                                              'about': service.about,
+        
+                                              // MUST BE LIST
+                                              'servicesOffered': [
+                                                'Accounting & Finance Services',
+                                                'Home Services',
+                                                'Education & Tutoring',
+                                                'Specialist Services',
+                                              ],
+        
+                                              // MUST BE LIST
+                                              'highlights': [
+                                                'assets/images/trade&service.png',
+                                                'assets/images/trade&service.png',
+                                                'assets/images/trade&service.png',
+                                                'assets/images/trade&service.png',
+                                              ],
+        
+                                              // MUST BE LIST OF ReviewModel
+                                              'reviews': [
+                                                ReviewModel(
+                                                  userName: 'Haris',
+                                                  userImage: 'assets/images/trade&service.png',
+                                                  review:
+                                                      'Excellent service! Blissful Spa was prompt, professional, and fixed everything perfectly.',
+                                                  daysAgo: 2,
+                                                ),
+                                              ],
+                                            },
+                                          );
+                                        },
+                                        text: 'View Details',
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

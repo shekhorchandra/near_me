@@ -11,6 +11,8 @@ import 'package:near_me/App/modules/common/splash/views/splash_view.dart';
 import '../core/enums/user_role.dart';
 import '../modules/auth/service/login/bindings/servicer_login_binding.dart';
 import '../modules/auth/service/login/views/servicer_login_view.dart';
+import '../modules/auth/service/servicer_plan/binding/choose_plan_binding.dart';
+import '../modules/auth/service/servicer_plan/views/choose_plan_view.dart';
 import '../modules/auth/service/servicer_verify/bindings/servicer_verify_account_binding.dart';
 import '../modules/auth/service/servicer_verify/views/servicer_verify_account_view.dart';
 import '../modules/auth/service/signup/bindings/servicer_signup_binding.dart';
@@ -31,12 +33,16 @@ import '../modules/auth/user_forget/user_reset_password/bindings/user_reset_pass
 import '../modules/auth/user_forget/user_reset_password/views/user_reset_password_view.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/bindings/servicer_navigation_bar_binding.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/views/servicer_bottom_nav_view.dart';
-import '../modules/servicer/servicer_chat/binding/servicer_chat_binding.dart';
-import '../modules/servicer/servicer_chat/views/servicer_chat_view.dart';
+import '../modules/servicer/servicer_chat/servicer_chat_conversation/bindings/servicer_conversation_binding.dart';
+import '../modules/servicer/servicer_chat/servicer_chat_conversation/views/servicer_conversation_view.dart';
+import '../modules/servicer/servicer_chat/servicer_inbox/bindings/servicer_chat_binding.dart';
+import '../modules/servicer/servicer_chat/servicer_inbox/views/servicer_chat_view.dart';
 import '../modules/servicer/servicer_dashboard/bindings/servicer_dashboard_binding.dart';
 import '../modules/servicer/servicer_dashboard/views/servicer_dashboard_view.dart';
-import '../modules/servicer/servicer_highlight/binding/servicer_highlight_binding.dart';
-import '../modules/servicer/servicer_highlight/views/servicer_highlight_view.dart';
+import '../modules/servicer/servicer_highlight/servicer_highlight_details/binding/service_highlights_details_binding.dart';
+import '../modules/servicer/servicer_highlight/servicer_highlight_details/views/service_highlights_details_page.dart';
+import '../modules/servicer/servicer_highlight/servicer_highlights_page/binding/servicer_highlight_binding.dart';
+import '../modules/servicer/servicer_highlight/servicer_highlights_page/views/servicer_highlight_view.dart';
 import '../modules/servicer/servicer_menu/payment_method/bindings/payment_method_binding.dart';
 import '../modules/servicer/servicer_menu/payment_method/view/add_new_card_view.dart';
 import '../modules/servicer/servicer_menu/payment_method/view/payment_methods_view.dart';
@@ -241,8 +247,8 @@ class AppPages {
     /// Servicer chat
     GetPage(
       name: AppRoutes.SERVICER_CHAT,
-      page: () => const ServiceChatView(),
-      binding: ServiceChatBinding(),
+      page: () => const ServicerChatView(),
+      binding: ServicerChatBinding(),
     ),
 
     /// Servicer Menu
@@ -280,6 +286,27 @@ class AppPages {
         return PaymentMethodsView(isSelectable: args['isSelectable'] as bool? ?? false);
       },
       binding: PaymentMethodBinding(),
+    ),
+
+    /// servicer chat conversion page
+    GetPage(
+      name: AppRoutes.SERVICER_CONVERSATION,
+      page: () => const ServicerConversationView(),
+      binding: ServicerConversationBinding(),
+    ),
+
+    /// service highlights details page
+    GetPage(
+      name: AppRoutes.SERVICE_HIGHLIGHTS_DETAILS,
+      page: () => const ServiceHighlightsDetailsView(),
+      binding: ServiceHightlightsDetailsBinding(),
+    ),
+
+    /// SERVICER CHOOSE PLAN
+    GetPage(
+      name: AppRoutes.SERVICE_CHOOSE_PLAN,
+      page: () => const ChoosePlanView(),
+      binding: ChoosePlanBinding(),
     ),
 
   ];

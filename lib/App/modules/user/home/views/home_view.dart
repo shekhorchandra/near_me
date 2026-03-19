@@ -12,22 +12,22 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          /// MAP (No Obx around GoogleMap!)
-          GoogleMap(
-            initialCameraPosition: const CameraPosition(target: LatLng(23.8103, 90.4125), zoom: 13),
-            markers: controller.markers, // RxSet works directly
-            onMapCreated: (GoogleMapController map) {
-              controller.mapController = map;
-            },
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-          ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            /// MAP (No Obx around GoogleMap!)
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(target: LatLng(23.8103, 90.4125), zoom: 13),
+              markers: controller.markers, // RxSet works directly
+              onMapCreated: (GoogleMapController map) {
+                controller.mapController = map;
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+            ),
 
-          /// TOP UI: buttons + search
-          SafeArea(
-            child: Column(
+            /// TOP UI: buttons + search
+            Column(
               children: [
                 // Login / Register buttons
                 Padding(
@@ -299,139 +299,139 @@ class HomeView extends GetView<HomeController> {
                 ),
               ],
             ),
-          ),
 
-          /// SERVICE CARDS (PageView)
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 50,
-            child: SizedBox(
-              height: 200,
-              child: Obx(() {
-                final services = controller.filteredServices.isNotEmpty
-                    ? controller.filteredServices
-                    : controller.services;
+            /// SERVICE CARDS (PageView)
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 50,
+              child: SizedBox(
+                height: 200,
+                child: Obx(() {
+                  final services = controller.filteredServices.isNotEmpty
+                      ? controller.filteredServices
+                      : controller.services;
 
-                if (services.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      "No services found",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  );
-                }
-
-                return PageView.builder(
-                  controller: controller.pageController,
-                  itemCount: services.length,
-                  onPageChanged: (index) {
-                    controller.focusService(services[index]);
-                  },
-                  itemBuilder: (context, index) {
-                    final service = services[index];
-
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(blurRadius: 10, color: Colors.black12, offset: Offset(0, 3)),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /// TITLE
-                          Text(
-                            service.title,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          /// RATING
-                          Row(
-                            children: [
-                              Row(
-                                children: List.generate(
-                                  5,
-                                  (i) => Icon(
-                                    i < service.rating.round() ? Icons.star : Icons.star_border,
-                                    size: 16,
-                                    color: Colors.orange,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                service.rating.toStringAsFixed(1),
-                                style: const TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          /// DISTANCE
-                          Row(
-                            children: [
-                              const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                              const SizedBox(width: 4),
-                              Text(
-                                "${service.distance.toStringAsFixed(1)} km away",
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          /// STATUS
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: service.available
-                                  ? Colors.green.withOpacity(0.15)
-                                  : Colors.red.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              service.available ? "Available" : "Closed",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: service.available ? Colors.green : Colors.red,
-                              ),
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          /// BUTTON
-                          SizedBox(
-                            width: double.infinity,
-                            child: AppButton(
-                              height: 38,
-                              text: "View Details",
-                              onPressed: () {
-                                controller.openService(service);
-                              },
-                            ),
-                          ),
-                        ],
+                  if (services.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No services found",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     );
-                  },
-                );
-              }),
+                  }
+
+                  return PageView.builder(
+                    controller: controller.pageController,
+                    itemCount: services.length,
+                    onPageChanged: (index) {
+                      controller.focusService(services[index]);
+                    },
+                    itemBuilder: (context, index) {
+                      final service = services[index];
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: const [
+                            BoxShadow(blurRadius: 10, color: Colors.black12, offset: Offset(0, 3)),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// TITLE
+                            Text(
+                              service.title,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            /// RATING
+                            Row(
+                              children: [
+                                Row(
+                                  children: List.generate(
+                                    5,
+                                    (i) => Icon(
+                                      i < service.rating.round() ? Icons.star : Icons.star_border,
+                                      size: 16,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  service.rating.toStringAsFixed(1),
+                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            /// DISTANCE
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${service.distance.toStringAsFixed(1)} km away",
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            /// STATUS
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: service.available
+                                    ? Colors.green.withOpacity(0.15)
+                                    : Colors.red.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                service.available ? "Available" : "Closed",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: service.available ? Colors.green : Colors.red,
+                                ),
+                              ),
+                            ),
+
+                            const Spacer(),
+
+                            /// BUTTON
+                            SizedBox(
+                              width: double.infinity,
+                              child: AppButton(
+                                height: 38,
+                                text: "View Details",
+                                onPressed: () {
+                                  controller.openService(service);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

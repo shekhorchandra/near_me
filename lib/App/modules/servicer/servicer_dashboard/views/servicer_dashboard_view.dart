@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/core/widgets/common_app_bar.dart';
 import '../controller/servicer_dashboard_controller.dart';
 
 
@@ -9,17 +10,18 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Service Dashboard"),
+      appBar: CommonAppBar(title: 'Service Dashboard',showBack: false
       ),
-      body: Center(
-        child: Obx(() => Text(
-          controller.title.value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        )),
+      body: SafeArea(
+        child: Center(
+          child: Obx(() => Text(
+            controller.title.value,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          )),
+        ),
       ),
     );
   }

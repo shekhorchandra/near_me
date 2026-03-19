@@ -18,15 +18,15 @@ class AppAssets {
   static const usercat = 'assets/images/usercategory.png';
 
   // USER bottom nav bar icons
-  static const home = 'assets/icons/servicer_dashboard.svg';
-  static const category = 'assets/icons/servicer_highlight.svg';
-  static const chat = 'assets/icons/servicer_chat.svg';
-  static const menu = 'assets/icons/servicer_menu.svg';
+  static const home = 'assets/icons/home.svg';
+  static const category = 'assets/icons/category.svg';
+  static const chat = 'assets/icons/chat.svg';
+  static const menu = 'assets/icons/menu.svg';
 
 
   ///////////////// SERVICER //////////////////////////
   // SERVICER bottom nav bar icons
-  static const dashboard = 'assets/icons/SERVICER_DASHBOARD.svg';
+  static const dashboard = 'assets/icons/dashboard.svg';
   static const highlights = 'assets/icons/SERVICER_HIGHLIGHTS.svg';
   static const servicer_chat = 'assets/icons/SERVICER_CHAT.svg';
   static const servicer_menu = 'assets/icons/SERVICER_MENU.svg';

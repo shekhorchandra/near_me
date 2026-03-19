@@ -184,18 +184,18 @@ class ReviewsView extends GetView<ReviewsController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-
-        appBar: const CommonAppBar(
-          title: 'Service Reviews',
-        ),
-
-        body: Padding(
+    return Scaffold(
+    
+      appBar: const CommonAppBar(
+        title: 'Service Reviews',
+      ),
+    
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Column(
             children: [
-
+            
               /// TOTAL REVIEWS
               Align(
                 alignment: Alignment.centerLeft,
@@ -208,37 +208,37 @@ class ReviewsView extends GetView<ReviewsController> {
                   ),
                 )),
               ),
-
+            
               const SizedBox(height: 12),
-
+            
               /// RATING BARS
               ratingBar(5, controller.ratingCount[5]!),
               const SizedBox(height: 6),
-
+            
               ratingBar(4, controller.ratingCount[4]!),
               const SizedBox(height: 6),
-
+            
               ratingBar(3, controller.ratingCount[3]!),
               const SizedBox(height: 6),
-
+            
               ratingBar(2, controller.ratingCount[2]!),
               const SizedBox(height: 6),
-
+            
               ratingBar(1, controller.ratingCount[1]!),
-
+            
               const SizedBox(height: 16),
-
+            
               /// FILTER TABS
               filterTabs(),
-
+            
               const SizedBox(height: 10),
-
+            
               /// REVIEW LIST
               Expanded(
                 child: Obx(() {
-
+            
                   final reviews = controller.filteredReviews;
-
+            
                   return ListView.builder(
                     itemCount: reviews.length,
                     itemBuilder: (context, index) {

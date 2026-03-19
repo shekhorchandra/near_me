@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/modules/user/User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
 import '../../../../core/values/app_assets.dart';
 import '../../../../core/values/app_color.dart';
-import '../controllers/bottom_nav_controller.dart';
 
 class UserNavigationBarPage extends GetView<UserNavigationBarController> {
   const UserNavigationBarPage({super.key});
@@ -13,19 +13,20 @@ class UserNavigationBarPage extends GetView<UserNavigationBarController> {
     final controller = Get.put(UserNavigationBarController());
 
     return Scaffold(
-      body: Obx(() {
-        return Stack(
-          children: [
-            // Main bottom nav screen
-            controller.screens[controller.selectedIndex.value],
+      body: SafeArea(
+        child: Obx(() {
+          return Stack(
+            children: [
+              // Main screen
+              controller.screens[controller.selectedIndex.value],
 
-            // Overlay page (e.g., AboutView)
-            if (controller.currentOverlayPage.value != null)
-              controller.currentOverlayPage.value!,
-          ],
-        );
-      }),
-
+              // Optional overlay page
+              if (controller.currentOverlayPage.value != null)
+                controller.currentOverlayPage.value!,
+            ],
+          );
+        }),
+      ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -44,7 +45,7 @@ class UserNavigationBarPage extends GetView<UserNavigationBarController> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
               child: Obx(
-                () => NavigationBar(
+                    () => NavigationBar(
                   indicatorShape: const CircleBorder(),
                   selectedIndex: controller.selectedIndex.value,
                   onDestinationSelected: controller.changeTab,
@@ -52,31 +53,33 @@ class UserNavigationBarPage extends GetView<UserNavigationBarController> {
                   height: 65,
                   backgroundColor: AppColor.neutral.s50,
                   indicatorColor: AppColor.neutral.s950,
-                  labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>((
-                    states,
-                  ) {
-                    if (states.contains(MaterialState.selected)) {
+                  labelTextStyle: MaterialStateProperty.resolveWith<TextStyle>(
+                        (states) {
+                      if (states.contains(MaterialState.selected)) {
+                        return TextStyle(
+                          color: AppColor.neutral.s950,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        );
+                      }
                       return TextStyle(
-                        color: AppColor.neutral.s950,
-                        fontWeight: FontWeight.w600,
+                        color: AppColor.neutral.s500,
                         fontSize: 12,
                       );
-                    }
-                    return TextStyle(color: AppColor.neutral.s500, fontSize: 12);
-                  }),
-
+                    },
+                  ),
                   destinations: [
                     NavigationDestination(
                       icon: SvgPicture.asset(
                         AppAssets.home,
+                        width: 20,
+                        height: 20,
                         colorFilter: ColorFilter.mode(
                           controller.selectedIndex.value == 0
                               ? AppColor.BG
                               : AppColor.neutral.s500,
                           BlendMode.srcIn,
                         ),
-                        width: 20,
-                        height: 20,
                       ),
                       label: 'Home',
                     ),

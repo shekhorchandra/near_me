@@ -70,9 +70,9 @@ class ConversationView extends GetView<ConversationController> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
           children: [
             /// IMAGE WITH BACK BUTTON AND OVERLAY INFO
             Stack(
@@ -84,7 +84,7 @@ class ConversationView extends GetView<ConversationController> {
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
-
+            
                 /// Back button
                 Positioned(
                   top: 40, // adjust for status bar
@@ -101,7 +101,7 @@ class ConversationView extends GetView<ConversationController> {
                     ),
                   ),
                 ),
-
+            
                 /// Overlay info (bottom)
                 Positioned(
                   bottom: 10,
@@ -141,7 +141,7 @@ class ConversationView extends GetView<ConversationController> {
                 ),
               ],
             ),
-
+            
             /// PROFILE SECTION
             Padding(
               padding: const EdgeInsets.all(12),
@@ -183,9 +183,9 @@ class ConversationView extends GetView<ConversationController> {
                 ],
               ),
             ),
-
+            
             const Divider(),
-
+            
             /// CHAT MESSAGES
             Expanded(
               child: Obx(
@@ -197,7 +197,7 @@ class ConversationView extends GetView<ConversationController> {
                 ),
               ),
             ),
-
+            
             /// CHAT INPUT
             chatInput(),
           ],

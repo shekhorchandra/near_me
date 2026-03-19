@@ -11,20 +11,21 @@ class ServicerNavigationBarPage extends GetView<ServicerNavigationBarController>
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ServicerNavigationBarController());
-
     return Scaffold(
-      body: Obx(() {
-        return Stack(
-          children: [
-            // Main bottom nav screen
-            controller.servicer_screens[controller.selectedIndex.value],
-
-            // Overlay page (e.g., AboutView)
-            if (controller.currentOverlayPage.value != null)
-              controller.currentOverlayPage.value!,
-          ],
-        );
-      }),
+      body: SafeArea(
+        child: Obx(() {
+          return Stack(
+            children: [
+              // Main bottom nav screen
+              controller.servicer_screens[controller.selectedIndex.value],
+        
+              // Overlay page (e.g., AboutView)
+              if (controller.currentOverlayPage.value != null)
+                controller.currentOverlayPage.value!,
+            ],
+          );
+        }),
+      ),
 
       bottomNavigationBar: SafeArea(
         child: Padding(

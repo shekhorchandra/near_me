@@ -16,145 +16,147 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CommonAppBar(title: "Servicer Menu", showBack: false),
-      body: Column(
-        children: [
-          // ===== Fixed avatar =====
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: GestureDetector(
-              // onTap: controller.onLoginTap,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-                  ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ===== Fixed avatar =====
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: GestureDetector(
+                // onTap: controller.onLoginTap,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: AppColor.primary.withOpacity(0.1),
+                        child: Image.asset(
+                          AppAssets.usercat,
+                          height: 50,
+                          width: 50,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+        
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  "Blissful Spa",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              "example123@gmail.com",
+                              style: TextStyle(fontSize: 13, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
                 ),
-                child: Row(
+              ),
+            ),
+            const SizedBox(height: 12),
+        
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: GestureDetector(
+                onTap: controller.review,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  "Reviews  ★ ★ ★ ★ ★",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // ===== Scrollable menu =====
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: AppColor.primary.withOpacity(0.1),
-                      child: Image.asset(
-                        AppAssets.usercat,
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.contain,
-                      ),
+                    Text("Settings", style: AppText.textTheme.headlineSmall),
+                    const SizedBox(height: 12),
+                    _menuItem(Icons.key, "Change Password", controller.changePassword),
+                    KMenuItem(
+                      title: 'Payment Methods',
+                      icon: Icons.credit_card_rounded,
+                      onTap: () => Get.toNamed(AppRoutes.PAYMENT_METHOD),
                     ),
-
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "Blissful Spa",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            "example123@gmail.com",
-                            style: TextStyle(fontSize: 13, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                    _menuItem(Icons.info_outline, "About Us", controller.goToAbout),
+                    _menuItem(
+                      Icons.contact_support_outlined,
+                      "Contact Us",
+                      controller.onContactUsTap,
                     ),
-                    const Icon(Icons.arrow_forward_ios, size: 16),
+                    _menuItem(Icons.emergency, "Help & Support", controller.onHelpSupportTap),
+                    const SizedBox(height: 24),
+                    _menuItem(
+                      Icons.privacy_tip_outlined,
+                      "Privacy Policy",
+                      controller.onPrivacyPolicyTap,
+                    ),
+                    _menuItem(Icons.description_outlined, "Terms & Condition", controller.onTermsTap),
+                    _menuItem(Icons.star_rate_outlined, "Rate the App", controller.onRateAppTap),
+                    _menuItem(Icons.share_outlined, "Invite Friends", controller.onInviteFriendsTap),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: AppButton(text: 'Logout', onPressed: controller.onLogoutTap),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: GestureDetector(
-              onTap: controller.review,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                "Reviews  ★ ★ ★ ★ ★",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios, size: 16),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // ===== Scrollable menu =====
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Settings", style: AppText.textTheme.headlineSmall),
-                  const SizedBox(height: 12),
-                  _menuItem(Icons.key, "Change Password", controller.changePassword),
-                  KMenuItem(
-                    title: 'Payment Methods',
-                    icon: Icons.credit_card_rounded,
-                    onTap: () => Get.toNamed(AppRoutes.PAYMENT_METHOD),
-                  ),
-                  _menuItem(Icons.info_outline, "About Us", controller.goToAbout),
-                  _menuItem(
-                    Icons.contact_support_outlined,
-                    "Contact Us",
-                    controller.onContactUsTap,
-                  ),
-                  _menuItem(Icons.emergency, "Help & Support", controller.onHelpSupportTap),
-                  const SizedBox(height: 24),
-                  _menuItem(
-                    Icons.privacy_tip_outlined,
-                    "Privacy Policy",
-                    controller.onPrivacyPolicyTap,
-                  ),
-                  _menuItem(Icons.description_outlined, "Terms & Condition", controller.onTermsTap),
-                  _menuItem(Icons.star_rate_outlined, "Rate the App", controller.onRateAppTap),
-                  _menuItem(Icons.share_outlined, "Invite Friends", controller.onInviteFriendsTap),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: AppButton(text: 'Logout', onPressed: controller.onLogoutTap),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

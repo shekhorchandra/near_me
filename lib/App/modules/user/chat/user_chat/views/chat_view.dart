@@ -63,28 +63,30 @@ class ChatView extends GetView<ChatController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CommonAppBar(title: "Chats"),
-      body: Column(
-        children: [
-          /// Search Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: CustomTextField(hint: 'Search Chats...'),
-          ),
-
-          /// Chat List
-          Expanded(
-            child: Obx(
-              () => ListView.separated(
-                itemCount: controller.chats.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final chat = controller.chats[index];
-                  return chatItem(chat);
-                },
+      body: SafeArea(
+        child: Column(
+          children: [
+            /// Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: CustomTextField(hint: 'Search Chats...'),
+            ),
+        
+            /// Chat List
+            Expanded(
+              child: Obx(
+                () => ListView.separated(
+                  itemCount: controller.chats.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final chat = controller.chats[index];
+                    return chatItem(chat);
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

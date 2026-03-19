@@ -24,60 +24,62 @@ class PaymentMethodsView extends StatelessWidget {
 
     return Scaffold(
       appBar: CommonAppBar(title: 'Payment Methods'),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(AppSizes.screenPadding),
-        child: Column(
-          children: [
-            // Payment methods list
-            Obx(() {
-              final selected = controller.selectedPaymentMethod.value;
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: mockPaymentMethod.length,
-                itemBuilder: (_, index) {
-                  return Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(AppSizes.screenPadding),
+          child: Column(
+            children: [
+              // Payment methods list
+              Obx(() {
+                final selected = controller.selectedPaymentMethod.value;
+        
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: mockPaymentMethod.length,
+                  itemBuilder: (_, index) {
+                    return Column(
+                      children: [
+                        PaymentMethodTile(
+                          paymentMethod: mockPaymentMethod[index],
+                          isSelectable: isSelectable ?? false,
+                          isSelected: selected == index,
+                          onSelect: () => controller.selectedPaymentMethod.value = index,
+                        ),
+        
+                        const SizedBox(height: 10),
+                      ],
+                    );
+                  },
+                );
+              }),
+        
+              // Add new card
+              InkWell(
+                borderRadius: BorderRadius.circular(100),
+                onTap: () => Get.toNamed(AppRoutes.ADD_PAYMENT_METHOD),
+                child: DottedBorder(
+                  options: RoundedRectDottedBorderOptions(
+                    radius: Radius.circular(100),
+                    dashPattern: [15, 5],
+                    strokeWidth: 2,
+                    padding: EdgeInsets.all(20),
+                    color: Colors.black,
+                  ),
+                  child: Row(
                     children: [
-                      PaymentMethodTile(
-                        paymentMethod: mockPaymentMethod[index],
-                        isSelectable: isSelectable ?? false,
-                        isSelected: selected == index,
-                        onSelect: () => controller.selectedPaymentMethod.value = index,
+                      Icon(Icons.add_rounded, color: Colors.black),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Add new card',
+                        style: AppText.body2.medium.copyWith(color: Colors.black),
                       ),
-
-                      const SizedBox(height: 10),
                     ],
-                  );
-                },
-              );
-            }),
-
-            // Add new card
-            InkWell(
-              borderRadius: BorderRadius.circular(100),
-              onTap: () => Get.toNamed(AppRoutes.ADD_PAYMENT_METHOD),
-              child: DottedBorder(
-                options: RoundedRectDottedBorderOptions(
-                  radius: Radius.circular(100),
-                  dashPattern: [15, 5],
-                  strokeWidth: 2,
-                  padding: EdgeInsets.all(20),
-                  color: Colors.black,
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.add_rounded, color: Colors.black),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Add new card',
-                      style: AppText.body2.medium.copyWith(color: Colors.black),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
 
