@@ -11,6 +11,8 @@ import 'package:near_me/App/modules/common/splash/views/splash_view.dart';
 import '../core/enums/user_role.dart';
 import '../modules/auth/service/login/bindings/servicer_login_binding.dart';
 import '../modules/auth/service/login/views/servicer_login_view.dart';
+import '../modules/auth/service/servicer_account/binding/service_provider_binding.dart';
+import '../modules/auth/service/servicer_account/views/service_provider_view.dart';
 import '../modules/auth/service/servicer_plan/binding/choose_plan_binding.dart';
 import '../modules/auth/service/servicer_plan/views/choose_plan_view.dart';
 import '../modules/auth/service/servicer_verify/bindings/servicer_verify_account_binding.dart';
@@ -307,6 +309,13 @@ class AppPages {
       name: AppRoutes.SERVICE_CHOOSE_PLAN,
       page: () => const ChoosePlanView(),
       binding: ChoosePlanBinding(),
+    ),
+
+    /// SERVICER PROVIDER ACCOUNT
+    GetPage(
+      name: AppRoutes.SERVICE_PROVIDER_ACCOUNT,
+      page: () => const ServiceProviderView(),
+      binding: ServiceProviderBinding(),
     ),
 
   ];

@@ -92,4 +92,7 @@ abstract class AppRoutes {
   /// servicer plan
   static const SERVICE_CHOOSE_PLAN = '/choose-plan';
 
+  /// servicer provider account
+  static const SERVICE_PROVIDER_ACCOUNT= '/service-provider';
+
 }

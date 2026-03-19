@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
+import '../../../../../routes/app_routes.dart';
 import '../controller/choose_plan_controller.dart';
 import '../models/plan_model.dart';
 
@@ -124,7 +125,11 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
               AppButton(
                 onPressed: () {
                   if (controller.selectedPlan.value != null) {
-                    // Continue action
+                    Get.toNamed(
+                      AppRoutes.SERVICE_PROVIDER_ACCOUNT,
+                      arguments: controller.selectedPlan.value,
+                    );
+
                     Get.snackbar(
                       "Plan Selected",
                       "You selected ${controller.selectedPlan.value!.name}",
