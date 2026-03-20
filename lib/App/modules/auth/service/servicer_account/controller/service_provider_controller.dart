@@ -13,6 +13,7 @@ class ServiceProviderController extends GetxController {
   final aboutController = TextEditingController();
   final addressController = TextEditingController();
   final websiteController = TextEditingController();
+  final customServiceController = TextEditingController();
 
   var categories = ['Cleaning', 'Plumbing', 'Electrical', 'Beauty'].obs;
   var services = [
@@ -54,6 +55,33 @@ class ServiceProviderController extends GetxController {
         val!.subscriptionPlan = plan.name;
       });
     }
+  }
+
+  void addCustomService() {
+    final value = customServiceController.text.trim();
+
+    if (value.isEmpty) return;
+
+    if (selectedServices.length >= 5) {
+      Get.snackbar('Limit', 'You can select up to 5 services');
+      return;
+    }
+
+    //  prevent duplicate in services list
+    if (services.contains(value)) {
+      // just select it if already exists
+      if (!selectedServices.contains(value)) {
+        selectedServices.add(value);
+      }
+    } else {
+      //  add to services list (so it appears in UI)
+      services.add(value);
+
+      //  auto select it (check mark)
+      selectedServices.add(value);
+    }
+
+    customServiceController.clear();
   }
 
   void selectCategory(String value) {

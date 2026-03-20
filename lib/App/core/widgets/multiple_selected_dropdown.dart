@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
+import 'package:near_me/App/core/widgets/custom_text_field.dart';
 import 'package:near_me/App/modules/auth/service/servicer_account/controller/service_provider_controller.dart';
 import '../values/app_color.dart';
 
@@ -64,45 +65,78 @@ class MultiSelectDropdownField extends StatelessWidget {
   void _showMultiSelectDialog(
       BuildContext context, ServiceProviderController controller) {
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      SafeArea(
+        child: Container(
+          height: Get.height * 0.75,
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              const Text(
+                "Select Services (Max 5)",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+        
+              const SizedBox(height: 10),
+        
+              //  SCROLLABLE AREA
+              Expanded(
+                child: Obx(
+                      () => ListView(
+                    children: [
+                      ...controller.services.map((service) {
+                        final isSelected =
+                        controller.selectedServices.contains(service);
+        
+                        return CheckboxListTile(
+                          value: isSelected,
+                          title: Text(service),
+                          onChanged: (_) {
+                            controller.toggleService(service);
+                          },
+                        );
+                      }).toList(),
+        
+                      const SizedBox(height: 10),
+        
+                      //  Add custom service
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              controller:
+                              controller.customServiceController,
+                              hint: 'Add custom service',
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          AppButton(
+                            width: 60,
+                            height: 40,
+                            onPressed: controller.addCustomService,
+                            text: 'Add',
+                          ),
+                        ],
+                      ),
+                      
+                    ],
+                  ),
+                ),
+              ),
+        
+              //  FIXED BUTTON (always visible)
+              AppButton(
+                onPressed: () => Get.back(),
+                text: 'Done',
+              ),
+            ],
+          ),
         ),
-        child: Obx(() => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Select Services (Max 5)",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-
-            ...controller.services.map((service) {
-              final isSelected =
-              controller.selectedServices.contains(service);
-
-              return CheckboxListTile(
-                value: isSelected,
-                title: Text(service),
-                onChanged: (_) {
-                  controller.toggleService(service);
-                },
-              );
-            }).toList(),
-
-            const SizedBox(height: 10),
-
-            AppButton(
-              onPressed: () => Get.back(),
-              text: 'Done',
-            ),
-
-            const SizedBox(height: 40),
-          ],
-        )),
       ),
+      isScrollControlled: true,
     );
   }
 }

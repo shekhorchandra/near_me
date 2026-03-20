@@ -130,10 +130,10 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                       arguments: controller.selectedPlan.value,
                     );
 
-                    Get.snackbar(
-                      "Plan Selected",
-                      "You selected ${controller.selectedPlan.value!.name}",
-                    );
+                    // Get.snackbar(
+                    //   "Plan Selected",
+                    //   "You selected ${controller.selectedPlan.value!.name}",
+                    // );
                   } else {
                     Get.snackbar("Error", "Please select a plan first");
                   }
