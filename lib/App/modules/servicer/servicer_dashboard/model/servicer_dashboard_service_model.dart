@@ -19,15 +19,16 @@
 //     required this.servicer_highlight,
 //   });
 //
-//   // factory HomeServiceModel.fromJson(Map<String, dynamic> json) {
-//   //   return HomeServiceModel(
-//   //     id: json['_id'],
-//   //     title: json['title'],
-//   //     rating: (json['rating'] ?? 0).toDouble(),
-//   //     distance: (json['distance'] ?? 0).toDouble(),
-//   //     available: json['available'] ?? false,
-//   //     lat: json['lat'],
-//   //     lng: json['lng'],
-//   //   );
-//   // }
+//   factory HomeServiceModel.fromJson(Map<String, dynamic> json) {
+//     return HomeServiceModel(
+//       id: json['_id'],
+//       title: json['title'],
+//       rating: (json['rating'] ?? 0).toDouble(),
+//       distance: (json['distance'] ?? 0).toDouble(),
+//       available: json['available'] ?? false,
+//       lat: json['lat'],
+//       lng: json['lng'],
+//       servicer_highlight: '',
+//     );
+//   }
 // }

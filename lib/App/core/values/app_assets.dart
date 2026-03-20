@@ -36,5 +36,12 @@ class AppAssets {
   static const discoverPaymentMethod = 'assets/icons/discover_card_logo.svg';
   static const paypalPaymentMethod = 'assets/icons/paypal.svg';
 
+  // service choose plan
+  static const crown = 'assets/icons/crown.svg';
+
+  // service dashboard
+  static const impression = 'assets/icons/impression.png';
+  static const views = 'assets/icons/view.png';
+
 
 }
