@@ -24,6 +24,11 @@ class ServicerMenuController extends GetxController {
   void onLoginTap() {
     Get.offAllNamed(AppRoutes.USER_LOGIN);
   }
+
+  void goToaccountedit() {
+    Get.toNamed(AppRoutes.SERVICE_PROVIDER_ACCOUNT_EDIT);
+  }
+
   void review() {
     Get.toNamed(AppRoutes.REVIEWS);
   }

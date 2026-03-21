@@ -1,7 +1,13 @@
+import 'dart:typed_data';
+import 'dart:ui';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../../core/widgets/App_button.dart';
 import '../model/HomeServiceModel.dart';
 
 class HomeController extends GetxController {
@@ -24,6 +30,14 @@ class HomeController extends GetxController {
   /// Loading state
   RxBool isLoading = false.obs;
 
+  // Category counts for badges
+  RxMap<String, int> categoryCounts = <String, int>{}.obs;
+
+  // Marker types
+  // Example: 'Elite', 'Pro', 'Active', 'Other'
+  RxMap<String, BitmapDescriptor> markerIcons = <String, BitmapDescriptor>{}.obs;
+
+
   RxDouble selectedRating = 0.0.obs;
   RxDouble selectedRadius = 10.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
@@ -33,6 +47,245 @@ class HomeController extends GetxController {
     super.onInit();
     loadServices();
     filteredServices.value = services;
+    updateCategoryCounts();
+    loadMarkerIcons();
+  }
+
+  void showFilterBottomSheet() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// TITLE
+            const Center(
+              child: Text(
+                "Filter Services",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            /// RATING
+            const Text(
+              "Rating",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            Obx(
+                  () => Slider(
+                value: selectedRating.value,
+                min: 0,
+                max: 5,
+                divisions: 5,
+                activeColor: Colors.black,
+                label: selectedRating.value.toString(),
+                onChanged: (value) => selectedRating.value = value,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            /// RADIUS
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Radius",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Obx(() => Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    "${selectedRadius.value.toStringAsFixed(0)} km",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                )),
+              ],
+            ),
+            Obx(() => Slider(
+              value: selectedRadius.value.clamp(1, 50),
+              min: 1,
+              max: 50,
+              divisions: 49,
+              activeColor: Colors.black,
+              label: "${selectedRadius.value.toStringAsFixed(0)} km",
+              onChanged: (value) => selectedRadius.value = value,
+            )),
+            const SizedBox(height: 15),
+
+            /// CATEGORY
+            const Text(
+              "Category",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 10),
+            Obx(() => Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"]
+                  .map((category) {
+                final selected = selectedCategories.contains(category);
+                return GestureDetector(
+                  onTap: () {
+                    if (selected) {
+                      selectedCategories.remove(category);
+                    } else {
+                      selectedCategories.add(category);
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: selected ? Colors.black : Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      category,
+                      style: TextStyle(
+                        color: selected ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            )),
+            const SizedBox(height: 25),
+
+            /// BUTTONS
+            Row(
+              children: [
+                /// CLEAR BUTTON
+                Expanded(
+                  child: AppButton(
+                    text: "Clear",
+                    onPressed: () {
+                      selectedRating.value = 0;
+                      selectedRadius.value = 10;
+                      selectedCategories.clear();
+                      applyFilters();
+                      Get.back();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                /// APPLY BUTTON
+                Expanded(
+                  child: AppButton(
+                    text: "Apply Filters",
+                    onPressed: () {
+                      applyFilters();
+                      Get.back();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  void updateCategoryCounts() {
+    final Map<String, int> counts = {};
+    for (var service in services) {
+      counts[service.category] = (counts[service.category] ?? 0) + 1;
+    }
+    categoryCounts.value = counts;
+  }
+
+  Future<BitmapDescriptor> getColoredMarker(
+      String path, int width, Color color) async {
+
+    final ByteData data = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+    );
+
+    final frame = await codec.getNextFrame();
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+
+    final paint = Paint()..colorFilter =
+    ColorFilter.mode(color, BlendMode.srcATop);
+
+    canvas.drawImage(frame.image, Offset.zero, paint);
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(width, width);
+    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
+
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  void loadMarkerIcons() async {
+    markerIcons['Elite'] =
+    await getColoredMarker('assets/icons/pin.png', 130, Colors.amber);
+
+    markerIcons['Pro'] =
+    await getColoredMarker('assets/icons/pin.png', 120, Colors.green);
+
+    markerIcons['Active'] =
+    await getColoredMarker('assets/icons/pin.png', 110, Colors.purple);
+
+    markerIcons['Other'] =
+    await getColoredMarker('assets/icons/pin.png', 100, Colors.red);
+
+    generateMarkers();
+  }
+
+  void generateMarkers() {
+    final Set<Marker> tempMarkers = {};
+
+    for (var service in services) {
+      String type;
+
+      if (service.rating >= 4.7) {
+        type = 'Elite';
+      } else if (service.rating >= 4.3) {
+        type = 'Pro';
+      } else if (service.available) {
+        type = 'Active';
+      } else {
+        type = 'Other';
+      }
+
+      tempMarkers.add(
+        Marker(
+          markerId: MarkerId(service.id),
+          position: LatLng(service.lat, service.lng),
+
+          // ✅ USE YOUR PNG HERE
+          icon: markerIcons[type] ?? BitmapDescriptor.defaultMarker,
+
+          infoWindow: InfoWindow(
+            title: service.title,
+            snippet: "$type Service",
+          ),
+
+          onTap: () => focusService(service),
+        ),
+      );
+    }
+
+    markers.value = tempMarkers;
   }
 
   void loadServices() {
@@ -41,7 +294,7 @@ class HomeController extends GetxController {
     services.value = [
       HomeServiceModel(
         id: "1",
-        title: "Car Wash",
+        title: "Car Wash (Pro)",
         rating: 4.5,
         distance: 1.2,
         available: true,
@@ -51,7 +304,7 @@ class HomeController extends GetxController {
       ),
       HomeServiceModel(
         id: "2",
-        title: "Bike Repair",
+        title: "Bike Repair (Active)",
         rating: 4.2,
         distance: 2.1,
         available: true,
@@ -61,7 +314,7 @@ class HomeController extends GetxController {
       ),
       HomeServiceModel(
         id: "3",
-        title: "Auto Service",
+        title: "Auto Service (Elite)",
         rating: 4.8,
         distance: 3.0,
         available: false,
@@ -93,26 +346,6 @@ class HomeController extends GetxController {
     }).toList();
   }
 
-  void generateMarkers() {
-
-    final Set<Marker> tempMarkers = {};
-
-    for (var service in services) {
-
-      tempMarkers.add(
-        Marker(
-          markerId: MarkerId(service.id),
-          position: LatLng(service.lat, service.lng),
-          infoWindow: InfoWindow(title: service.title),
-          onTap: () {
-            focusService(service);
-          },
-        ),
-      );
-    }
-
-    markers.value = tempMarkers;
-  }
 
   void focusService(HomeServiceModel service) {
 

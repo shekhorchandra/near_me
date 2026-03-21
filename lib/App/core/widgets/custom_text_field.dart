@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final String? errorText;
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const CustomTextField({
     super.key,
@@ -30,12 +31,14 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     this.focusNode,
     this.validator,
+    this.readOnly = false, // default false
   });
 
   @override
   Widget build(BuildContext context) {
     final safeMaxLines = obscure ? 1 : (maxLines ?? 1);
     return TextFormField(
+      readOnly: readOnly,
       controller: controller,
       focusNode: focusNode,
       obscureText: obscure,
@@ -50,6 +53,8 @@ class CustomTextField extends StatelessWidget {
         prefixIcon: icon != null ? Icon(icon) : null,
         suffixIcon: suffix,
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+
+
         //  Default border
         border: OutlineInputBorder(
           borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
@@ -68,6 +73,12 @@ class CustomTextField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColor.primary, width: 1.5),
+        ),
+
+        // 👇 ADD disabled border
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
 
         //  Error (optional)

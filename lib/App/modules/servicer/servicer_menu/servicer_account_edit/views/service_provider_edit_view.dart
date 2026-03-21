@@ -3,35 +3,38 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:near_me/App/core/widgets/App_button.dart';
-import 'package:near_me/App/core/widgets/common_app_bar.dart';
-import 'package:near_me/App/core/widgets/custom_text_field.dart';
-import 'package:near_me/App/modules/auth/service/servicer_account/controller/service_provider_controller.dart';
+import '../../../../../core/widgets/App_button.dart';
+import '../../../../../core/widgets/SectionLabelWithEdit.dart';
+import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_dropdown_field.dart';
+import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/multiple_selected_dropdown.dart';
+import '../../servicer_preview/service_provider_preview_view.dart';
+import '../controller/service_provider_edit_controller.dart';
 
-class ServiceProviderView extends GetView<ServiceProviderController> {
-  const ServiceProviderView({super.key});
+class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
+  const ServiceProviderEditView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: 'Service Provider Account', showBack: true),
+      appBar: CommonAppBar(title: 'Edit Service Provider Account', showBack: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Create Service Provider Account",
-                style: TextStyle(fontSize: 20, color: Colors.black),
+              SizedBox(
+                width: double.infinity,
+                child: AppButton(
+                  text: "Preview as User",
+                  icon: Icons.remove_red_eye,
+                  onPressed: () {
+                    Get.to(() => ServiceProviderPreviewView(controller: controller));
+                  },
+                ),
               ),
-              const Text(
-                "Start earning by offering services near you.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-
               const SizedBox(height: 20),
 
               const Text(
@@ -44,16 +47,24 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Service Name",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  SectionLabelWithEdit(
+                    title: "Service Name",
+                    onEdit: () {
+                      controller.isServiceNameEditable.value = true;
+                      controller.serviceNameFocus.requestFocus(); // <-- focus properly
+                    },
                   ),
+
                   const SizedBox(height: 6),
 
-                  CustomTextField(
-                    controller: controller.serviceNameController,
-                    hint: 'Enter Your Service Name',
-                    icon: Icons.miscellaneous_services,
+                  Obx(
+                        () => CustomTextField(
+                      controller: controller.serviceNameController,
+                      focusNode: controller.serviceNameFocus,
+                      hint: 'Enter Your Service Name',
+                      icon: Icons.miscellaneous_services,
+                      readOnly: !controller.isServiceNameEditable.value, // <-- use readOnly
+                    ),
                   ),
                 ],
               ),
@@ -94,35 +105,38 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                   ),
                   const SizedBox(height: 6),
 
-                  // const MultiSelectDropdownField(
-                  //   hint: "Select up to 5 services",
-                  //   icon: Icons.design_services,
-                  // ),
-
                   MultiSelectDropdownField(
                     hint: "Select up to 5 services",
                     icon: Icons.design_services,
-                    controller: controller, // ServiceProviderController
+                    controller: controller, // ServiceProviderEditController
                   ),
                 ],
               ),
 
               const SizedBox(height: 12),
 
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Contact Number",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  SectionLabelWithEdit(
+                    title: "Contact Number",
+                    onEdit: () {
+                      controller.isContactEditable.value = true;
+                      controller.contactFocus.requestFocus();
+                    },
                   ),
+
                   const SizedBox(height: 6),
 
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.contactController,
-                    hint: 'Your Contact Number',
+                    focusNode: controller.contactFocus,
+                    hint: 'Enter Your Contact Number',
                     icon: Icons.call,
-                  ),
+                    readOnly: !controller.isContactEditable.value, // toggle edit
+
+                  )),
                 ],
               ),
               const SizedBox(height: 12),
@@ -130,18 +144,24 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "About Section",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  SectionLabelWithEdit(
+                    title: "About Section",
+                    onEdit: () {
+                      controller.isAboutEditable.value = true;
+                      controller.aboutFocus.requestFocus();
+                    },
                   ),
+
                   const SizedBox(height: 6),
 
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.aboutController,
+                    focusNode: controller.aboutFocus,
                     maxLines: 5,
-                    maxLength: 50,
+                    maxLength: 500,
                     hint: 'Tell us about you or your services',
-                  ),
+                    readOnly: !controller.isAboutEditable.value, // toggle edit
+                  )),
                 ],
               ),
 
@@ -150,36 +170,50 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Address",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  SectionLabelWithEdit(
+                    title: "Address",
+                    onEdit: () {
+                      controller.isAddressEditable.value = true;
+                      controller.addressFocus.requestFocus();
+                    },
                   ),
+
                   const SizedBox(height: 6),
 
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.addressController,
+                    focusNode: controller.addressFocus,
+                    maxLines: 2,
                     hint: 'Your Address',
-                    icon: Icons.book,
-                  ),
+                    readOnly: !controller.isAddressEditable.value, // toggle edit
+
+                  )),
                 ],
               ),
 
               const SizedBox(height: 12),
 
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Website (Optional)",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  SectionLabelWithEdit(
+                    title: "Website (Optional)",
+                    onEdit: () {
+                      controller.isWebsiteEditable.value = true;
+                      controller.websiteFocus.requestFocus();
+                    },
                   ),
+
                   const SizedBox(height: 6),
 
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.websiteController,
+                    focusNode: controller.websiteFocus,
                     hint: 'Website link',
                     icon: Icons.link,
-                  ),
+                    readOnly: !controller.isWebsiteEditable.value, // toggle edit
+                  )),
                 ],
               ),
 
@@ -197,7 +231,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               const SizedBox(height: 12),
 
               const Text(
-                "Media (Max 3 Images)",
+                "Edit Media (Max 3 Images)",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
 
@@ -328,7 +362,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                                     ),
                                     const SizedBox(height: 8),
                                     const Text(
-                                      "Upload Logo",
+                                      "Edit Logo",
                                       style: TextStyle(color: Colors.grey, fontSize: 12),
                                     ),
                                   ],
@@ -354,8 +388,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                             width: double.infinity,
                             child: AppButton(
                               onPressed: () => controller.setLogo(), // your file picker
-                              text: 'Upload Logo',
-                              icon: Icons.upload_file,
+                              text: 'Edit Logo',
+                              icon: Icons.edit,
                             ),
                           ),
                         ],
@@ -367,7 +401,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 20),
               const Text(
-                "Set Opening & Closing Time",
+                "Edit Set Opening & Closing Time",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
 
@@ -449,57 +483,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                 ),
               ),
 
-              const SizedBox(height: 12),
-
-              const Text(
-                "Subscription Plan",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-
-              const SizedBox(height: 6),
-
-              const Text(
-                "You have selected the Free Plan (£0/month). You can continue using the platform with this plan or upgrade anytime for additional features.",
-                style: TextStyle(fontSize: 14, color: Colors.black87),
-              ),
-
-              const SizedBox(height: 12),
-
-              Obx(
-                () => Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade400),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            controller.selectedPlan.value.subscriptionPlan,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "£${controller.selectedPlan.value.subscriptionPrice.toStringAsFixed(2)}/month",
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      const Icon(Icons.check_circle, color: Colors.green),
-                    ],
-                  ),
-                ),
-              ),
               const SizedBox(height: 20),
 
-              AppButton(onPressed: controller.submit, text: 'Continue to Payment'),
-              SizedBox(height: 40),
             ],
           ),
         ),

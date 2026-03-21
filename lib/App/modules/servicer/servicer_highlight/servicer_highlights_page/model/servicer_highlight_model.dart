@@ -6,4 +6,7 @@ class ServiceItem {
   String description;
 
   ServiceItem({this.imageFile, required this.title, this.description = ""});
+
+  // Add this getter so preview page can use highlight.image
+  String get image => imageFile?.path ?? '';
 }

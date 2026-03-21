@@ -23,7 +23,8 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: GestureDetector(
-                // onTap: controller.onLoginTap,
+                onTap: controller.goToaccountedit,
+
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(

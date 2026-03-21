@@ -5,7 +5,7 @@ class CustomDropdownField extends StatelessWidget {
   final String hint;
   final List<String> items;
   final String? value;
-  final Function(String?) onChanged;
+  final void Function(String?)? onChanged;
   final IconData? icon;
 
   const CustomDropdownField({

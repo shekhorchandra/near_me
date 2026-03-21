@@ -10,15 +10,18 @@ class MultiSelectDropdownField extends StatelessWidget {
   final String hint;
   final IconData? icon;
 
+  final dynamic controller;
+
   const MultiSelectDropdownField({
     super.key,
     required this.hint,
     this.icon,
+    required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ServiceProviderController>();
+
 
     return Obx(() {
       return GestureDetector(
@@ -63,7 +66,7 @@ class MultiSelectDropdownField extends StatelessWidget {
   }
 
   void _showMultiSelectDialog(
-      BuildContext context, ServiceProviderController controller) {
+      BuildContext context, dynamic controller) {
     Get.bottomSheet(
       SafeArea(
         child: Container(

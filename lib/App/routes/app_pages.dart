@@ -8,6 +8,8 @@ import 'package:near_me/App/modules/common/onboarding/bindings/onboarding_bindin
 import 'package:near_me/App/modules/common/onboarding/views/onboarding_view.dart';
 import 'package:near_me/App/modules/common/splash/bindings/splash_binding.dart';
 import 'package:near_me/App/modules/common/splash/views/splash_view.dart';
+import 'package:near_me/App/modules/servicer/servicer_menu/servicer_account_edit/binding/service_provider_edit_binding.dart';
+import 'package:near_me/App/modules/servicer/servicer_menu/servicer_account_edit/views/service_provider_edit_view.dart';
 import '../core/enums/user_role.dart';
 import '../modules/auth/service/login/bindings/servicer_login_binding.dart';
 import '../modules/auth/service/login/views/servicer_login_view.dart';
@@ -316,6 +318,13 @@ class AppPages {
       name: AppRoutes.SERVICE_PROVIDER_ACCOUNT,
       page: () => const ServiceProviderView(),
       binding: ServiceProviderBinding(),
+    ),
+
+    /// SERVICER PROVIDER ACCOUNT EDIT
+    GetPage(
+      name: AppRoutes.SERVICE_PROVIDER_ACCOUNT_EDIT,
+      page: () => const ServiceProviderEditView(),
+      binding: ServiceProviderEditBinding(),
     ),
 
   ];
