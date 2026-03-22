@@ -228,7 +228,7 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     Color color = const Color(0xFFF0F0F0), // default light grey
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: color,
@@ -246,7 +246,7 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: Colors.grey,fontSize: 14,),
                   ),
                   Text(
                     value.value.toString(),
@@ -259,8 +259,8 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
               ),
               Image.asset(
                 iconPath,
-                height: 24,
-                width: 24,
+                height: 22,
+                width: 22,
               ),
             ],
           ),

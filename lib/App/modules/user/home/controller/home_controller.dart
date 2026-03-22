@@ -11,7 +11,6 @@ import '../../../../core/widgets/App_button.dart';
 import '../model/HomeServiceModel.dart';
 
 class HomeController extends GetxController {
-
   /// Filtered services list (for search/filter)
   RxList<HomeServiceModel> filteredServices = <HomeServiceModel>[].obs;
 
@@ -37,7 +36,6 @@ class HomeController extends GetxController {
   // Example: 'Elite', 'Pro', 'Active', 'Other'
   RxMap<String, BitmapDescriptor> markerIcons = <String, BitmapDescriptor>{}.obs;
 
-
   RxDouble selectedRating = 0.0.obs;
   RxDouble selectedRadius = 10.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
@@ -51,6 +49,7 @@ class HomeController extends GetxController {
     loadMarkerIcons();
   }
 
+  /// get bottom sheet for filter
   void showFilterBottomSheet() {
     Get.bottomSheet(
       Container(
@@ -73,12 +72,9 @@ class HomeController extends GetxController {
             const SizedBox(height: 20),
 
             /// RATING
-            const Text(
-              "Rating",
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
+            const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
             Obx(
-                  () => Slider(
+              () => Slider(
                 value: selectedRating.value,
                 min: 0,
                 max: 5,
@@ -94,74 +90,70 @@ class HomeController extends GetxController {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Radius",
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
+                Obx(
+                  () => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      "${selectedRadius.value.toStringAsFixed(0)} km",
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
                 ),
-                Obx(() => Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "${selectedRadius.value.toStringAsFixed(0)} km",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                )),
               ],
             ),
-            Obx(() => Slider(
-              value: selectedRadius.value.clamp(1, 50),
-              min: 1,
-              max: 50,
-              divisions: 49,
-              activeColor: Colors.black,
-              label: "${selectedRadius.value.toStringAsFixed(0)} km",
-              onChanged: (value) => selectedRadius.value = value,
-            )),
+            Obx(
+              () => Slider(
+                value: selectedRadius.value.clamp(1, 50),
+                min: 1,
+                max: 50,
+                divisions: 49,
+                activeColor: Colors.black,
+                label: "${selectedRadius.value.toStringAsFixed(0)} km",
+                onChanged: (value) => selectedRadius.value = value,
+              ),
+            ),
             const SizedBox(height: 15),
 
             /// CATEGORY
-            const Text(
-              "Category",
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
+            const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
-            Obx(() => Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"]
-                  .map((category) {
-                final selected = selectedCategories.contains(category);
-                return GestureDetector(
-                  onTap: () {
-                    if (selected) {
-                      selectedCategories.remove(category);
-                    } else {
-                      selectedCategories.add(category);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: selected ? Colors.black : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      category,
-                      style: TextStyle(
-                        color: selected ? Colors.white : Colors.black,
-                        fontWeight: FontWeight.w500,
+            Obx(
+              () => Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"].map((category) {
+                  final selected = selectedCategories.contains(category);
+                  return GestureDetector(
+                    onTap: () {
+                      if (selected) {
+                        selectedCategories.remove(category);
+                      } else {
+                        selectedCategories.add(category);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? Colors.black : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        category,
+                        style: TextStyle(
+                          color: selected ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
-            )),
+                  );
+                }).toList(),
+              ),
+            ),
             const SizedBox(height: 25),
 
             /// BUTTONS
@@ -200,7 +192,6 @@ class HomeController extends GetxController {
     );
   }
 
-
   void updateCategoryCounts() {
     final Map<String, int> counts = {};
     for (var service in services) {
@@ -209,22 +200,16 @@ class HomeController extends GetxController {
     categoryCounts.value = counts;
   }
 
-  Future<BitmapDescriptor> getColoredMarker(
-      String path, int width, Color color) async {
-
+  Future<BitmapDescriptor> getColoredMarker(String path, int width, Color color) async {
     final ByteData data = await rootBundle.load(path);
-    final codec = await ui.instantiateImageCodec(
-      data.buffer.asUint8List(),
-      targetWidth: width,
-    );
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
 
     final frame = await codec.getNextFrame();
 
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
 
-    final paint = Paint()..colorFilter =
-    ColorFilter.mode(color, BlendMode.srcATop);
+    final paint = Paint()..colorFilter = ColorFilter.mode(color, BlendMode.srcATop);
 
     canvas.drawImage(frame.image, Offset.zero, paint);
 
@@ -236,17 +221,13 @@ class HomeController extends GetxController {
   }
 
   void loadMarkerIcons() async {
-    markerIcons['Elite'] =
-    await getColoredMarker('assets/icons/pin.png', 130, Colors.amber);
+    markerIcons['Elite'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFAF0000));
 
-    markerIcons['Pro'] =
-    await getColoredMarker('assets/icons/pin.png', 120, Colors.green);
+    markerIcons['Pro'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF281C59));
 
-    markerIcons['Active'] =
-    await getColoredMarker('assets/icons/pin.png', 110, Colors.purple);
+    markerIcons['Active'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF25671E));
 
-    markerIcons['Other'] =
-    await getColoredMarker('assets/icons/pin.png', 100, Colors.red);
+    markerIcons['Other'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFFF4400));
 
     generateMarkers();
   }
@@ -272,13 +253,10 @@ class HomeController extends GetxController {
           markerId: MarkerId(service.id),
           position: LatLng(service.lat, service.lng),
 
-          // ✅ USE YOUR PNG HERE
+          // USE YOUR PNG HERE
           icon: markerIcons[type] ?? BitmapDescriptor.defaultMarker,
 
-          infoWindow: InfoWindow(
-            title: service.title,
-            snippet: "$type Service",
-          ),
+          infoWindow: InfoWindow(title: service.title, snippet: "$type Service"),
 
           onTap: () => focusService(service),
         ),
@@ -289,75 +267,97 @@ class HomeController extends GetxController {
   }
 
   void loadServices() {
-
     /// Dummy data (replace with API)
     services.value = [
       HomeServiceModel(
         id: "1",
-        title: "Car Wash (Pro)",
+        title: "Car Wash",
         rating: 4.5,
         distance: 1.2,
         available: true,
-        lat: 23.8103,
-        lng: 90.4125,
+        lat: 23.77002871396432,
+        lng: 90.41767335602759,
         category: 'Full load',
       ),
       HomeServiceModel(
         id: "2",
-        title: "Bike Repair (Active)",
+        title: "Bike Repair",
         rating: 4.2,
         distance: 2.1,
         available: true,
-        lat: 23.8140,
-        lng: 90.4170,
+        lat: 25.707178456987403,
+        lng: 89.40034264802111,
         category: 'Trade and startup',
       ),
       HomeServiceModel(
         id: "3",
-        title: "Auto Service (Elite)",
+        title: "Auto Service",
         rating: 4.8,
         distance: 3.0,
         available: false,
-        lat: 23.8000,
-        lng: 90.4200,
+        lat: 23.450936186653884,
+        lng: 87.81394250424515,
         category: 'car abd bike wash',
+      ),
+
+      HomeServiceModel(
+        id: "4",
+        title: "Auto moto",
+        rating: 2.8,
+        distance: 3.0,
+        available: false,
+        lat: 40.741895,
+        lng: -73.989308,
+        category: 'car abd bike wash',
+      ),
+
+      HomeServiceModel(
+        id: "5",
+        title: "BMC college Service",
+        rating: 2.2,
+        distance: 1.2,
+        available: true,
+        lat: 24.811516368950436,
+        lng: 88.94157331547738,
+        category: 'Full load',
+      ),
+
+      HomeServiceModel(
+        id: "6",
+        title: "Padma Wash Service",
+        rating: 4.5,
+        distance: 1.2,
+        available: true,
+        lat: 23.53135973516676,
+        lng: 90.12162702073485,
+        category: 'Full load',
       ),
     ];
 
     generateMarkers();
   }
 
-
   void applyFilters() {
     final rating = selectedRating.value;
     final radius = selectedRadius.value;
 
     filteredServices.value = services.where((service) {
-
       final matchRating = service.rating >= rating;
 
       final matchRadius = service.distance <= radius;
 
-      final matchCategory = selectedCategories.isEmpty ||
-          selectedCategories.contains(service.category);
+      final matchCategory =
+          selectedCategories.isEmpty || selectedCategories.contains(service.category);
 
       return matchRating && matchRadius && matchCategory;
-
     }).toList();
   }
 
-
   void focusService(HomeServiceModel service) {
-
-    mapController?.animateCamera(
-      CameraUpdate.newLatLng(
-        LatLng(service.lat, service.lng),
-      ),
-    );
+    mapController?.animateCamera(CameraUpdate.newLatLng(LatLng(service.lat, service.lng)));
   }
 
   void openService(HomeServiceModel service) {
-
     /// Navigate to details page
     print("Open service: ${service.title}");
   }

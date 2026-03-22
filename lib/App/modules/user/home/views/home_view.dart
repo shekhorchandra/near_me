@@ -16,25 +16,27 @@ class HomeView extends GetView<HomeController> {
         child: Stack(
           children: [
             /// MAP (No Obx around GoogleMap!)
-            Obx(() => GoogleMap(
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(23.8103, 90.4125),
-                zoom: 12,
+            Obx(
+              () => GoogleMap(
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(23.8103, 90.4125),
+                  zoom: 12,
+                ),
+                markers: controller.markers.value,
+                onMapCreated: (GoogleMapController map) {
+                  controller.mapController = map;
+                },
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
               ),
-              markers: controller.markers.value, // <- use .value
-              onMapCreated: (GoogleMapController map) {
-                controller.mapController = map;
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-            )),
+            ),
 
             /// TOP UI: buttons + search
             Column(
               children: [
                 // Login / Register buttons
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   child: Row(
                     children: [
                       Expanded(
@@ -58,7 +60,7 @@ class HomeView extends GetView<HomeController> {
 
                 // 🔍 SEARCH BAR
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
                     children: [
                       Expanded(
@@ -68,8 +70,11 @@ class HomeView extends GetView<HomeController> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(30),
                           ),
-                          child: const CustomTextField(
-                            hint: 'Search near me services',
+                          child: SizedBox(
+                            height: 40,
+                            child: CustomTextField(
+                              hint: 'Search near me services',
+                            ),
                           ),
                         ),
                       ),
@@ -101,11 +106,10 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
 
-                const SizedBox(height: 12),
 
                 // YOUR CIRCULAR CATEGORY ROW HERE
                 SizedBox(
-                  height: 50,
+                  height: 80,
                   child: Obx(() {
                     final categories = controller.services.value;
                     return ListView.separated(
@@ -121,16 +125,16 @@ class HomeView extends GetView<HomeController> {
 
                         if (service.rating >= 4.7) {
                           type = 'Elite';
-                          badgeColor = Colors.amber.shade700;
+                          badgeColor = Color(0xFFAF0000);
                         } else if (service.rating >= 4.3) {
                           type = 'Pro';
-                          badgeColor = Colors.green;
+                          badgeColor = Color(0xFF281C59);
                         } else if (service.available) {
                           type = 'Active';
-                          badgeColor = Colors.purple;
+                          badgeColor = Color(0xFF25671E);
                         } else {
                           type = 'Other';
-                          badgeColor = Colors.black;
+                          badgeColor = Color(0xFFFF4400);
                         }
 
                         return GestureDetector(
@@ -163,20 +167,19 @@ class HomeView extends GetView<HomeController> {
 
                               // Badge
                               Positioned(
-                                top: -4,
+                                top: 4,
                                 left: -4,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: badgeColor,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
                                     type,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 10,
+                                      fontSize: 8,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -185,26 +188,61 @@ class HomeView extends GetView<HomeController> {
 
                               // Rating Overlay
                               Positioned(
-                                bottom: -8,
+                                bottom: 0,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                  width: 70,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
+                                    color: Colors.black.withOpacity(0.7),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Row(
+                                  child: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    children: List.generate(
-                                      5,
-                                          (i) => Icon(
-                                        i < service.rating.round()
-                                            ? Icons.star
-                                            : Icons.star_border,
-                                        size: 10,
-                                        color: Colors.orange,
+                                    children: [
+                                      /// ⭐ Rating + Number
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Row(
+                                            children: List.generate(
+                                              1, // ✅ FIXED (not 1)
+                                                  (i) => Icon(
+                                                i < service.rating.floor()
+                                                    ? Icons.star
+                                                    : (i < service.rating
+                                                    ? Icons.star_half
+                                                    : Icons.star_border),
+                                                size: 10,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            service.rating.toStringAsFixed(1),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
+
+
+                                      /// 📝 Title (clean + centered)
+                                      Text(
+                                        service.title.split('(').first, // 👈 cleaner title
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -217,7 +255,6 @@ class HomeView extends GetView<HomeController> {
                 ),
               ],
             ),
-
 
             /// SERVICE CARDS (PageView)
             Positioned(
@@ -281,7 +318,7 @@ class HomeView extends GetView<HomeController> {
                                     (i) => Icon(
                                       i < service.rating.round() ? Icons.star : Icons.star_border,
                                       size: 16,
-                                      color: Colors.orange,
+                                      color: Colors.black,
                                     ),
                                   ),
                                 ),
