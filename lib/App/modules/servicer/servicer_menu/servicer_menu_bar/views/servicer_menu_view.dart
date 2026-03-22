@@ -75,7 +75,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
               ),
             ),
             const SizedBox(height: 12),
-        
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: GestureDetector(
@@ -99,8 +99,38 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                             Row(
                               children: [
                                 const Text(
-                                  "Reviews  ★ ★ ★ ★ ★",
+                                  "★ Reviews",
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                const Spacer(),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=5"),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=6"),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=7"),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=8"),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=9"),
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
                                 ),
                               ],
                             ),

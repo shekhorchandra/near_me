@@ -62,7 +62,7 @@ class ChatView extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: "Chats"),
+      appBar: const CommonAppBar(title: "Chats", showBack: false,),
       body: SafeArea(
         child: Column(
           children: [

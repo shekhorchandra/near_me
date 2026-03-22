@@ -17,7 +17,7 @@ class UserLoginView extends GetView<UserLoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: " ", showBack: true),
+      appBar: const CommonAppBar(title: " ", showBack: false),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),

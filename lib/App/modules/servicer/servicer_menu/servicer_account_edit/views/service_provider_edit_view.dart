@@ -9,6 +9,7 @@ import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_dropdown_field.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/multiple_selected_dropdown.dart';
+import '../../../../../routes/app_routes.dart';
 import '../../servicer_preview/service_provider_preview_view.dart';
 import '../controller/service_provider_edit_controller.dart';
 
@@ -88,7 +89,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                           : controller.selectedCategory.value,
                       items: controller.categories,
                       onChanged: (val) => controller.selectCategory(val ?? ''),
-                      icon: Icons.category,
+                      icon: Icons.control_point_duplicate,
                     ),
                   ),
                 ],
@@ -483,6 +484,120 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                 ),
               ),
 
+              const SizedBox(height: 20),
+
+              // --- Service Highlights Section ---
+              const Text(
+                "Service Highlights",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+
+              Obx(() => GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: controller.highlights.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.2,
+                ),
+                itemBuilder: (context, index) {
+                  final highlight = controller.highlights[index];
+                  return GestureDetector(
+                    onTap: () {
+                      // Open bottom sheet to pick image
+                      Get.bottomSheet(
+                        Container(
+                          color: Colors.white,
+                          padding: const EdgeInsets.all(16),
+                          child: Wrap(
+                            children: [
+                              ListTile(
+                                leading: const Icon(Icons.camera_alt),
+                                title: const Text("Camera"),
+                                onTap: () {
+                                  Get.back();
+                                  controller.pickHighlightImage(index, ImageSource.camera);
+                                },
+                              ),
+                              ListTile(
+                                leading: const Icon(Icons.photo_library),
+                                title: const Text("Gallery"),
+                                onTap: () {
+                                  Get.back();
+                                  controller.pickHighlightImage(index, ImageSource.gallery);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade200,
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                        color: Colors.white,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Image Box
+                          Container(
+                            height: 110,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                              color: Colors.grey.shade200,
+                              image: highlight.imageFile != null
+                                  ? DecorationImage(
+                                image: FileImage(highlight.imageFile!),
+                                fit: BoxFit.cover,
+                              )
+                                  : null,
+                            ),
+                            child: highlight.imageFile == null
+                                ? const Center(child: Icon(Icons.add_a_photo, color: Colors.grey, size: 30))
+                                : null,
+                          ),
+                          const SizedBox(height: 8),
+                          // Title
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              highlight.title,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // Optional Description
+                          if (highlight.description.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                highlight.description,
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              )),
               const SizedBox(height: 20),
 
             ],

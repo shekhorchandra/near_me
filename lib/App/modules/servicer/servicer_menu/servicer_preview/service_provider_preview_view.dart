@@ -158,25 +158,76 @@ class ServiceProviderPreviewView extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Highlights (images uploaded beyond logo)
-                  if (controller.images.length > 1)
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: controller.images.length - 1,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.3,
+                  // Highlights Section
+                  if (controller.highlights.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Service Highlights', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: controller.highlights.length,
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: 1.0,
+                            ),
+                            itemBuilder: (context, index) {
+                              final highlight = controller.highlights[index];
+                              return Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Image box
+                                    Container(
+                                      height: 120,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.grey.shade200,
+                                        image: highlight.imageFile != null
+                                            ? DecorationImage(
+                                          image: FileImage(highlight.imageFile!),
+                                          fit: BoxFit.cover,
+                                        )
+                                            : null,
+                                      ),
+                                      child: highlight.imageFile == null
+                                          ? const Center(
+                                        child: Icon(Icons.add_a_photo, color: Colors.grey),
+                                      )
+                                          : null,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Title
+                                    Text(highlight.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    const SizedBox(height: 4),
+                                    // Description
+                                    if (highlight.description.isNotEmpty)
+                                      Text(
+                                        highlight.description,
+                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                        ],
                       ),
-                      itemBuilder: (context, index) {
-                        final img = controller.images[index + 1];
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(File(img), fit: BoxFit.cover),
-                        );
-                      },
                     ),
                   const SizedBox(height: 12),
 
@@ -191,11 +242,11 @@ class ServiceProviderPreviewView extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // Reviews (optional, can show mock or empty)
-                  const Text('Reviews', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 4),
-                  const Text('No reviews yet'), // You can connect your review list here
-                  const SizedBox(height: 80),
+                  // // Reviews (optional, can show mock or empty)
+                  // const Text('Reviews', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  // const SizedBox(height: 4),
+                  // const Text('No reviews yet'), // You can connect your review list here
+                  // const SizedBox(height: 80),
                 ],
               ),
             ),

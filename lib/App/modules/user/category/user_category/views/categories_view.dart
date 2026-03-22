@@ -12,7 +12,7 @@ class CategoriesView extends GetView<CategoriesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: 'User Categories'),
+      appBar: CommonAppBar(title: 'User Categories', showBack: false,),
       body: SafeArea(
         child: Column(
           children: [

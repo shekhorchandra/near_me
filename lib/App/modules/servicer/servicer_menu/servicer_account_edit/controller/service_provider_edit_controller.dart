@@ -193,6 +193,8 @@ class ServiceProviderEditController extends GetxController {
     images.removeAt(index);
   }
 
+
+
   // Pick logo
   Future<void> setLogo() async {
     final XFile? pickedFile = await _picker.pickImage(
