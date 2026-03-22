@@ -19,7 +19,9 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
           return LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16,),
+                padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
+                  bottom: MediaQuery.of(context).viewPadding.bottom + 16, // safe area for bottom
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: constraints.maxHeight - 40,

@@ -28,34 +28,37 @@ class ServiceHighlightController extends GetxController {
   /// Show option dialog
   void pickImage(int index) {
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Camera"),
-              onTap: () {
-                Get.back();
-                _getImage(index, ImageSource.camera);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo),
-              title: const Text("Gallery"),
-              onTap: () {
-                Get.back();
-                _getImage(index, ImageSource.gallery);
-              },
-            ),
-            SizedBox(height: 100,)
-          ],
+      SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
+                onTap: () {
+                  Get.back();
+                  _getImage(index, ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text("Gallery"),
+                onTap: () {
+                  Get.back();
+                  _getImage(index, ImageSource.gallery);
+                },
+              ),
+              // SizedBox(height: 100,)
+            ],
+          ),
         ),
       ),
+      isScrollControlled: true, // allows full-height bottom sheet if keyboard opens
     );
   }
 

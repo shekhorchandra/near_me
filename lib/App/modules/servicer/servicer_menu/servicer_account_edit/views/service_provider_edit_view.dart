@@ -282,31 +282,33 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                     GestureDetector(
                       onTap: () {
                         Get.bottomSheet(
-                          Container(
-                            color: Colors.white,
-                            padding: const EdgeInsets.all(16),
-                            child: Wrap(
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.camera_alt),
-                                  title: const Text("Camera"),
-                                  onTap: () {
-                                    Get.back();
-                                    controller.pickImage(ImageSource.camera);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.photo_library),
-                                  title: const Text("Gallery"),
-                                  onTap: () {
-                                    Get.back();
-                                    controller.pickImage(ImageSource.gallery);
-                                  },
-                                ),
-                                const SizedBox(height: 100),
-                              ],
+                          SafeArea(
+                            child: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(16),
+                              child: Wrap(
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.camera_alt),
+                                    title: const Text("Camera"),
+                                    onTap: () {
+                                      Get.back();
+                                      controller.pickImage(ImageSource.camera);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.photo_library),
+                                    title: const Text("Gallery"),
+                                    onTap: () {
+                                      Get.back();
+                                      controller.pickImage(ImageSource.gallery);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
+                          isScrollControlled: true, // allows full-height bottom sheet if keyboard opens
                         );
                       },
                       child: Container(
@@ -509,30 +511,33 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                     onTap: () {
                       // Open bottom sheet to pick image
                       Get.bottomSheet(
-                        Container(
-                          color: Colors.white,
-                          padding: const EdgeInsets.all(16),
-                          child: Wrap(
-                            children: [
-                              ListTile(
-                                leading: const Icon(Icons.camera_alt),
-                                title: const Text("Camera"),
-                                onTap: () {
-                                  Get.back();
-                                  controller.pickHighlightImage(index, ImageSource.camera);
-                                },
-                              ),
-                              ListTile(
-                                leading: const Icon(Icons.photo_library),
-                                title: const Text("Gallery"),
-                                onTap: () {
-                                  Get.back();
-                                  controller.pickHighlightImage(index, ImageSource.gallery);
-                                },
-                              ),
-                            ],
+                        SafeArea(
+                          child: Container(
+                            color: Colors.white,
+                            padding: const EdgeInsets.all(16),
+                            child: Wrap(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(Icons.camera_alt),
+                                  title: const Text("Camera"),
+                                  onTap: () {
+                                    Get.back();
+                                    controller.pickHighlightImage(index, ImageSource.camera);
+                                  },
+                                ),
+                                ListTile(
+                                  leading: const Icon(Icons.photo_library),
+                                  title: const Text("Gallery"),
+                                  onTap: () {
+                                    Get.back();
+                                    controller.pickHighlightImage(index, ImageSource.gallery);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        isScrollControlled: true, // allows full-height bottom sheet if keyboard opens
                       );
                     },
                     child: Container(
