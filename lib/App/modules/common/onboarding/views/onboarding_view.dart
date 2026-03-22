@@ -32,17 +32,13 @@ class OnboardingView extends GetView<OnboardingController> {
                           width: double.infinity,
                           fit: BoxFit.contain,
                         ),
-
                         const SizedBox(height: 20),
-
                         Text(
                           page['title']!,
                           textAlign: TextAlign.center,
                           style: AppText.h1.bold.copyWith(color: AppColor.primary),
                         ),
-
                         const SizedBox(height: 10),
-
                         Text(
                           page['subtitle']!,
                           textAlign: TextAlign.center,
@@ -54,40 +50,26 @@ class OnboardingView extends GetView<OnboardingController> {
                 },
               ),
             ),
-            // const SizedBox(height: 50),
-            // Obx(
-            //   () => Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: List.generate(
-            //       controller.pages.length,
-            //       (index) => Container(
-            //         margin: const EdgeInsets.symmetric(horizontal: 4),
-            //         width: controller.currentPage.value == index ? 34 : 20,
-            //         height: 4,
-            //         decoration: BoxDecoration(
-            //           color: controller.currentPage.value == index
-            //               ? AppColor.primary
-            //               : Colors.grey.shade300,
-            //           borderRadius: BorderRadius.circular(2),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
 
-            // const SizedBox(height: 20),
-
+            // Padding for the button / loading indicator
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: AppButton(
-                  onPressed: controller.nextPage,
-                  text: 'Get Started',
-
-                ),
-              ),
+              child: Obx(() {
+                return SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: controller.isLoading.value
+                      ? const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColor.primary,
+                    ),
+                  )
+                      : AppButton(
+                    onPressed: controller.nextPage,
+                    text: 'Get Started',
+                  ),
+                );
+              }),
             ),
           ],
         ),

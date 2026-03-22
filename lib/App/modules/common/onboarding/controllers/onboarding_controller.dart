@@ -6,6 +6,7 @@ import '../../../../routes/app_routes.dart';
 class OnboardingController extends GetxController {
   final PageController pageController = PageController();
   final currentPage = 0.obs;
+  var isLoading = false.obs;
 
   final pages = [
     {
@@ -16,10 +17,20 @@ class OnboardingController extends GetxController {
     },
   ];
 
-  void nextPage() {
+  void nextPage() async {
+    isLoading.value = true;
+
     if (currentPage.value < pages.length - 1) {
-      pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+      await pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      isLoading.value = false; // stop loading after page animation
     } else {
+      // Optional: show loading until navigation completes
+      await Future.delayed(const Duration(milliseconds: 200));
+      isLoading.value = false;
+
       Get.offNamed(AppRoutes.USER_BOTTOM_NAV);
     }
   }
