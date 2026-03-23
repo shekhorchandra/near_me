@@ -175,6 +175,8 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 selected: controller.selectedImpressionFilter,
                 onChange: controller.changeImpressionFilter,
                 data: controller.impressionData,
+                onPrevious: () => controller.goToPrevious(controller.selectedImpressionFilter.value),
+                onNext: () => controller.goToNext(controller.selectedImpressionFilter.value),
               ),
 
               const SizedBox(height: 20),
@@ -184,6 +186,8 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 selected: controller.selectedViewsFilter,
                 onChange: controller.changeViewsFilter,
                 data: controller.viewsData,
+                onPrevious: () => controller.goToPrevious(controller.selectedViewsFilter.value),
+                onNext: () => controller.goToNext(controller.selectedViewsFilter.value),
               ),
             ],
           ),
@@ -275,6 +279,8 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     required RxString selected,
     required Function(String) onChange,
     required RxList<double> data,
+    required VoidCallback onPrevious,
+    required VoidCallback onNext,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +313,37 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
           }).toList(),
         )),
 
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                onPressed: onPrevious,
+                icon: const Icon(Icons.arrow_back_ios, size: 18),
+              ),
+
+              Obx(() => Text(
+                controller.getDisplayRange(selected.value),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              )),
+
+              IconButton(
+                onPressed: onNext,
+                icon: const Icon(Icons.arrow_forward_ios, size: 18),
+              ),
+            ],
+          ),
+        ),
+
+
+
         const SizedBox(height: 12),
+
+
 
         /// Chart
         SizedBox(
