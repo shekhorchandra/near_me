@@ -99,7 +99,7 @@ class HomeController extends GetxController {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "${selectedRadius.value.toStringAsFixed(0)} km",
+                        "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
                       style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
@@ -113,7 +113,7 @@ class HomeController extends GetxController {
                 max: 50,
                 divisions: 49,
                 activeColor: Colors.black,
-                label: "${selectedRadius.value.toStringAsFixed(0)} km",
+                label: "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
                 onChanged: (value) => selectedRadius.value = value,
               ),
             ),
@@ -313,7 +313,7 @@ class HomeController extends GetxController {
 
       HomeServiceModel(
         id: "5",
-        title: "BMC college Service",
+        title: "Service",
         rating: 2.2,
         distance: 1.2,
         available: true,
@@ -324,7 +324,7 @@ class HomeController extends GetxController {
 
       HomeServiceModel(
         id: "6",
-        title: "Padma Wash Service",
+        title: "Service",
         rating: 4.5,
         distance: 1.2,
         available: true,

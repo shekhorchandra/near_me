@@ -63,7 +63,7 @@ class AppButton extends StatelessWidget {
             ),
           )
               : Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (leading != null) ...[
@@ -76,6 +76,7 @@ class AppButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   text,
+                  textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: AppText.h5.medium.copyWith(color: fgColor),
                 ),
