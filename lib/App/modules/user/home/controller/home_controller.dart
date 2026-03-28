@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-import 'dart:ui';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:near_me/App/modules/user/home/controller/marker_generator.dart';
 
 import '../../../../core/widgets/App_button.dart';
 import '../model/HomeServiceModel.dart';
@@ -46,7 +43,7 @@ class HomeController extends GetxController {
     loadServices();
     filteredServices.value = services;
     updateCategoryCounts();
-    loadMarkerIcons();
+    generateMarkers();
   }
 
   /// get bottom sheet for filter
@@ -99,7 +96,7 @@ class HomeController extends GetxController {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                        "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
+                      "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
                       style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
@@ -200,39 +197,35 @@ class HomeController extends GetxController {
     categoryCounts.value = counts;
   }
 
-  Future<BitmapDescriptor> getColoredMarker(String path, int width, Color color) async {
-    final ByteData data = await rootBundle.load(path);
-    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+  LinearGradient getMarkerGradient(String type) {
+    if (type == 'Elite') {
+      return LinearGradient(
+        colors: [Color(0xFF000000), Color(0xFF7161AA)],
+        begin: .topCenter,
+        end: .center,
+      );
+    } else if (type == 'Pro') {
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFFFFA800)]);
+    } else if (type == 'Basic') {
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFF4B9B69)]);
+    }
 
-    final frame = await codec.getNextFrame();
-
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-
-    final paint = Paint()..colorFilter = ColorFilter.mode(color, BlendMode.srcATop);
-
-    canvas.drawImage(frame.image, Offset.zero, paint);
-
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(width, width);
-    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return LinearGradient(colors: [Color(0xFF000000), Color(0xFF3612FF)]);
   }
 
-  void loadMarkerIcons() async {
-    markerIcons['Elite'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFAF0000));
+  IconData getMarkerIcon(String type) {
+    if (type == 'Elite') {
+      return Iconsax.crown1;
+    } else if (type == 'Pro') {
+      return Iconsax.star1;
+    } else if (type == 'Basic') {
+      return Iconsax.shield_security;
+    }
 
-    markerIcons['Pro'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF281C59));
-
-    markerIcons['Active'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF25671E));
-
-    markerIcons['Other'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFFF4400));
-
-    generateMarkers();
+    return Icons.broken_image;
   }
 
-  void generateMarkers() {
+  void generateMarkers() async {
     final Set<Marker> tempMarkers = {};
 
     for (var service in services) {
@@ -243,26 +236,38 @@ class HomeController extends GetxController {
       } else if (service.rating >= 4.3) {
         type = 'Pro';
       } else if (service.available) {
-        type = 'Active';
+        type = 'Basic';
       } else {
         type = 'Other';
       }
+
+      // Define the SVG string (Make sure fill is white so it accepts gradient)
+      const String svgString = '''
+    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 24.5454C0 10.9893 10.9894 0 24.5455 0H35.4546C49.0106 0 60 10.9893 60 24.5454C60 38.1015 48.8894 49.0909 35.3333 49.0909L30.4492 59.0812C30.2664 59.455 29.7336 59.455 29.5508 59.0812L24.6667 49.0909C11.1106 49.0909 0 38.1015 0 24.5454Z" fill="white"/>
+    </svg>
+    ''';
+
+      // Generate the complex marker
+      BitmapDescriptor customIcon = await MarkerGenerator.svgToBitmapDescriptor(
+        svgString: svgString,
+        size: Size(160, 160),
+        gradient: getMarkerGradient(type),
+        icon: getMarkerIcon(type),
+        badgeLabel: type, // 'Elite', 'Pro', 'Basic'
+        badgeGradient: getMarkerGradient(type), // reuse or define a separate badge gradient
+      );
 
       tempMarkers.add(
         Marker(
           markerId: MarkerId(service.id),
           position: LatLng(service.lat, service.lng),
-
-          // USE YOUR PNG HERE
-          icon: markerIcons[type] ?? BitmapDescriptor.defaultMarker,
-
+          icon: customIcon,
           infoWindow: InfoWindow(title: service.title, snippet: "$type Service"),
-
           onTap: () => focusService(service),
         ),
       );
     }
-
     markers.value = tempMarkers;
   }
 

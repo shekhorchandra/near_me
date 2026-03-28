@@ -149,7 +149,7 @@ class HomeView extends GetView<HomeController> {
                 SizedBox(
                   height: 120,
                   child: Obx(() {
-                    final categories = controller.services.value;
+                    final categories = controller.services;
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       scrollDirection: Axis.horizontal,
@@ -438,11 +438,11 @@ class HomeView extends GetView<HomeController> {
               left: 0,
               right: 50,
               child: SizedBox(
-                height: 200,
+                height: 220,
                 child: Obx(() {
                   final services = controller.filteredServices.isNotEmpty
                       ? controller.filteredServices
-                      : controller.services.value;
+                      : controller.services;
 
                   if (services.isEmpty) {
                     return const Center(
@@ -479,6 +479,20 @@ class HomeView extends GetView<HomeController> {
                             Text(
                               service.title,
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            /// Company
+                            Text(
+                              "Company Name will show here", // TODO: show company name dynamically
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
