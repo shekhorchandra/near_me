@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
+
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
+
+  LinearGradient getBadgeGradient(String type) {
+    switch (type) {
+      case 'Elite':
+        return LinearGradient(
+          colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'Pro':
+        return LinearGradient(
+          colors: [Color(0xFFFFEA00), Color(0xFFFFA600)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'Basic':
+        return LinearGradient(
+          colors: [Color.fromARGB(255, 72, 248, 140), Color(0xFF4B9868)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      default:
+        return LinearGradient(
+          colors: [Colors.transparent, Colors.transparent], // Hide if no plan is enrolled
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +53,7 @@ class HomeView extends GetView<HomeController> {
                   target: LatLng(23.8103, 90.4125),
                   zoom: 12,
                 ),
-                markers: controller.markers.value,
+                markers: controller.markers,
                 onMapCreated: (GoogleMapController map) {
                   controller.mapController = map;
                 },
@@ -89,7 +120,6 @@ class HomeView extends GetView<HomeController> {
                         ),
                       ),
 
-                      const SizedBox(width: 10),
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         child: IconButton(
@@ -97,7 +127,6 @@ class HomeView extends GetView<HomeController> {
                           onPressed: () {},
                         ),
                       ),
-                      const SizedBox(width: 10),
                       IconButton(
                         icon: const Icon(Icons.filter_alt, color: Colors.black),
                         style: IconButton.styleFrom(backgroundColor: Colors.white),
@@ -105,7 +134,6 @@ class HomeView extends GetView<HomeController> {
                           controller.showFilterBottomSheet();
                         },
                       ),
-                      const SizedBox(width: 10),
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         child: IconButton(
@@ -117,7 +145,6 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
 
-
                 // YOUR CIRCULAR CATEGORY ROW HERE
                 SizedBox(
                   height: 120,
@@ -127,25 +154,30 @@ class HomeView extends GetView<HomeController> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
                         final service = categories[index];
 
                         String type;
-                        Color badgeColor;
+                        IconData badgeIcon;
+                        Gradient badgeGradient;
 
                         if (service.rating >= 4.7) {
                           type = 'Elite';
-                          badgeColor = Color(0xFFAF0000);
+                          badgeIcon = Iconsax.crown1;
+                          badgeGradient = getBadgeGradient(type);
                         } else if (service.rating >= 4.3) {
                           type = 'Pro';
-                          badgeColor = Color(0xFF281C59);
+                          badgeIcon = Iconsax.star1;
+                          badgeGradient = getBadgeGradient(type);
                         } else if (service.available) {
-                          type = 'Active';
-                          badgeColor = Color(0xFF25671E);
+                          type = 'Basic';
+                          badgeIcon = Iconsax.shield_security;
+                          badgeGradient = getBadgeGradient(type);
                         } else {
                           type = 'Other';
-                          badgeColor = Color(0xFFFF4400);
+                          badgeIcon = badgeIcon = Iconsax.crown;
+                          badgeGradient = getBadgeGradient(type);
                         }
 
                         // return GestureDetector(
@@ -302,18 +334,16 @@ class HomeView extends GetView<HomeController> {
                                     top: 4,
                                     left: -4,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.all(4),
+                                      alignment: .center,
                                       decoration: BoxDecoration(
-                                        color: badgeColor,
-                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: badgeGradient,
+                                        shape: BoxShape.circle,
                                       ),
-                                      child: Text(
-                                        type,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      child: Icon(
+                                        badgeIcon,
+                                        size: 16,
+                                        color: Colors.white, // Icon color
                                       ),
                                     ),
                                   ),
@@ -323,7 +353,10 @@ class HomeView extends GetView<HomeController> {
                                     bottom: 0,
                                     child: Container(
                                       width: 30,
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withOpacity(0.7),
                                         borderRadius: BorderRadius.circular(6),
@@ -336,12 +369,12 @@ class HomeView extends GetView<HomeController> {
                                             Row(
                                               children: List.generate(
                                                 1, // 5 stars
-                                                    (i) => Icon(
+                                                (i) => Icon(
                                                   i < service.rating.floor()
                                                       ? Icons.star
                                                       : (i < service.rating
-                                                      ? Icons.star_half
-                                                      : Icons.star_border),
+                                                            ? Icons.star_half
+                                                            : Icons.star_border),
                                                   size: 10,
                                                   color: Colors.orange,
                                                 ),
@@ -364,14 +397,18 @@ class HomeView extends GetView<HomeController> {
                                 ],
                               ),
 
-
                               const SizedBox(height: 4),
                               // Title below the image + rating
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2), // optional padding
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ), // optional padding
                                 decoration: BoxDecoration(
                                   color: Colors.black, // ✅ background color
-                                  borderRadius: BorderRadius.circular(6), // optional rounded corners
+                                  borderRadius: BorderRadius.circular(
+                                    6,
+                                  ), // optional rounded corners
                                 ),
                                 child: Text(
                                   service.title.split('(').first,
