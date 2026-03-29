@@ -150,12 +150,24 @@ class HomeView extends GetView<HomeController> {
                   height: 120,
                   child: Obx(() {
                     final categories = controller.services;
+                    final visibleIndexes = List.generate(categories.length, (i) => i).where((i) {
+                      final service = categories[i];
+
+                      if (service.rating >= 4.7) return true;
+                      if (service.rating >= 4.3) return true;
+                      if (service.available) return true;
+                      return false;
+                    }).toList();
+
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
                       separatorBuilder: (_, _) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
+                      itemBuilder: (context, i) {
+                        if (i >= visibleIndexes.length) return const SizedBox.shrink();
+
+                        final index = visibleIndexes[i]; // original index
                         final service = categories[index];
 
                         String type;
@@ -298,7 +310,7 @@ class HomeView extends GetView<HomeController> {
                         // );
 
                         return GestureDetector(
-                          onTap: () => controller.focusService(service),
+                          onTap: () => controller.focusService(service, index: index),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -315,7 +327,8 @@ class HomeView extends GetView<HomeController> {
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
                                         image: NetworkImage(
-                                          "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
+                                          // "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
+                                          "https://img.freepik.com/premium-psd/red-flaming-bird-with-red-feather-it_1007137-145.jpg",
                                         ),
                                         fit: BoxFit.cover,
                                       ),
@@ -343,7 +356,9 @@ class HomeView extends GetView<HomeController> {
                                       child: Icon(
                                         badgeIcon,
                                         size: 16,
-                                        color: Colors.white, // Icon color
+                                        color: type == "Other"
+                                            ? Colors.transparent
+                                            : Colors.white, // Icon color
                                       ),
                                     ),
                                   ),
@@ -436,7 +451,7 @@ class HomeView extends GetView<HomeController> {
             Positioned(
               bottom: 10,
               left: 0,
-              right: 50,
+              right: 0,
               child: SizedBox(
                 height: 220,
                 child: Obx(() {

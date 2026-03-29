@@ -1,9 +1,9 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/modules/user/home/controller/marker_generator.dart';
 
 import '../../../../core/widgets/App_button.dart';
@@ -215,16 +215,38 @@ class HomeController extends GetxController {
     return LinearGradient(colors: [Color(0xFF000000), Color(0xFF3612FF)]);
   }
 
-  IconData getMarkerIcon(String type) {
-    if (type == 'Elite') {
-      return Iconsax.crown1;
-    } else if (type == 'Pro') {
-      return Iconsax.star1;
-    } else if (type == 'Basic') {
-      return Iconsax.shield_security;
-    }
+  final _random = Random();
 
-    return Icons.broken_image;
+  final List<IconData> _icons = [
+    Icons.computer,
+    Icons.code,
+    Icons.language,
+    Icons.phone_android,
+    Icons.analytics,
+    Icons.design_services,
+    Icons.local_hospital,
+    Icons.medical_services,
+    Icons.local_pharmacy,
+    Icons.school,
+    Icons.person,
+    Icons.manage_accounts,
+    Icons.camera_alt,
+    Icons.brush,
+    Icons.edit,
+    Icons.music_note,
+    Icons.build,
+    Icons.drive_eta,
+    Icons.restaurant,
+    Icons.security,
+    Icons.engineering,
+    Icons.agriculture,
+    Icons.gavel,
+    Icons.flight,
+    Icons.science,
+  ];
+
+  IconData getMarkerIcon() {
+    return _icons[_random.nextInt(_icons.length)];
   }
 
   void generateMarkers() async {
@@ -261,7 +283,7 @@ class HomeController extends GetxController {
         svgString: svgString,
         size: isSmallScreen ? Size(80, 80) : Size(160, 160),
         gradient: getMarkerGradient(type),
-        icon: getMarkerIcon(type),
+        icon: getMarkerIcon(),
         badgeLabel: type, // 'Elite', 'Pro', 'Basic'
         badgeGradient: getMarkerGradient(type), // reuse or define a separate badge gradient
       );
@@ -366,8 +388,9 @@ class HomeController extends GetxController {
     }).toList();
   }
 
-  void focusService(HomeServiceModel service) {
+  void focusService(HomeServiceModel service, {int? index}) {
     mapController?.animateCamera(CameraUpdate.newLatLng(LatLng(service.lat, service.lng)));
+    if (index != null) pageController.jumpToPage(index);
   }
 
   void openService(HomeServiceModel service) {
