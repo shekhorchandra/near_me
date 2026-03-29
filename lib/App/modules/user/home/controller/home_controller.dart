@@ -100,7 +100,7 @@ class HomeController extends GetxController {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
+                        "${(selectedRadius.value).toStringAsFixed(0)} miles",
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ),
@@ -114,7 +114,7 @@ class HomeController extends GetxController {
                   max: 50,
                   divisions: 49,
                   activeColor: Colors.black,
-                  label: "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
+                  label: "${(selectedRadius.value).toStringAsFixed(0)} miles",
                   onChanged: (value) => selectedRadius.value = value,
                 ),
               ),
