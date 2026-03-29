@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/modules/user/home/controller/marker_generator.dart';
 
 import '../../../../core/widgets/App_button.dart';
@@ -213,6 +214,18 @@ class HomeController extends GetxController {
     return LinearGradient(colors: [Color(0xFF000000), Color(0xFF3612FF)]);
   }
 
+  IconData getMarkerIcon(String type) {
+    if (type == 'Elite') {
+      return Iconsax.crown1;
+    } else if (type == 'Pro') {
+      return Iconsax.star1;
+    } else if (type == 'Basic') {
+      return Iconsax.shield_security;
+    }
+
+    return Icons.broken_image;
+  }
+
   final _random = Random();
 
   final List<IconData> _icons = [
@@ -243,7 +256,7 @@ class HomeController extends GetxController {
     Icons.science,
   ];
 
-  IconData getMarkerIcon() {
+  IconData getMarkerCategory() {
     return _icons[_random.nextInt(_icons.length)];
   }
 
@@ -281,7 +294,8 @@ class HomeController extends GetxController {
         svgString: svgString,
         size: isSmallScreen ? Size(80, 80) : Size(160, 160),
         gradient: getMarkerGradient(type),
-        icon: getMarkerIcon(),
+        icon: getMarkerIcon(type),
+        category: getMarkerCategory(),
         badgeLabel: type, // 'Elite', 'Pro', 'Basic'
         badgeGradient: getMarkerGradient(type), // reuse or define a separate badge gradient
       );

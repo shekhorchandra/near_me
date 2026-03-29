@@ -164,7 +164,7 @@ class HomeView extends GetView<HomeController> {
 
                       if (service.rating >= 4.7) return true;
                       if (service.rating >= 4.3) return true;
-                      if (service.available) return true;
+                      if (service.available) return false;
                       return false;
                     }).toList();
 

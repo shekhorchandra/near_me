@@ -12,6 +12,7 @@ class MarkerGenerator {
     required Size size,
     required LinearGradient gradient,
     required IconData icon,
+    required IconData category,
     required String badgeLabel,
     required LinearGradient badgeGradient,
     Color iconColor = Colors.white,
@@ -51,14 +52,14 @@ class MarkerGenerator {
     canvas.restore();
 
     // ── 3. Draw Belly Icon (Center of Pin) ──────────────────────────────────
-    final double bellyIconSize = 96 * scale;
+    final double bellyIconSize = 80 * scale;
     final bellyPainter = TextPainter(textDirection: TextDirection.ltr)
       ..text = TextSpan(
-        text: String.fromCharCode(icon.codePoint),
+        text: String.fromCharCode(category.codePoint),
         style: TextStyle(
           fontSize: bellyIconSize,
-          fontFamily: icon.fontFamily,
-          package: icon.fontPackage,
+          fontFamily: category.fontFamily,
+          package: category.fontPackage,
           color: iconColor,
         ),
       )
