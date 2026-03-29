@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -249,9 +251,15 @@ class HomeController extends GetxController {
     ''';
 
       // Generate the complex marker
+      final double screenWidth =
+          ui.PlatformDispatcher.instance.views.first.physicalSize.width /
+          ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+
+      final bool isSmallScreen = screenWidth < 400;
+
       BitmapDescriptor customIcon = await MarkerGenerator.svgToBitmapDescriptor(
         svgString: svgString,
-        size: Size(160, 160),
+        size: isSmallScreen ? Size(80, 80) : Size(160, 160),
         gradient: getMarkerGradient(type),
         icon: getMarkerIcon(type),
         badgeLabel: type, // 'Elite', 'Pro', 'Basic'

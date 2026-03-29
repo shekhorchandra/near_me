@@ -17,6 +17,7 @@ class MarkerGenerator {
     Color iconColor = Colors.white,
   }) async {
     // 1. INCREASE PADDING: More room for the badge to overflow top/left
+    final double scale = size.width / 160.0;
     const double badgeOverflow = 60.0; // Increased padding
     final Size canvasSize = Size(size.width + badgeOverflow, size.height + badgeOverflow);
 
@@ -50,7 +51,7 @@ class MarkerGenerator {
     canvas.restore();
 
     // ── 3. Draw Belly Icon (Center of Pin) ──────────────────────────────────
-    final double bellyIconSize = size.width * 0.6; // Increased size
+    final double bellyIconSize = 96 * scale;
     final bellyPainter = TextPainter(textDirection: TextDirection.ltr)
       ..text = TextSpan(
         text: String.fromCharCode(icon.codePoint),
@@ -74,15 +75,15 @@ class MarkerGenerator {
 
     // ── 4. Draw Badge Pill (Top-Left) ───────────────────────────────────────
     if (badgeLabel != "Other") {
-      const double badgeFontSize = 32.0; // Increased font size
-      const double badgeIconSize = 32.0; // Increased icon size
-      const double badgeHeight = 60.0; // Taller pill
-      const double pillHorizontalPadding = 15.0; // Wider pill ends
+      final double badgeFontSize = 32.0 * scale;
+      final double badgeIconSize = 32.0 * scale;
+      final double badgeHeight = 60.0 * scale;
+      final double pillHorizontalPadding = 15.0 * scale;
 
       final labelPainter = TextPainter(textDirection: TextDirection.ltr)
         ..text = TextSpan(
           text: badgeLabel,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: badgeFontSize,
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -96,21 +97,18 @@ class MarkerGenerator {
           (badgeHeight * 0.8) + labelPainter.width + (pillHorizontalPadding * 2);
 
       // Position: Move it HIGHER (y) and FURTHER LEFT (x)
-      final double pillLeft = markerOffsetX - 35;
-      final double pillTop = markerOffsetY - 25;
+      final double pillLeft = markerOffsetX - (35 * scale);
+      final double pillTop = markerOffsetY - (25 * scale);
 
       final Rect pillRect = Rect.fromLTWH(pillLeft, pillTop, pillWidth, badgeHeight);
-      final RRect pillRRect = RRect.fromRectAndRadius(
-        pillRect,
-        const Radius.circular(badgeHeight / 2),
-      );
+      final RRect pillRRect = RRect.fromRectAndRadius(pillRect, Radius.circular(badgeHeight / 2));
 
       // Draw Pill Background with Shadow for better visibility
       canvas.drawRRect(
-        pillRRect.shift(const Offset(0, 3)),
+        pillRRect.shift(Offset(0, 3 * scale)),
         Paint()
           ..color = Colors.black26
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, 3 * scale),
       );
       final badgePaint = Paint()..shader = badgeGradient.createShader(pillRect);
       canvas.drawRRect(pillRRect, badgePaint);
