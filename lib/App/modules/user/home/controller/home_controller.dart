@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/modules/user/home/controller/marker_generator.dart';
+import 'package:near_me/App/modules/user/home/model/dummy_data.dart';
 
 import '../../../../core/widgets/App_button.dart';
 import '../model/HomeServiceModel.dart';
@@ -284,15 +285,46 @@ class HomeController extends GetxController {
     ''';
 
       // Generate the complex marker
-      final double screenWidth =
-          ui.PlatformDispatcher.instance.views.first.physicalSize.width /
+      final double screenHeight =
+          ui.PlatformDispatcher.instance.views.first.physicalSize.height /
           ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
 
-      final bool isSmallScreen = screenWidth < 400;
+      final bool isSmallScreen = screenHeight < 700;
+
+      Size getSizeForMarker(String type) {
+        double size = 100;
+
+        if (isSmallScreen) {
+          // For small screens
+          if (type == 'Elite') {
+            size = 120;
+          } else if (type == 'Pro') {
+            size = 100;
+          } else if (type == 'Basic') {
+            size = 80;
+          } else {
+            size = 60;
+          }
+        } else {
+          // For large screens
+          if (type == 'Elite') {
+            size = 160;
+          } else if (type == 'Pro') {
+            size = 130;
+          } else if (type == 'Basic') {
+            size = 100;
+          } else {
+            size = 80;
+          }
+        }
+
+        // Return the size as a Size object (width, height are equal)
+        return Size(size, size);
+      }
 
       BitmapDescriptor customIcon = await MarkerGenerator.svgToBitmapDescriptor(
         svgString: svgString,
-        size: isSmallScreen ? Size(80, 80) : Size(160, 160),
+        size: getSizeForMarker(type),
         gradient: getMarkerGradient(type),
         icon: getMarkerIcon(type),
         category: getMarkerCategory(),
@@ -302,7 +334,7 @@ class HomeController extends GetxController {
 
       tempMarkers.add(
         Marker(
-          markerId: MarkerId(service.id),
+          markerId: MarkerId(service.id.toString()),
           position: LatLng(service.lat, service.lng),
           icon: customIcon,
           infoWindow: InfoWindow(title: service.title, snippet: "$type Service"),
@@ -315,71 +347,7 @@ class HomeController extends GetxController {
 
   void loadServices() {
     /// Dummy data (replace with API)
-    services.value = [
-      HomeServiceModel(
-        id: "1",
-        title: "Car Wash",
-        rating: 4.5,
-        distance: 1.2,
-        available: true,
-        lat: 23.77002871396432,
-        lng: 90.41767335602759,
-        category: 'Full load',
-      ),
-      HomeServiceModel(
-        id: "2",
-        title: "Bike Repair",
-        rating: 4.2,
-        distance: 2.1,
-        available: true,
-        lat: 25.707178456987403,
-        lng: 89.40034264802111,
-        category: 'Trade and startup',
-      ),
-      HomeServiceModel(
-        id: "3",
-        title: "Auto Service",
-        rating: 4.8,
-        distance: 3.0,
-        available: false,
-        lat: 23.450936186653884,
-        lng: 87.81394250424515,
-        category: 'car abd bike wash',
-      ),
-
-      HomeServiceModel(
-        id: "4",
-        title: "Auto moto",
-        rating: 2.8,
-        distance: 3.0,
-        available: false,
-        lat: 40.741895,
-        lng: -73.989308,
-        category: 'car abd bike wash',
-      ),
-
-      HomeServiceModel(
-        id: "5",
-        title: "Service",
-        rating: 2.2,
-        distance: 1.2,
-        available: true,
-        lat: 24.811516368950436,
-        lng: 88.94157331547738,
-        category: 'Full load',
-      ),
-
-      HomeServiceModel(
-        id: "6",
-        title: "Service",
-        rating: 4.5,
-        distance: 1.2,
-        available: true,
-        lat: 23.53135973516676,
-        lng: 90.12162702073485,
-        category: 'Full load',
-      ),
-    ];
+    services.value = (dummyData as List).map((e) => HomeServiceModel.fromMap(e)).toList();
 
     generateMarkers();
   }

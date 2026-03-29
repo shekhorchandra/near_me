@@ -50,8 +50,8 @@ class HomeView extends GetView<HomeController> {
             Obx(
               () => GoogleMap(
                 initialCameraPosition: const CameraPosition(
-                  target: LatLng(23.8103, 90.4125),
-                  zoom: 12,
+                  target: LatLng(51.5074, -0.1278),
+                  zoom: 13,
                 ),
                 markers: controller.markers.value,
                 onMapCreated: (GoogleMapController map) {
@@ -336,14 +336,14 @@ class HomeView extends GetView<HomeController> {
                                     ),
                                     padding: EdgeInsets.all(3),
                                     child: Container(
-                                      width: 70,
-                                      height: 70,
+                                      width: 50,
+                                      height: 50,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
                                           image: NetworkImage(
                                             // "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
-                                            "https://img.freepik.com/premium-psd/red-flaming-bird-with-red-feather-it_1007137-145.jpg",
+                                            service.image,
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -436,15 +436,17 @@ class HomeView extends GetView<HomeController> {
                                   vertical: 2,
                                 ), // optional padding
                                 decoration: BoxDecoration(
-                                  color: Colors.black, // ✅ background color
+                                  color: Colors.black,
                                   borderRadius: BorderRadius.circular(
                                     6,
                                   ), // optional rounded corners
                                 ),
+                                width: 100,
                                 child: Text(
-                                  service.title.split('(').first,
+                                  service.title,
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
+                                  softWrap: true,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: Colors.white,
