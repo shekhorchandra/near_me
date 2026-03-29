@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
+
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
+
+  LinearGradient getBadgeGradient(String type) {
+    switch (type) {
+      case 'Elite':
+        return LinearGradient(
+          colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'Pro':
+        return LinearGradient(
+          colors: [Color(0xFFFFEA00), Color(0xFFFFA600)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      case 'Basic':
+        return LinearGradient(
+          colors: [Color.fromARGB(255, 72, 248, 140), Color(0xFF4B9868)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      default:
+        return LinearGradient(
+          colors: [Colors.transparent, Colors.transparent], // Hide if no plan is enrolled
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,23 +104,34 @@ class HomeView extends GetView<HomeController> {
                           child: SizedBox(
                             height: 50,
                             child: CustomTextField(
-                              hint: 'Search near me services',
+                              hint: 'Search near me',
 
                               // RIGHT SIDE SEARCH BUTTON
-                              suffix: IconButton(
-                                icon: const Icon(Icons.search),
-                                color: Colors.black,
-                                onPressed: () {
-                                  // your search action here
-                                  print("Search clicked");
-                                },
+                              icon: Icons.search,
+                              // suffix: IconButton(
+                              //   icon: const Icon(Icons.search),
+                              //   color: Colors.black,
+                              //   onPressed: () {
+                              //     // your search action here
+                              //     print("Search clicked");
+                              //   },
+                              // ),
+                              // suffix: IconButton(
+                              //   icon: const Icon(Icons.tune, color: Colors.black),
+                              //   style: IconButton.styleFrom(backgroundColor: Colors.white),
+                              //   onPressed: () {
+                              //     controller.showFilterBottomSheet();
+                              //   },
+                              // ),
+                              suffix: InkWell(
+                                onTap: () => controller.showFilterBottomSheet(),
+                                child: Icon(Icons.tune),
                               ),
                             ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(width: 10),
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         child: IconButton(
@@ -97,15 +139,7 @@ class HomeView extends GetView<HomeController> {
                           onPressed: () {},
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      IconButton(
-                        icon: const Icon(Icons.filter_alt, color: Colors.black),
-                        style: IconButton.styleFrom(backgroundColor: Colors.white),
-                        onPressed: () {
-                          controller.showFilterBottomSheet();
-                        },
-                      ),
-                      const SizedBox(width: 10),
+
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         child: IconButton(
@@ -117,35 +151,54 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
 
-
                 // YOUR CIRCULAR CATEGORY ROW HERE
                 SizedBox(
                   height: 120,
                   child: Obx(() {
-                    final categories = controller.services.value;
+                    final categories = controller.services.toList();
+
+                    if (categories.isEmpty) return const SizedBox.shrink();
+
+                    final visibleIndexes = List.generate(categories.length, (i) => i).where((i) {
+                      final service = categories[i];
+
+                      if (service.rating >= 4.7) return true;
+                      if (service.rating >= 4.3) return true;
+                      if (service.available) return false;
+                      return false;
+                    }).toList();
+
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, i) {
+                        if (i >= visibleIndexes.length) return const SizedBox.shrink();
+
+                        final index = visibleIndexes[i]; // original index
                         final service = categories[index];
 
                         String type;
-                        Color badgeColor;
+                        IconData badgeIcon;
+                        Gradient badgeGradient;
 
                         if (service.rating >= 4.7) {
                           type = 'Elite';
-                          badgeColor = Color(0xFFAF0000);
+                          badgeIcon = Iconsax.crown1;
+                          badgeGradient = getBadgeGradient(type);
                         } else if (service.rating >= 4.3) {
                           type = 'Pro';
-                          badgeColor = Color(0xFF281C59);
+                          badgeIcon = Iconsax.star1;
+                          badgeGradient = getBadgeGradient(type);
                         } else if (service.available) {
-                          type = 'Active';
-                          badgeColor = Color(0xFF25671E);
+                          type = 'Basic';
+                          badgeIcon = Iconsax.shield_security;
+                          badgeGradient = getBadgeGradient(type);
                         } else {
                           type = 'Other';
-                          badgeColor = Color(0xFFFF4400);
+                          badgeIcon = badgeIcon = Iconsax.crown;
+                          badgeGradient = getBadgeGradient(type);
                         }
 
                         // return GestureDetector(
@@ -266,7 +319,7 @@ class HomeView extends GetView<HomeController> {
                         // );
 
                         return GestureDetector(
-                          onTap: () => controller.focusService(service),
+                          onTap: () => controller.focusService(service, index: index),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -277,23 +330,31 @@ class HomeView extends GetView<HomeController> {
                                 children: [
                                   // Circle Image
                                   Container(
-                                    width: 70,
-                                    height: 70,
                                     decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
+                                      gradient: badgeGradient,
+                                      shape: .circle,
+                                    ),
+                                    padding: EdgeInsets.all(3),
+                                    child: Container(
+                                      width: 70,
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            // "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
+                                            "https://img.freepik.com/premium-psd/red-flaming-bird-with-red-feather-it_1007137-145.jpg",
+                                          ),
+                                          fit: BoxFit.cover,
                                         ),
-                                        fit: BoxFit.cover,
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 6,
+                                            offset: Offset(0, 3),
+                                          ),
+                                        ],
                                       ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 6,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
                                     ),
                                   ),
 
@@ -302,18 +363,18 @@ class HomeView extends GetView<HomeController> {
                                     top: 4,
                                     left: -4,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      padding: const EdgeInsets.all(4),
+                                      alignment: .center,
                                       decoration: BoxDecoration(
-                                        color: badgeColor,
-                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: badgeGradient,
+                                        shape: BoxShape.circle,
                                       ),
-                                      child: Text(
-                                        type,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 8,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      child: Icon(
+                                        badgeIcon,
+                                        size: 16,
+                                        color: type == "Other"
+                                            ? Colors.transparent
+                                            : Colors.white.withAlpha(240), // Icon color
                                       ),
                                     ),
                                   ),
@@ -323,7 +384,10 @@ class HomeView extends GetView<HomeController> {
                                     bottom: 0,
                                     child: Container(
                                       width: 30,
-                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.black.withOpacity(0.7),
                                         borderRadius: BorderRadius.circular(6),
@@ -336,12 +400,12 @@ class HomeView extends GetView<HomeController> {
                                             Row(
                                               children: List.generate(
                                                 1, // 5 stars
-                                                    (i) => Icon(
+                                                (i) => Icon(
                                                   i < service.rating.floor()
                                                       ? Icons.star
                                                       : (i < service.rating
-                                                      ? Icons.star_half
-                                                      : Icons.star_border),
+                                                            ? Icons.star_half
+                                                            : Icons.star_border),
                                                   size: 10,
                                                   color: Colors.orange,
                                                 ),
@@ -364,14 +428,18 @@ class HomeView extends GetView<HomeController> {
                                 ],
                               ),
 
-
                               const SizedBox(height: 4),
                               // Title below the image + rating
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2), // optional padding
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ), // optional padding
                                 decoration: BoxDecoration(
                                   color: Colors.black, // ✅ background color
-                                  borderRadius: BorderRadius.circular(6), // optional rounded corners
+                                  borderRadius: BorderRadius.circular(
+                                    6,
+                                  ), // optional rounded corners
                                 ),
                                 child: Text(
                                   service.title.split('(').first,
@@ -399,12 +467,12 @@ class HomeView extends GetView<HomeController> {
             Positioned(
               bottom: 10,
               left: 0,
-              right: 50,
+              right: 0,
               child: SizedBox(
-                height: 200,
+                height: 220,
                 child: Obx(() {
-                  final services = controller.filteredServices.isNotEmpty
-                      ? controller.filteredServices
+                  final services = controller.filteredServices.value.isNotEmpty
+                      ? controller.filteredServices.value
                       : controller.services.value;
 
                   if (services.isEmpty) {
@@ -446,6 +514,20 @@ class HomeView extends GetView<HomeController> {
                               overflow: TextOverflow.ellipsis,
                             ),
 
+                            const SizedBox(height: 4),
+
+                            /// Company
+                            Text(
+                              "Company Name will show here", // TODO: show company name dynamically
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+
                             const SizedBox(height: 8),
 
                             /// RATING
@@ -477,7 +559,7 @@ class HomeView extends GetView<HomeController> {
                                 const Icon(Icons.location_on, size: 16, color: Colors.grey),
                                 const SizedBox(width: 4),
                                 Text(
-                                  "${service.distance.toStringAsFixed(1)} km away",
+                                  "${service.distance.toStringAsFixed(1)} miles away",
                                   style: const TextStyle(color: Colors.grey),
                                 ),
                               ],

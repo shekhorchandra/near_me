@@ -1,11 +1,11 @@
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:near_me/App/modules/user/home/controller/marker_generator.dart';
 
 import '../../../../core/widgets/App_button.dart';
 import '../model/HomeServiceModel.dart';
@@ -46,147 +46,149 @@ class HomeController extends GetxController {
     loadServices();
     filteredServices.value = services;
     updateCategoryCounts();
-    loadMarkerIcons();
+    generateMarkers();
   }
 
   /// get bottom sheet for filter
   void showFilterBottomSheet() {
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// TITLE
-            const Center(
-              child: Text(
-                "Filter Services",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            /// RATING
-            const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
-            Obx(
-              () => Slider(
-                value: selectedRating.value,
-                min: 0,
-                max: 5,
-                divisions: 5,
-                activeColor: Colors.black,
-                label: selectedRating.value.toString(),
-                onChanged: (value) => selectedRating.value = value,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            /// RADIUS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
-                Obx(
-                  () => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                        "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
+      SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// TITLE
+              const Center(
+                child: Text(
+                  "Filter Services",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
-            Obx(
-              () => Slider(
-                value: selectedRadius.value.clamp(1, 50),
-                min: 1,
-                max: 50,
-                divisions: 49,
-                activeColor: Colors.black,
-                label: "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
-                onChanged: (value) => selectedRadius.value = value,
               ),
-            ),
-            const SizedBox(height: 15),
+              const SizedBox(height: 20),
 
-            /// CATEGORY
-            const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 10),
-            Obx(
-              () => Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"].map((category) {
-                  final selected = selectedCategories.contains(category);
-                  return GestureDetector(
-                    onTap: () {
-                      if (selected) {
-                        selectedCategories.remove(category);
-                      } else {
-                        selectedCategories.add(category);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              /// RATING
+              const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
+              Obx(
+                () => Slider(
+                  value: selectedRating.value,
+                  min: 0,
+                  max: 5,
+                  divisions: 5,
+                  activeColor: Colors.black,
+                  label: selectedRating.value.toString(),
+                  onChanged: (value) => selectedRating.value = value,
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              /// RADIUS
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
+                  Obx(
+                    () => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: selected ? Colors.black : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        category,
-                        style: TextStyle(
-                          color: selected ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        "${(selectedRadius.value).toStringAsFixed(0)} miles",
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 25),
-
-            /// BUTTONS
-            Row(
-              children: [
-                /// CLEAR BUTTON
-                Expanded(
-                  child: AppButton(
-                    text: "Clear",
-                    onPressed: () {
-                      selectedRating.value = 0;
-                      selectedRadius.value = 10;
-                      selectedCategories.clear();
-                      applyFilters();
-                      Get.back();
-                    },
-                  ),
+              Obx(
+                () => Slider(
+                  value: selectedRadius.value.clamp(1, 50),
+                  min: 1,
+                  max: 50,
+                  divisions: 49,
+                  activeColor: Colors.black,
+                  label: "${(selectedRadius.value).toStringAsFixed(0)} miles",
+                  onChanged: (value) => selectedRadius.value = value,
                 ),
-                const SizedBox(width: 10),
+              ),
+              const SizedBox(height: 15),
 
-                /// APPLY BUTTON
-                Expanded(
-                  child: AppButton(
-                    text: "Apply Filters",
-                    onPressed: () {
-                      applyFilters();
-                      Get.back();
-                    },
-                  ),
+              /// CATEGORY
+              const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 10),
+              Obx(
+                () => Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"].map((category) {
+                    final selected = selectedCategories.contains(category);
+                    return GestureDetector(
+                      onTap: () {
+                        if (selected) {
+                          selectedCategories.remove(category);
+                        } else {
+                          selectedCategories.add(category);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: selected ? Colors.black : Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            color: selected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 25),
+
+              /// BUTTONS
+              Row(
+                children: [
+                  /// CLEAR BUTTON
+                  Expanded(
+                    child: AppButton(
+                      text: "Clear",
+                      onPressed: () {
+                        selectedRating.value = 0;
+                        selectedRadius.value = 10;
+                        selectedCategories.clear();
+                        applyFilters();
+                        Get.back();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  /// APPLY BUTTON
+                  Expanded(
+                    child: AppButton(
+                      text: "Apply Filters",
+                      onPressed: () {
+                        applyFilters();
+                        Get.back();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -200,39 +202,65 @@ class HomeController extends GetxController {
     categoryCounts.value = counts;
   }
 
-  Future<BitmapDescriptor> getColoredMarker(String path, int width, Color color) async {
-    final ByteData data = await rootBundle.load(path);
-    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+  LinearGradient getMarkerGradient(String type) {
+    if (type == 'Elite') {
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFF7161AA)]);
+    } else if (type == 'Pro') {
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFFFFA800)]);
+    } else if (type == 'Basic') {
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFF4B9B69)]);
+    }
 
-    final frame = await codec.getNextFrame();
-
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-
-    final paint = Paint()..colorFilter = ColorFilter.mode(color, BlendMode.srcATop);
-
-    canvas.drawImage(frame.image, Offset.zero, paint);
-
-    final picture = recorder.endRecording();
-    final img = await picture.toImage(width, width);
-    final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-
-    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+    return LinearGradient(colors: [Color(0xFF000000), Color(0xFF3612FF)]);
   }
 
-  void loadMarkerIcons() async {
-    markerIcons['Elite'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFAF0000));
+  IconData getMarkerIcon(String type) {
+    if (type == 'Elite') {
+      return Iconsax.crown1;
+    } else if (type == 'Pro') {
+      return Iconsax.star1;
+    } else if (type == 'Basic') {
+      return Iconsax.shield_security;
+    }
 
-    markerIcons['Pro'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF281C59));
-
-    markerIcons['Active'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFF25671E));
-
-    markerIcons['Other'] = await getColoredMarker('assets/icons/mak.png', 130, Color(0xFFFF4400));
-
-    generateMarkers();
+    return Icons.broken_image;
   }
 
-  void generateMarkers() {
+  final _random = Random();
+
+  final List<IconData> _icons = [
+    Icons.computer,
+    Icons.code,
+    Icons.language,
+    Icons.phone_android,
+    Icons.analytics,
+    Icons.design_services,
+    Icons.local_hospital,
+    Icons.medical_services,
+    Icons.local_pharmacy,
+    Icons.school,
+    Icons.person,
+    Icons.manage_accounts,
+    Icons.camera_alt,
+    Icons.brush,
+    Icons.edit,
+    Icons.music_note,
+    Icons.build,
+    Icons.drive_eta,
+    Icons.restaurant,
+    Icons.security,
+    Icons.engineering,
+    Icons.agriculture,
+    Icons.gavel,
+    Icons.flight,
+    Icons.science,
+  ];
+
+  IconData getMarkerCategory() {
+    return _icons[_random.nextInt(_icons.length)];
+  }
+
+  void generateMarkers() async {
     final Set<Marker> tempMarkers = {};
 
     for (var service in services) {
@@ -243,26 +271,45 @@ class HomeController extends GetxController {
       } else if (service.rating >= 4.3) {
         type = 'Pro';
       } else if (service.available) {
-        type = 'Active';
+        type = 'Basic';
       } else {
         type = 'Other';
       }
+
+      // Define the SVG string (Make sure fill is white so it accepts gradient)
+      const String svgString = '''
+    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 24.5454C0 10.9893 10.9894 0 24.5455 0H35.4546C49.0106 0 60 10.9893 60 24.5454C60 38.1015 48.8894 49.0909 35.3333 49.0909L30.4492 59.0812C30.2664 59.455 29.7336 59.455 29.5508 59.0812L24.6667 49.0909C11.1106 49.0909 0 38.1015 0 24.5454Z" fill="white"/>
+    </svg>
+    ''';
+
+      // Generate the complex marker
+      final double screenWidth =
+          ui.PlatformDispatcher.instance.views.first.physicalSize.width /
+          ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+
+      final bool isSmallScreen = screenWidth < 400;
+
+      BitmapDescriptor customIcon = await MarkerGenerator.svgToBitmapDescriptor(
+        svgString: svgString,
+        size: isSmallScreen ? Size(80, 80) : Size(160, 160),
+        gradient: getMarkerGradient(type),
+        icon: getMarkerIcon(type),
+        category: getMarkerCategory(),
+        badgeLabel: type, // 'Elite', 'Pro', 'Basic'
+        badgeGradient: getMarkerGradient(type), // reuse or define a separate badge gradient
+      );
 
       tempMarkers.add(
         Marker(
           markerId: MarkerId(service.id),
           position: LatLng(service.lat, service.lng),
-
-          // USE YOUR PNG HERE
-          icon: markerIcons[type] ?? BitmapDescriptor.defaultMarker,
-
+          icon: customIcon,
           infoWindow: InfoWindow(title: service.title, snippet: "$type Service"),
-
           onTap: () => focusService(service),
         ),
       );
     }
-
     markers.value = tempMarkers;
   }
 
@@ -353,8 +400,9 @@ class HomeController extends GetxController {
     }).toList();
   }
 
-  void focusService(HomeServiceModel service) {
+  void focusService(HomeServiceModel service, {int? index}) {
     mapController?.animateCamera(CameraUpdate.newLatLng(LatLng(service.lat, service.lng)));
+    if (index != null) pageController.jumpToPage(index);
   }
 
   void openService(HomeServiceModel service) {

@@ -36,13 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.3
   shared_preferences: ^2.5.4
-  flutter_svg: ^2.2.3
+  flutter_svg: ^2.2.4
   url_launcher: ^6.3.2
   image_picker: ^1.2.1
   google_maps_flutter: ^2.14.2
   flutter_credit_card: ^4.1.0
   dotted_border: ^3.1.0
   fl_chart: ^1.2.0
+  iconsax: ^0.0.8
 
 dev_dependencies:
   flutter_test:
