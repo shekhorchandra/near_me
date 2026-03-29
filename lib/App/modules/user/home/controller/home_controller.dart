@@ -51,141 +51,143 @@ class HomeController extends GetxController {
   /// get bottom sheet for filter
   void showFilterBottomSheet() {
     Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// TITLE
-            const Center(
-              child: Text(
-                "Filter Services",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            /// RATING
-            const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
-            Obx(
-              () => Slider(
-                value: selectedRating.value,
-                min: 0,
-                max: 5,
-                divisions: 5,
-                activeColor: Colors.black,
-                label: selectedRating.value.toString(),
-                onChanged: (value) => selectedRating.value = value,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            /// RADIUS
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
-                Obx(
-                  () => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
+      SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// TITLE
+              const Center(
+                child: Text(
+                  "Filter Services",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ],
-            ),
-            Obx(
-              () => Slider(
-                value: selectedRadius.value.clamp(1, 50),
-                min: 1,
-                max: 50,
-                divisions: 49,
-                activeColor: Colors.black,
-                label: "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
-                onChanged: (value) => selectedRadius.value = value,
               ),
-            ),
-            const SizedBox(height: 15),
+              const SizedBox(height: 20),
 
-            /// CATEGORY
-            const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 10),
-            Obx(
-              () => Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"].map((category) {
-                  final selected = selectedCategories.contains(category);
-                  return GestureDetector(
-                    onTap: () {
-                      if (selected) {
-                        selectedCategories.remove(category);
-                      } else {
-                        selectedCategories.add(category);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              /// RATING
+              const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
+              Obx(
+                () => Slider(
+                  value: selectedRating.value,
+                  min: 0,
+                  max: 5,
+                  divisions: 5,
+                  activeColor: Colors.black,
+                  label: selectedRating.value.toString(),
+                  onChanged: (value) => selectedRating.value = value,
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              /// RADIUS
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
+                  Obx(
+                    () => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: selected ? Colors.black : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        category,
-                        style: TextStyle(
-                          color: selected ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 25),
-
-            /// BUTTONS
-            Row(
-              children: [
-                /// CLEAR BUTTON
-                Expanded(
-                  child: AppButton(
-                    text: "Clear",
-                    onPressed: () {
-                      selectedRating.value = 0;
-                      selectedRadius.value = 10;
-                      selectedCategories.clear();
-                      applyFilters();
-                      Get.back();
-                    },
-                  ),
+              Obx(
+                () => Slider(
+                  value: selectedRadius.value.clamp(1, 50),
+                  min: 1,
+                  max: 50,
+                  divisions: 49,
+                  activeColor: Colors.black,
+                  label: "${(selectedRadius.value * 0.621371).toStringAsFixed(0)} miles",
+                  onChanged: (value) => selectedRadius.value = value,
                 ),
-                const SizedBox(width: 10),
+              ),
+              const SizedBox(height: 15),
 
-                /// APPLY BUTTON
-                Expanded(
-                  child: AppButton(
-                    text: "Apply Filters",
-                    onPressed: () {
-                      applyFilters();
-                      Get.back();
-                    },
-                  ),
+              /// CATEGORY
+              const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 10),
+              Obx(
+                () => Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: ["Car Wash", "Bike Repair", "Auto Service", "Cleaning"].map((category) {
+                    final selected = selectedCategories.contains(category);
+                    return GestureDetector(
+                      onTap: () {
+                        if (selected) {
+                          selectedCategories.remove(category);
+                        } else {
+                          selectedCategories.add(category);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: selected ? Colors.black : Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            color: selected ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 25),
+
+              /// BUTTONS
+              Row(
+                children: [
+                  /// CLEAR BUTTON
+                  Expanded(
+                    child: AppButton(
+                      text: "Clear",
+                      onPressed: () {
+                        selectedRating.value = 0;
+                        selectedRadius.value = 10;
+                        selectedCategories.clear();
+                        applyFilters();
+                        Get.back();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  /// APPLY BUTTON
+                  Expanded(
+                    child: AppButton(
+                      text: "Apply Filters",
+                      onPressed: () {
+                        applyFilters();
+                        Get.back();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -201,11 +203,7 @@ class HomeController extends GetxController {
 
   LinearGradient getMarkerGradient(String type) {
     if (type == 'Elite') {
-      return LinearGradient(
-        colors: [Color(0xFF000000), Color(0xFF7161AA)],
-        begin: .topCenter,
-        end: .center,
-      );
+      return LinearGradient(colors: [Color(0xFF000000), Color(0xFF7161AA)]);
     } else if (type == 'Pro') {
       return LinearGradient(colors: [Color(0xFF000000), Color(0xFFFFA800)]);
     } else if (type == 'Basic') {
