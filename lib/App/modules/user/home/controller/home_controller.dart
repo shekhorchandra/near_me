@@ -267,9 +267,9 @@ class HomeController extends GetxController {
     for (var service in services) {
       String type;
 
-      if (service.rating >= 4.7) {
+      if (service.rating >= 4) {
         type = 'Elite';
-      } else if (service.rating >= 4.3) {
+      } else if (service.rating >= 3) {
         type = 'Pro';
       } else if (service.available) {
         type = 'Basic';
