@@ -45,6 +45,8 @@ dependencies:
   fl_chart: ^1.2.0
   iconsax: ^0.0.8
   geolocator: ^14.0.2
+  get_storage: ^2.1.1
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

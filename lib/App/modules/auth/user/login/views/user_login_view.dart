@@ -45,7 +45,11 @@ class UserLoginView extends GetView<UserLoginController> {
               const SizedBox(height: 24),
         
               // Email TextField
-              const CustomTextField(hint: "Email Address", icon: Icons.email_outlined),
+              CustomTextField(
+                hint: "Email Address",
+                icon: Icons.email_outlined,
+                controller: controller.emailController,
+              ),
         
               const SizedBox(height: 12),
         
@@ -54,10 +58,13 @@ class UserLoginView extends GetView<UserLoginController> {
                 () => CustomTextField(
                   hint: "Password",
                   icon: Icons.lock_outline,
+                  controller: controller.passwordController,
                   obscure: controller.obscurePassword.value,
                   suffix: IconButton(
                     icon: Icon(
-                      controller.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                      controller.obscurePassword.value
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
                     onPressed: controller.togglePassword,
                   ),
@@ -85,9 +92,15 @@ class UserLoginView extends GetView<UserLoginController> {
               const SizedBox(height: 10),
         
               // Login Button
-              AppButton(text: "Log in", onPressed: () {
-                Get.toNamed(AppRoutes.USER_BOTTOM_NAV);
-              }),
+              Obx(
+                    () => AppButton(
+                  text: "Log in",
+                  loading: controller.isLoading.value,
+                  onPressed: () async {
+                    await controller.loginUser();
+                  },
+                ),
+              ),
         
               const SizedBox(height: 20),
               // Sign Up RichText

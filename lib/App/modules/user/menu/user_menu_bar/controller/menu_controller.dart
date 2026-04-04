@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../../../services/contants/api_constants.dart';
+import '../../../../services/utils/helpers/HttpStatusHandler.dart';
+import '../../../../services/utils/helpers/app_snackbar.dart';
 import '../../../User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
 
 
@@ -76,8 +82,32 @@ class UserMenuController extends GetxController {
   void onTermsTap() => Get.toNamed(AppRoutes.TERMS_CONDITION);
   void onRateAppTap() {}
   void onInviteFriendsTap() {}
-  void onLogoutTap() {
-    Get.deleteAll();
-    Get.offAllNamed(AppRoutes.USER_LOGIN);
+  Future<void> onLogoutTap() async {
+    try {
+      final box = GetStorage();
+      final token = box.read("accessToken");
+
+      final response = await http.post(
+        Uri.parse(ApiConstants.user_logout),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      final message = HttpStatusHandler.getMessage(
+        statusCode: response.statusCode,
+        apiMessage: data["message"],
+      );
+
+      await box.erase();
+      Get.deleteAll();
+
+      AppSnackbar.success(message);
+      Get.offAllNamed(AppRoutes.USER_LOGIN);
+    } catch (e) {
+      AppSnackbar.error("Logout failed");
+    }
   }
 }

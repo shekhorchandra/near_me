@@ -73,7 +73,9 @@ class MenuView extends GetView<UserMenuController> {
                       height: 52,
                       child: AppButton(
                         text: 'Logout',
-                        onPressed: controller.onLogoutTap,
+                        onPressed: () async {
+                          await controller.onLogoutTap();
+                        },
                       ),
                     ),
                     const SizedBox(height: 16),

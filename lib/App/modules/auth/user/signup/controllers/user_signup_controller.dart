@@ -34,7 +34,7 @@ class UserSignupController extends GetxController {
       isLoading.value = true;
 
       final response = await http.post(
-        Uri.parse(ApiConstants.register),
+        Uri.parse(ApiConstants.user_register),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "name": nameController.text.trim(),
