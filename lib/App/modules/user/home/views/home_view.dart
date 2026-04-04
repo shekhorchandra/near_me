@@ -91,57 +91,51 @@ class HomeView extends GetView<HomeController> {
 
                 // 🔍 SEARCH BAR
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   child: Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: SizedBox(
-                            height: 50,
-                            child: CustomTextField(
-                              hint: 'Search near me',
+                        child: SizedBox(
+                          height: 50,
+                          child: CustomTextField(
+                            hint: 'Search near me',
+                            icon: Icons.search,
 
-                              // RIGHT SIDE SEARCH BUTTON
-                              icon: Icons.search,
-                              // suffix: IconButton(
-                              //   icon: const Icon(Icons.search),
-                              //   color: Colors.black,
-                              //   onPressed: () {
-                              //     // your search action here
-                              //     print("Search clicked");
-                              //   },
-                              // ),
-                              // suffix: IconButton(
-                              //   icon: const Icon(Icons.tune, color: Colors.black),
-                              //   style: IconButton.styleFrom(backgroundColor: Colors.white),
-                              //   onPressed: () {
-                              //     controller.showFilterBottomSheet();
-                              //   },
-                              // ),
-                              suffix: InkWell(
-                                onTap: () => controller.showFilterBottomSheet(),
-                                child: Icon(Icons.tune),
+                            suffix: InkWell(
+                              onTap: () => controller.showFilterBottomSheet(),
+                              child: const Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Icon(Icons.tune, color: Colors.grey),
                               ),
                             ),
                           ),
                         ),
                       ),
 
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
+                      const SizedBox(width: 4),
+
+                      // LOCATION BUTTON
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
                         child: IconButton(
                           icon: const Icon(Icons.my_location, color: Colors.black),
                           onPressed: () {},
                         ),
                       ),
+
                       const SizedBox(width: 4),
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
+
+                      // NOTIFICATION BUTTON
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
                         child: IconButton(
                           icon: const Icon(Icons.notifications, color: Colors.black),
                           onPressed: () {},
