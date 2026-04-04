@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
-
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
@@ -194,123 +193,6 @@ class HomeView extends GetView<HomeController> {
                           badgeIcon = badgeIcon = Iconsax.crown;
                           badgeGradient = getBadgeGradient(type);
                         }
-
-                        // return GestureDetector(
-                        //   onTap: () => controller.focusService(service),
-                        //   child: Column(
-                        //     mainAxisSize: MainAxisSize.min,
-                        //     children: [
-                        //       // Image + Badge + Rating
-                        //       Stack(
-                        //         clipBehavior: Clip.none,
-                        //         alignment: Alignment.center,
-                        //         children: [
-                        //           // Circle Image
-                        //           Container(
-                        //             width: 80,
-                        //             height: 80,
-                        //             decoration: BoxDecoration(
-                        //               shape: BoxShape.circle,
-                        //               image: DecorationImage(
-                        //                 image: NetworkImage(
-                        //                   "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
-                        //                 ),
-                        //                 fit: BoxFit.cover,
-                        //               ),
-                        //               boxShadow: const [
-                        //                 BoxShadow(
-                        //                   color: Colors.black12,
-                        //                   blurRadius: 6,
-                        //                   offset: Offset(0, 3),
-                        //                 ),
-                        //               ],
-                        //             ),
-                        //           ),
-                        //
-                        //           // Badge
-                        //           Positioned(
-                        //             top: 4,
-                        //             left: -4,
-                        //             child: Container(
-                        //               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        //               decoration: BoxDecoration(
-                        //                 color: badgeColor,
-                        //                 borderRadius: BorderRadius.circular(10),
-                        //               ),
-                        //               child: Text(
-                        //                 type,
-                        //                 style: const TextStyle(
-                        //                   color: Colors.white,
-                        //                   fontSize: 8,
-                        //                   fontWeight: FontWeight.bold,
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //           ),
-                        //
-                        //           // Rating Overlay
-                        //           Positioned(
-                        //             bottom: 0,
-                        //             child: Container(
-                        //               width: 70,
-                        //               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                        //               decoration: BoxDecoration(
-                        //                 color: Colors.black.withOpacity(0.7),
-                        //                 borderRadius: BorderRadius.circular(12),
-                        //               ),
-                        //               child: Row(
-                        //                 mainAxisAlignment: MainAxisAlignment.center,
-                        //                 children: [
-                        //                   Row(
-                        //                     children: List.generate(
-                        //                       5, // ✅ generate 5 stars
-                        //                           (i) => Icon(
-                        //                         i < service.rating.floor()
-                        //                             ? Icons.star
-                        //                             : (i < service.rating
-                        //                             ? Icons.star_half
-                        //                             : Icons.star_border),
-                        //                         size: 10,
-                        //                         color: Colors.orange,
-                        //                       ),
-                        //                     ),
-                        //                   ),
-                        //                   const SizedBox(width: 4),
-                        //                   Text(
-                        //                     service.rating.toStringAsFixed(1),
-                        //                     style: const TextStyle(
-                        //                       color: Colors.white,
-                        //                       fontSize: 10,
-                        //                       fontWeight: FontWeight.bold,
-                        //                     ),
-                        //                   ),
-                        //                 ],
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ],
-                        //       ),
-                        //
-                        //       const SizedBox(height: 6), // spacing between image and title
-                        //
-                        //       // Title below the image + rating
-                        //       SizedBox(
-                        //         width: 80,
-                        //         child: Text(
-                        //           service.title.split('(').first, // clean title
-                        //           textAlign: TextAlign.center,
-                        //           style: const TextStyle(
-                        //             color: Colors.black87,
-                        //             fontSize: 12,
-                        //             fontWeight: FontWeight.w500,
-                        //           ),
-                        //           maxLines: 2,
-                        //           overflow: TextOverflow.ellipsis,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // );
 
                         return GestureDetector(
                           onTap: () => controller.focusService(service, index: index),

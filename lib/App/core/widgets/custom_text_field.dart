@@ -48,25 +48,19 @@ class CustomTextField extends StatelessWidget {
       maxLines: safeMaxLines,
       validator: validator,
 
-
-
       decoration: InputDecoration(
         hintText: hint,
         errorText: errorText,
 
-        prefixIcon: icon != null
-            ? Icon(icon, color: Colors.grey)
-            : null,
+        prefixIcon: icon != null ? Icon(icon, color: Colors.grey) : null,
 
         suffixIcon: suffix,
 
-        contentPadding:
-        const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
 
         filled: true,
-        fillColor: Colors.white, // ✅ keep white for search feel
-
-        // ✅ SOFT BORDER (no shadow feel)
+        fillColor: Colors.white, // keep white for search feel
+        // SOFT BORDER (no shadow feel)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide(color: AppColor.primary, width: 1),
@@ -97,54 +91,6 @@ class CustomTextField extends StatelessWidget {
           borderSide: const BorderSide(color: Colors.red),
         ),
       ),
-
-
-
-      // decoration: InputDecoration(
-      //   hintText: hint,
-      //   errorText: errorText,
-      //   prefixIcon: icon != null ? Icon(icon) : null,
-      //   suffixIcon: suffix,
-      //   contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      //
-      //
-      //   //  Default border
-      //   border: OutlineInputBorder(
-      //     borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
-      //     borderSide: const BorderSide(color: AppColor.primary, width: 1),
-      //   ),
-      //
-      //   //  Enabled (not focused)
-      //   enabledBorder: OutlineInputBorder(
-      //     borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
-      //     borderSide: const BorderSide(
-      //         // color: AppColor.border,
-      //         width: 1),
-      //   ),
-      //
-      //   //  Focused
-      //   focusedBorder: OutlineInputBorder(
-      //     borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
-      //     borderSide: const BorderSide(color: AppColor.primary, width: 1.5),
-      //   ),
-      //
-      //   // 👇 ADD disabled border
-      //   disabledBorder: OutlineInputBorder(
-      //     borderRadius: BorderRadius.circular(10),
-      //     borderSide: BorderSide(color: Colors.grey.shade300),
-      //   ),
-      //
-      //   //  Error (optional)
-      //   errorBorder: OutlineInputBorder(
-      //     borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
-      //     borderSide: const BorderSide(color: Colors.red, width: 1),
-      //   ),
-      //
-      //   focusedErrorBorder: OutlineInputBorder(
-      //     borderRadius: maxLines == null ? BorderRadius.circular(10) : BorderRadius.circular(10),
-      //     borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      //   ),
-      // ),
     );
   }
 }

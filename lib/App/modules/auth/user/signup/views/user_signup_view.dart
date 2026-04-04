@@ -45,17 +45,19 @@ class UserSignupView extends GetView<UserSignupController> {
               const SizedBox(height: 24),
         
               // User Name
-              const CustomTextField(
+              CustomTextField(
                 hint: "User Name",
                 icon: Icons.person_outline,
+                controller: controller.nameController, // name
               ),
         
               const SizedBox(height: 12),
         
               // Email
-              const CustomTextField(
+              CustomTextField(
                 hint: "Email Address",
                 icon: Icons.email_outlined,
+                controller: controller.emailController, //email
               ),
         
               const SizedBox(height: 12),
@@ -63,16 +65,19 @@ class UserSignupView extends GetView<UserSignupController> {
               // Password
               Obx(
                     () => CustomTextField(
-                  hint: "Set Password",
-                  icon: Icons.lock_outline,
-                  obscure: controller.obscurePassword.value,
-                  suffix: IconButton(
-                    icon: Icon(
-                      controller.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
+                      hint: "Set Password",
+                      icon: Icons.lock_outline,
+                      controller: controller.passwordController, //set password
+                      obscure: controller.obscurePassword.value,
+                      suffix: IconButton(
+                        icon: Icon(
+                          controller.obscurePassword.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: controller.togglePassword,
+                      ),
                     ),
-                    onPressed: controller.togglePassword,
-                  ),
-                ),
               ),
         
               const SizedBox(height: 12),
@@ -80,29 +85,32 @@ class UserSignupView extends GetView<UserSignupController> {
               // Confirm Password
               Obx(
                     () => CustomTextField(
-                  hint: "Confirm Password",
-                  icon: Icons.lock_outline,
-                  obscure: controller.obscureConfirmPassword.value,
-                  suffix: IconButton(
-                    icon: Icon(
-                      controller.obscureConfirmPassword.value
-                          ? Icons.visibility_off
-                          : Icons.visibility,
+                      hint: "Confirm Password",
+                      icon: Icons.lock_outline,
+                      controller: controller.confirmPasswordController, // confirm password
+                      obscure: controller.obscureConfirmPassword.value,
+                      suffix: IconButton(
+                        icon: Icon(
+                          controller.obscureConfirmPassword.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: controller.toggleConfirmPassword,
+                      ),
                     ),
-                    onPressed: controller.toggleConfirmPassword,
-                  ),
-                ),
               ),
         
               const SizedBox(height: 20),
         
               // Sign Up Button
-              AppButton(
-                text: "Create an account",
-                onPressed: () {
-                  // Navigate to Verify Account after sign up
-                  Get.toNamed(AppRoutes.USER_VERIFY_ACCOUNT);
-                },
+              Obx(
+                    () => AppButton(
+                  text: "Create an account",
+                  loading: controller.isLoading.value,
+                  onPressed: () async {
+                    await controller.registerUser();
+                  },
+                ),
               ),
         
               const SizedBox(height: 20),
