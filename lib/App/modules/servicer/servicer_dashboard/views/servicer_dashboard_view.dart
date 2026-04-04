@@ -332,9 +332,9 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
               )),
 
               IconButton(
-                onPressed: onNext,
-                icon: const Icon(Icons.arrow_forward_ios, size: 18),
+                onPressed: onNext,                icon: const Icon(Icons.arrow_forward_ios, size: 18),
               ),
+
             ],
           ),
         ),

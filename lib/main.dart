@@ -7,7 +7,7 @@ import 'App/routes/app_pages.dart';
 import 'App/routes/app_routes.dart';
 
 void main() async {
-  Get.put(UserNavigationBarController());
+  // Get.put(UserNavigationBarController());
   runApp(const NearMeeApp());
 }
 
