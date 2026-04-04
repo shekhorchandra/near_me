@@ -91,7 +91,7 @@ class HomeView extends GetView<HomeController> {
 
                 // 🔍 SEARCH BAR
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
                   child: Row(
                     children: [
                       Expanded(
@@ -139,7 +139,7 @@ class HomeView extends GetView<HomeController> {
                           onPressed: () {},
                         ),
                       ),
-
+                      const SizedBox(width: 4),
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         child: IconButton(
