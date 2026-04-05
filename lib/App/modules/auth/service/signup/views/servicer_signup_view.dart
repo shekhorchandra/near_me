@@ -25,45 +25,48 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
             shrinkWrap: true,
             children: [
               const SizedBox(height: 40),
-        
+
               // Title
               Text(
                 "Become a Service Provider",
                 textAlign: TextAlign.center,
                 style: AppText.h2.bold.copyWith(color: AppColor.primary),
               ),
-        
+
               const SizedBox(height: 8),
-        
+
               // Subtitle
               Text(
                 "Grow your business with local customers.",
                 textAlign: TextAlign.center,
                 style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // User Name
-              const CustomTextField(
+              CustomTextField(
                 hint: "Servicer Name",
                 icon: Icons.person_outline,
+                controller: controller.servicernameController,
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Email
-              const CustomTextField(
+              CustomTextField(
                 hint: "Email Address",
                 icon: Icons.email_outlined,
+                controller: controller.serviceremailController,
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Password
               Obx(
-                    () => CustomTextField(
+                () => CustomTextField(
                   hint: "Set Password",
+                  controller: controller.servicerpasswordController,
                   icon: Icons.lock_outline,
                   obscure: controller.obscurePassword.value,
                   suffix: IconButton(
@@ -74,13 +77,14 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Confirm Password
               Obx(
-                    () => CustomTextField(
+                () => CustomTextField(
                   hint: "Confirm Password",
+                  controller: controller.servicerconfirmPasswordController,
                   icon: Icons.lock_outline,
                   obscure: controller.obscureConfirmPassword.value,
                   suffix: IconButton(
@@ -93,20 +97,22 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Sign Up Button
-              AppButton(
-                text: "Sign Up",
-                onPressed: () {
-                  // Navigate to Verify Account after sign up
-                  Get.toNamed(AppRoutes.SERVICER_VERIFY_ACCOUNT);
-                },
+              Obx(
+                () => AppButton(
+                  text: "Create an account",
+                  loading: controller.isLoading.value,
+                  onPressed: () async {
+                    await controller.registerProvider();
+                  },
+                ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Already have account
               Center(
                 child: RichText(
@@ -126,9 +132,9 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Divider with text
               Row(
                 children: [
@@ -143,20 +149,20 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                   const Expanded(child: Divider(thickness: 1)),
                 ],
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Social Buttons
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Flexible(
-                      child: SocialButton(text: "Google", iconPath: AppAssets.google),
+                      child: SocialButton(text: "Google", iconPath: AppAssets.google, onPressed: () {  },),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple),
+                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple, onPressed: () {  },),
                     ),
                   ],
                 ),

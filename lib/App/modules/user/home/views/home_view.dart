@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
@@ -8,7 +9,9 @@ import '../../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+  HomeView({super.key});
+
+  final box = GetStorage();
 
   LinearGradient getBadgeGradient(String type) {
     switch (type) {
@@ -72,7 +75,10 @@ class HomeView extends GetView<HomeController> {
                       Expanded(
                         child: AppButton(
                           height: 30,
-                          onPressed: () => Get.toNamed(AppRoutes.USER_LOGIN),
+                          onPressed: () {
+                            box.write("selectedRole", "USER"); // 🔥 save role
+                            Get.toNamed(AppRoutes.USER_LOGIN);
+                          },
                           text: 'Login / Create an user account',
                         ),
                       ),
@@ -80,7 +86,10 @@ class HomeView extends GetView<HomeController> {
                       Expanded(
                         child: AppButton(
                           height: 30,
-                          onPressed: () => Get.toNamed(AppRoutes.SERVICER_LOGIN),
+                          onPressed: () {
+                            box.write("selectedRole", "PROVIDER"); // 🔥 save role
+                            Get.toNamed(AppRoutes.SERVICER_LOGIN);
+                          },
                           text: 'Register Service',
                         ),
                       ),

@@ -144,7 +144,7 @@ class AppPages {
     ),
 
     /// User Home page
-    GetPage(name: AppRoutes.HOME, page: () => const HomeView(), binding: HomeBinding()),
+    GetPage(name: AppRoutes.HOME, page: () => HomeView(), binding: HomeBinding()),
 
     // User Category Details page
     GetPage(

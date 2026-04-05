@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:near_me/App/routes/app_routes.dart';
-
 import '../../../../services/utils/helpers/HttpStatusHandler.dart';
 import '../../../../services/contants/api_constants.dart';
 import '../../../../services/utils/helpers/app_snackbar.dart';
@@ -40,6 +39,7 @@ class UserSignupController extends GetxController {
           "name": nameController.text.trim(),
           "email": emailController.text.trim(),
           "password": passwordController.text.trim(),
+          "role": "USER",
         }),
       );
 

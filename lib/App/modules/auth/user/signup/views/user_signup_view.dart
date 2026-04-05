@@ -25,86 +25,84 @@ class UserSignupView extends GetView<UserSignupController> {
             shrinkWrap: true,
             children: [
               const SizedBox(height: 40),
-        
+
               // Title
               Text(
                 "Create New Account",
                 textAlign: TextAlign.center,
                 style: AppText.h2.bold.copyWith(color: AppColor.primary),
               ),
-        
+
               const SizedBox(height: 8),
-        
+
               // Subtitle
               Text(
                 "Please enter your details to Create an account",
                 textAlign: TextAlign.center,
                 style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // User Name
               CustomTextField(
                 hint: "User Name",
                 icon: Icons.person_outline,
                 controller: controller.nameController, // name
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Email
               CustomTextField(
                 hint: "Email Address",
                 icon: Icons.email_outlined,
                 controller: controller.emailController, //email
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Password
               Obx(
-                    () => CustomTextField(
-                      hint: "Set Password",
-                      icon: Icons.lock_outline,
-                      controller: controller.passwordController, //set password
-                      obscure: controller.obscurePassword.value,
-                      suffix: IconButton(
-                        icon: Icon(
-                          controller.obscurePassword.value
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: controller.togglePassword,
-                      ),
+                () => CustomTextField(
+                  hint: "Set Password",
+                  icon: Icons.lock_outline,
+                  controller: controller.passwordController, //set password
+                  obscure: controller.obscurePassword.value,
+                  suffix: IconButton(
+                    icon: Icon(
+                      controller.obscurePassword.value ? Icons.visibility_off : Icons.visibility,
                     ),
+                    onPressed: controller.togglePassword,
+                  ),
+                ),
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Confirm Password
               Obx(
-                    () => CustomTextField(
-                      hint: "Confirm Password",
-                      icon: Icons.lock_outline,
-                      controller: controller.confirmPasswordController, // confirm password
-                      obscure: controller.obscureConfirmPassword.value,
-                      suffix: IconButton(
-                        icon: Icon(
-                          controller.obscureConfirmPassword.value
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: controller.toggleConfirmPassword,
-                      ),
+                () => CustomTextField(
+                  hint: "Confirm Password",
+                  icon: Icons.lock_outline,
+                  controller: controller.confirmPasswordController, // confirm password
+                  obscure: controller.obscureConfirmPassword.value,
+                  suffix: IconButton(
+                    icon: Icon(
+                      controller.obscureConfirmPassword.value
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                     ),
+                    onPressed: controller.toggleConfirmPassword,
+                  ),
+                ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Sign Up Button
               Obx(
-                    () => AppButton(
+                () => AppButton(
                   text: "Create an account",
                   loading: controller.isLoading.value,
                   onPressed: () async {
@@ -112,9 +110,9 @@ class UserSignupView extends GetView<UserSignupController> {
                   },
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Already have account
               Center(
                 child: RichText(
@@ -134,9 +132,9 @@ class UserSignupView extends GetView<UserSignupController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Divider with text
               Row(
                 children: [
@@ -151,20 +149,28 @@ class UserSignupView extends GetView<UserSignupController> {
                   const Expanded(child: Divider(thickness: 1)),
                 ],
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Social Buttons
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Flexible(
-                      child: SocialButton(text: "Google", iconPath: AppAssets.google),
+                      child: SocialButton(
+                        text: "Google",
+                        iconPath: AppAssets.google,
+                        onPressed: () {},
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple),
+                      child: SocialButton(
+                        text: "Apple",
+                        iconPath: AppAssets.apple,
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),

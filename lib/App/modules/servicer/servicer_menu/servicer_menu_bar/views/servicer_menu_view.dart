@@ -179,7 +179,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                     SizedBox(
                       width: double.infinity,
                       height: 52,
-                      child: AppButton(text: 'Logout', onPressed: controller.onLogoutTap),
+                      child: AppButton(text: 'Logout', onPressed: controller.serviceronLogoutTap),
                     ),
                     const SizedBox(height: 16),
                   ],

@@ -24,7 +24,7 @@ class UserNavigationBarController extends GetxController {
   }
 
   final screens = [
-    const HomeView(),
+    HomeView(),
     const CategoriesView(),
     const ChatView(),
     const MenuView(),

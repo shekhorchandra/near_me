@@ -9,6 +9,7 @@ import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../signup/controllers/user_signup_controller.dart';
 import '../controllers/user_login_controller.dart';
 
 class UserLoginView extends GetView<UserLoginController> {
@@ -148,11 +149,12 @@ class UserLoginView extends GetView<UserLoginController> {
                 child: Row(
                   children: [
                     Flexible(
-                      child: SocialButton(text: "Google", iconPath: AppAssets.google),
+                      child: SocialButton(text: "Google", iconPath: AppAssets.google,
+                        onPressed: () => Get.find<UserLoginController>().loginWithGoogleUserDeepLink(),),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple),
+                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple, onPressed: () {  },),
                     ),
                   ],
                 ),
