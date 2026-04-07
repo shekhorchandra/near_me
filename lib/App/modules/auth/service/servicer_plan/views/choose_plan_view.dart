@@ -113,15 +113,26 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.6,
-                  children: controller.plans.map(planCard).toList(),
-                ),
+
+              Expanded( // ✅ IMPORTANT FIX
+
+
+
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.6,
+                    children: controller.plans.map(planCard).toList(),
+                  );
+                }),
               ),
+
               AppButton(
                 onPressed: () {
                   if (controller.selectedPlan.value != null) {
@@ -129,11 +140,6 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                       AppRoutes.SERVICE_PROVIDER_ACCOUNT,
                       arguments: controller.selectedPlan.value,
                     );
-
-                    // Get.snackbar(
-                    //   "Plan Selected",
-                    //   "You selected ${controller.selectedPlan.value!.name}",
-                    // );
                   } else {
                     Get.snackbar("Error", "Please select a plan first");
                   }

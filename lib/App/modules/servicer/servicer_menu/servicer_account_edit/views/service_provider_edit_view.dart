@@ -3,6 +3,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:near_me/App/modules/servicer/servicer_menu/servicer_account_edit/controller/service_provider_edit_controller.dart';
 import '../../../../../core/widgets/App_button.dart';
 import '../../../../../core/widgets/SectionLabelWithEdit.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
@@ -11,13 +12,14 @@ import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/multiple_selected_dropdown.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../servicer_preview/service_provider_preview_view.dart';
-import '../controller/service_provider_edit_controller.dart';
+
 
 class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
   const ServiceProviderEditView({super.key});
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: CommonAppBar(title: 'Edit Service Provider Account', showBack: true),
       body: SafeArea(
@@ -82,16 +84,21 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                   const SizedBox(height: 6),
 
                   Obx(
-                    () => CustomDropdownField(
+                        () => CustomDropdownField(
                       hint: "Select Category",
                       value: controller.selectedCategory.value.isEmpty
                           ? null
                           : controller.selectedCategory.value,
-                      items: controller.categories,
+                      items: controller.categories
+                          .map((e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(e),
+                      ))
+                          .toList(), // <-- map to DropdownMenuItem
                       onChanged: (val) => controller.selectCategory(val ?? ''),
                       icon: Icons.control_point_duplicate,
                     ),
-                  ),
+                  )
                 ],
               ),
 
@@ -106,11 +113,11 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                   ),
                   const SizedBox(height: 6),
 
-                  MultiSelectDropdownField(
-                    hint: "Select up to 5 services",
-                    icon: Icons.design_services,
-                    controller: controller, // ServiceProviderEditController
-                  ),
+                  // MultiSelectDropdownField(
+                  //   hint: "Select up to 5 services",
+                  //   icon: Icons.design_services,
+                  //   controller: controller, // ServiceProviderEditController
+                  // ),
                 ],
               ),
 
@@ -242,37 +249,27 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                     // Uploaded images
                     ...controller.images.map((img) {
                       final index = controller.images.indexOf(img);
-                      return Stack(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            width: double.infinity,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: FileImage(File(img)),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: () => controller.removeImage(index),
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.black54,
-                                  shape: BoxShape.circle,
+                      return Obx(
+                            () => Stack(
+                          children: [
+                            Image.file(File(controller.images[index])),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: GestureDetector(
+                                onTap: () => controller.removeImage(index),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black54,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close, color: Colors.white, size: 18),
                                 ),
-                                child: const Icon(Icons.close, color: Colors.white, size: 18),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       );
                     }).toList(),
 

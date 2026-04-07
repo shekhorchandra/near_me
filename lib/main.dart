@@ -7,6 +7,7 @@ import 'App/routes/app_pages.dart';
 import 'App/routes/app_routes.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   runApp(const NearMeeApp());
 }

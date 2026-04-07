@@ -3,7 +3,7 @@ import '../values/app_color.dart';
 
 class CustomDropdownField extends StatelessWidget {
   final String hint;
-  final List<String> items;
+  final List<DropdownMenuItem<String>> items; // <- changed
   final String? value;
   final void Function(String?)? onChanged;
   final IconData? icon;
@@ -23,43 +23,28 @@ class CustomDropdownField extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       icon: const Icon(Icons.keyboard_arrow_down),
-      items: items
-          .map((e) => DropdownMenuItem(
-        value: e,
-        child: Text(e),
-      ))
-          .toList(),
+      items: items, // <- now directly using DropdownMenuItem
 
       decoration: InputDecoration(
         hintText: hint,
-
         prefixIcon: icon != null ? Icon(icon) : null,
-
-        contentPadding:
-        const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-
-        // SAME DESIGN AS CustomTextField
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColor.primary, width: 1),
         ),
-
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(width: 1),
         ),
-
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-          const BorderSide(color: AppColor.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColor.primary, width: 1.5),
         ),
-
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.red, width: 1),
         ),
-
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.red, width: 1.5),

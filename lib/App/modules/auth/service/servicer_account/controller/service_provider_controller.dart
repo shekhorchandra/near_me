@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
 
 class ServiceProviderController extends GetxController {
@@ -15,18 +18,15 @@ class ServiceProviderController extends GetxController {
   final websiteController = TextEditingController();
   final customServiceController = TextEditingController();
 
-  var categories = ['Cleaning', 'Plumbing', 'Electrical', 'Beauty'].obs;
-  var services = [
-    'Home Cleaning',
-    'AC Repair',
-    'Hair Cut',
-    'Makeup',
-    'Plumbing Fix',
-    'Wiring'
-  ].obs;
+  var categories = <Category>[].obs;
+  var selectedCategoryId = ''.obs;
 
-  var selectedCategory = ''.obs;
-  var selectedServices = <String>[].obs;
+  var services = <Category>[].obs;        // level 1
+  var childServices = <Category>[].obs;   // level 2
+
+  var selectedServiceIds = <String>[].obs;
+  var selectedChildServiceIds = <String>[].obs;
+
 
   var is24Hours = false.obs;
 
@@ -49,53 +49,82 @@ class ServiceProviderController extends GetxController {
   void onInit() {
     super.onInit();
 
+    fetchCategories();
+
     final plan = Get.arguments;
     if (plan != null) {
-      model.update((val) {
+      selectedPlan.update((val) {
         val!.subscriptionPlan = plan.name;
+        val.subscriptionPrice = double.tryParse(plan.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
       });
     }
   }
 
-  void addCustomService() {
-    final value = customServiceController.text.trim();
 
-    if (value.isEmpty) return;
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/category/tree"),
+      );
 
-    if (selectedServices.length >= 5) {
-      Get.snackbar('Limit', 'You can select up to 5 services');
-      return;
-    }
+      final data = jsonDecode(response.body);
 
-    //  prevent duplicate in services list
-    if (services.contains(value)) {
-      // just select it if already exists
-      if (!selectedServices.contains(value)) {
-        selectedServices.add(value);
+      if (data['success']) {
+        categories.value = List.from(data['data'])
+            .map((e) => Category.fromJson(e))
+            .toList();
       }
-    } else {
-      //  add to services list (so it appears in UI)
-      services.add(value);
-
-      //  auto select it (check mark)
-      selectedServices.add(value);
+    } catch (e) {
+      Get.snackbar("Error", "Failed to load categories");
     }
-
-    customServiceController.clear();
   }
 
-  void selectCategory(String value) {
-    selectedCategory.value = value;
+  void selectCategory(Category category) {
+    selectedCategoryId.value = category.id;
+
+    // ✅ Level 1 services
+    services.value = category.children;
+
+    // ✅ Clear child services initially
+    childServices.clear();
+
+    selectedServiceIds.clear();
+    selectedChildServiceIds.clear();
   }
 
-  void toggleService(String service) {
-    if (selectedServices.contains(service)) {
-      selectedServices.remove(service);
+  void toggleService(String id) {
+    if (selectedServiceIds.contains(id)) {
+      selectedServiceIds.remove(id);
+      childServices.clear(); // remove child if unselected
     } else {
-      if (selectedServices.length < 5) {
-        selectedServices.add(service);
+      if (selectedServiceIds.length < 5) {
+        selectedServiceIds.add(id);
+
+        // 🔥 find selected service
+        final selectedService =
+        services.firstWhere((s) => s.id == id);
+
+        // 🔥 load its children (LEVEL 2)
+        childServices.clear();
+
+        for (var id in selectedServiceIds) {
+          final service = services.firstWhere((s) => s.id == id);
+          childServices.addAll(service.children);
+        }
       } else {
-        Get.snackbar('Limit', 'You can select up to 5 services');
+        Get.snackbar('Limit', 'Max 5 services');
+      }
+    }
+  }
+
+  void toggleChildService(String id) {
+    if (selectedChildServiceIds.contains(id)) {
+      selectedChildServiceIds.remove(id);
+    } else {
+      if (selectedChildServiceIds.length < 5) {
+        selectedChildServiceIds.add(id);
+      } else {
+        Get.snackbar('Limit', 'Max 5 child services');
       }
     }
   }
@@ -116,24 +145,81 @@ class ServiceProviderController extends GetxController {
     images.removeAt(index);
   }
 
-  void submit() {
-    model.update((val) {
-      val!.serviceName = serviceNameController.text;
-      val.category = selectedCategory.value;
-      val.selectedServices = selectedServices;
-      val.contactNumber = contactController.text;
-      val.about = aboutController.text;
-      val.address = addressController.text;
-      val.website = websiteController.text;
-      val.images = images;
-      val.logo = logo.value;
-      val.is24Hours = is24Hours.value;
-    });
-
-    Get.snackbar('Success', 'Proceeding to payment');
-  }
 
   // Pick image from camera or gallery
+
+  List<Category> getAllServices(Category category) {
+    List<Category> result = [];
+
+    for (var child in category.children) {
+      result.add(child);
+
+      // recursive (VERY IMPORTANT)
+      result.addAll(getAllServices(child));
+    }
+
+    return result;
+  }
+
+
+  Future<void> submit() async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
+      );
+
+      request.fields['service_name'] = serviceNameController.text;
+      request.fields['service_category'] = selectedCategoryId.value;
+      request.fields['phone'] = contactController.text;
+      request.fields['service_address'] = addressController.text;
+      request.fields['about'] = aboutController.text;
+      request.fields['website_link'] = websiteController.text;
+
+      request.fields['openingTime'] =
+      "${openingTime.value.hour}:${openingTime.value.minute}";
+      request.fields['closingTime'] =
+      "${closingTime.value.hour}:${closingTime.value.minute}";
+
+      request.fields['allTimeAvailability'] =
+          isOpen24_7.value.toString();
+
+      // 🔥 location (IMPORTANT FORMAT)
+      request.fields['location[type]'] = 'Point';
+      request.fields['location[coordinates][0]'] = '90.4125';
+      request.fields['location[coordinates][1]'] = '23.8103';
+
+      // 🔥 offer services array
+      for (int i = 0; i < selectedServiceIds.length; i++) {
+        request.fields['offer_services[$i]'] = selectedServiceIds[i];
+      }
+
+      // 🔥 logo
+      if (logo.value.isNotEmpty) {
+        request.files.add(
+          await http.MultipartFile.fromPath('company_logo', logo.value),
+        );
+      }
+
+      // 🔥 media images
+      for (var img in images) {
+        request.files.add(
+          await http.MultipartFile.fromPath('media', img),
+        );
+      }
+
+      var response = await request.send();
+
+      if (response.statusCode == 201) {
+        Get.snackbar("Success", "Service created successfully");
+      } else {
+        Get.snackbar("Error", "Failed to create service");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    }
+  }
+
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
 

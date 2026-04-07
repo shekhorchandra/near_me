@@ -80,7 +80,7 @@ class UserLoginView extends GetView<UserLoginController> {
                 child: TextButton(
                   onPressed: () {
                     // Navigate to Forgot Password page
-                    Get.toNamed('/user_forgot');
+                    Get.toNamed(AppRoutes.USER_FORGOT_PASSWORD);
         
                   },
                   child: Text(

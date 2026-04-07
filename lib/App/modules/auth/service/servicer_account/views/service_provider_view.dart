@@ -69,17 +69,23 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                   ),
                   const SizedBox(height: 6),
 
-                  Obx(
-                    () => CustomDropdownField(
-                      hint: "Select Category",
-                      value: controller.selectedCategory.value.isEmpty
-                          ? null
-                          : controller.selectedCategory.value,
-                      items: controller.categories,
-                      onChanged: (val) => controller.selectCategory(val ?? ''),
-                      icon: Icons.category,
-                    ),
-                  ),
+                  Obx(() => CustomDropdownField(
+                    hint: "Select Category",
+                    value: controller.selectedCategoryId.value.isEmpty
+                        ? null
+                        : controller.selectedCategoryId.value,
+                    items: controller.categories.map((e) =>
+                        DropdownMenuItem(
+                          value: e.id,
+                          child: Text(e.name),
+                        )
+                    ).toList(),
+                    onChanged: (val) {
+                      final selected = controller.categories.firstWhere((e) => e.id == val);
+                      controller.selectCategory(selected);
+                    },
+                    icon: Icons.category,
+                  )),
                 ],
               ),
 
@@ -108,6 +114,24 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               ),
 
               const SizedBox(height: 12),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Child Services You Offer (Max 5)",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+
+                  MultiSelectDropdownField(
+                    hint: "Select child services",
+                    icon: Icons.design_services,
+                    controller: controller,
+                    isChild: true, // 👈 important
+                  ),
+                ],
+              ),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

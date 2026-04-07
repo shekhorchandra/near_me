@@ -13,17 +13,17 @@ abstract class AppRoutes {
   static const USER_FORGOT_PASSWORD = '/user-forgot-password';
 
   /// user forget password otp
-  static const USER_OTP_VERIFICATION = '/user_otp_verification';
-  static const USER_RESET_PASSWORD = '/user_reset_password';
+  static const USER_OTP_VERIFICATION = '/user-otp-verification';
+  static const USER_RESET_PASSWORD = '/user-reset-password';
 
   /// user bottom nav bar
   static const USER_BOTTOM_NAV = '/navigation_bar';
 
   /// bottom nav bar servicer_dashboard page
-  static const HOME = '/servicer_dashboard';
+  static const HOME = '/servicer-dashboard';
 
   /// user servicer_highlight nav bar details
-  static const USER_CATEGORY_DETAILS = '/user-servicer_highlight-details';
+  static const USER_CATEGORY_DETAILS = '/user-servicer-highlight-details';
 
   /// Service Details page
   static const SERVICE_DETAILS = '/user-service-details';
@@ -35,7 +35,7 @@ abstract class AppRoutes {
   static const CONVERSATION = '/conversation';
 
   /// user servicer_menu nav bar
-  static const USER_MENU = '/user_menu';
+  static const USER_MENU = '/user-menu';
   static const CHANGE_PASSWORD = '/change-password';
   static const ABOUT = '/about';
   static const CONTACT_US = '/contact-us';
@@ -52,11 +52,11 @@ abstract class AppRoutes {
   // servicer forget password
   static const SERVICER_FORGOT_PASSWORD = '/servicer-forgot-password';
   /// servicer forget password otp
-  static const SERVICER_OTP_VERIFICATION = '/servicer_otp_verification';
-  static const SERVICER_RESET_PASSWORD = '/servicer_reset_password';
+  static const SERVICER_OTP_VERIFICATION = '/servicer-otp-verification';
+  static const SERVICER_RESET_PASSWORD = '/servicer-reset-password';
 
   /// servicer bottom nav bar
-  static const SERVICER_BOTTOM_NAV = '/servicer-navigation_bar';
+  static const SERVICER_BOTTOM_NAV = '/servicer-navigation-bar';
 
   /// servicer highlight
   static const SERVICER_HIGHLIGHT = '/service-highlight';
@@ -79,8 +79,8 @@ abstract class AppRoutes {
   static const SERVICER_PRIVACY_POLICY = '/servicer-privacy-policy';
 
   // payment method
-  static const ADD_PAYMENT_METHOD = '/payment_method/add';
-  static const PAYMENT_METHOD = '/payment_method';
+  static const ADD_PAYMENT_METHOD = '/payment-method/add';
+  static const PAYMENT_METHOD = '/payment-method';
 
   // servicer chat conversion
 

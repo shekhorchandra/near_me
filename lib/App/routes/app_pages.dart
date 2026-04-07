@@ -117,7 +117,7 @@ class AppPages {
 
     /// verify user forget password
     GetPage(
-      name: '/user_forgot',
+      name: AppRoutes.USER_FORGOT_PASSWORD,
       page: () => const UserForgotPasswordView(),
       binding: UserForgotPasswordBinding(role: UserRole.user),
     ),

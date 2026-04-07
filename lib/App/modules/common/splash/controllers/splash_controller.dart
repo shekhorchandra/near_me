@@ -18,10 +18,9 @@ class SplashController extends GetxController {
 
     if (first) {
       await prefs.setBool('is_first_launch', false);
-      Get.offAllNamed(AppRoutes.ONBOARDING);
+      Get.offAllNamed(AppRoutes.ONBOARDING); // only on app start
     } else {
-      Get.offAllNamed(AppRoutes.ONBOARDING);
-      // Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
+      Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV); // main page
     }
   }
 }

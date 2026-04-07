@@ -11,4 +11,7 @@ class ApiConstants {
 
   ///user logout
   static const String user_logout = "$baseUrl/auth/logout";
+
+  /// forget password
+  static const String forgetPassword = "$baseUrl/auth/forgot-password";
 }
