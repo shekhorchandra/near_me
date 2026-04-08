@@ -46,7 +46,7 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
 
               // User Name
               CustomTextField(
-                hint: "Servicer Name",
+                hint: "Full Name",
                 icon: Icons.person_outline,
                 controller: controller.servicernameController,
               ),

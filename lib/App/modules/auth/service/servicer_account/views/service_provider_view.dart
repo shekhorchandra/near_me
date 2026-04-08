@@ -69,23 +69,22 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                   ),
                   const SizedBox(height: 6),
 
-                  Obx(() => CustomDropdownField(
-                    hint: "Select Category",
-                    value: controller.selectedCategoryId.value.isEmpty
-                        ? null
-                        : controller.selectedCategoryId.value,
-                    items: controller.categories.map((e) =>
-                        DropdownMenuItem(
-                          value: e.id,
-                          child: Text(e.name),
-                        )
-                    ).toList(),
-                    onChanged: (val) {
-                      final selected = controller.categories.firstWhere((e) => e.id == val);
-                      controller.selectCategory(selected);
-                    },
-                    icon: Icons.category,
-                  )),
+                  Obx(
+                    () => CustomDropdownField(
+                      hint: "Select Category",
+                      value: controller.selectedCategoryId.value.isEmpty
+                          ? null
+                          : controller.selectedCategoryId.value,
+                      items: controller.categories
+                          .map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                          .toList(),
+                      onChanged: (val) {
+                        final selected = controller.categories.firstWhere((e) => e.id == val);
+                        controller.selectCategory(selected);
+                      },
+                      icon: Icons.category,
+                    ),
+                  ),
                 ],
               ),
 
@@ -104,7 +103,6 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                   //   hint: "Select up to 5 services",
                   //   icon: Icons.design_services,
                   // ),
-
                   MultiSelectDropdownField(
                     hint: "Select up to 5 services",
                     icon: Icons.design_services,
@@ -201,7 +199,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
                   CustomTextField(
                     controller: controller.websiteController,
-                    hint: 'Website link',
+                    hint: 'Example: https://www.airbnb.com/',
                     icon: Icons.link,
                   ),
                 ],
@@ -522,7 +520,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               ),
               const SizedBox(height: 20),
 
-              AppButton(onPressed: controller.submit, text: 'Continue to Payment'),
+              AppButton(onPressed: controller.submitService, text: 'Continue to Payment'),
               SizedBox(height: 40),
             ],
           ),

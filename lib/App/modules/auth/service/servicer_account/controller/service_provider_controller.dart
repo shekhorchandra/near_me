@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../../data/services/storage_service.dart';
 import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
 
@@ -21,12 +23,11 @@ class ServiceProviderController extends GetxController {
   var categories = <Category>[].obs;
   var selectedCategoryId = ''.obs;
 
-  var services = <Category>[].obs;        // level 1
-  var childServices = <Category>[].obs;   // level 2
+  var services = <Category>[].obs; // level 1
+  var childServices = <Category>[].obs; // level 2
 
   var selectedServiceIds = <String>[].obs;
   var selectedChildServiceIds = <String>[].obs;
-
 
   var is24Hours = false.obs;
 
@@ -42,7 +43,6 @@ class ServiceProviderController extends GetxController {
     ServiceProviderModel(subscriptionPlan: 'Free Plan', subscriptionPrice: 0.0),
   );
 
-
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -50,7 +50,6 @@ class ServiceProviderController extends GetxController {
     super.onInit();
 
     fetchCategories();
-
     final plan = Get.arguments;
     if (plan != null) {
       selectedPlan.update((val) {
@@ -59,7 +58,6 @@ class ServiceProviderController extends GetxController {
       });
     }
   }
-
 
   Future<void> fetchCategories() async {
     try {
@@ -70,9 +68,7 @@ class ServiceProviderController extends GetxController {
       final data = jsonDecode(response.body);
 
       if (data['success']) {
-        categories.value = List.from(data['data'])
-            .map((e) => Category.fromJson(e))
-            .toList();
+        categories.value = List.from(data['data']).map((e) => Category.fromJson(e)).toList();
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to load categories");
@@ -101,8 +97,7 @@ class ServiceProviderController extends GetxController {
         selectedServiceIds.add(id);
 
         // 🔥 find selected service
-        final selectedService =
-        services.firstWhere((s) => s.id == id);
+        final selectedService = services.firstWhere((s) => s.id == id);
 
         // 🔥 load its children (LEVEL 2)
         childServices.clear();
@@ -145,7 +140,6 @@ class ServiceProviderController extends GetxController {
     images.removeAt(index);
   }
 
-
   // Pick image from camera or gallery
 
   List<Category> getAllServices(Category category) {
@@ -162,63 +156,203 @@ class ServiceProviderController extends GetxController {
   }
 
 
-  Future<void> submit() async {
+
+
+
+  // Future<void> submitService() async {
+  //   try {
+  //     final token = StorageService().accessToken;
+  //     if (token == null || token.isEmpty) return;
+  //
+  //     var request = http.MultipartRequest(
+  //       'POST',
+  //       Uri.parse(
+  //         "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create",
+  //       ),
+  //     );
+  //
+  //     request.headers['Authorization'] =
+  //     token.startsWith("Bearer ") ? token : 'Bearer $token';
+  //
+  //     // ----------------- STRING & BOOLEAN -----------------
+  //     request.fields['service_name'] = serviceNameController.text.trim();
+  //     request.fields['service_category'] = selectedCategoryId.value;
+  //     request.fields['phone'] = contactController.text.replaceAll('+', '').trim();
+  //     request.fields['service_address'] = addressController.text.trim();
+  //     request.fields['about'] = aboutController.text.trim();
+  //     request.fields['website_link'] = websiteController.text.trim();
+  //     request.fields['openingTime'] =
+  //     "${openingTime.value.hour.toString().padLeft(2,'0')}:${openingTime.value.minute.toString().padLeft(2,'0')}";
+  //     request.fields['closingTime'] =
+  //     "${closingTime.value.hour.toString().padLeft(2,'0')}:${closingTime.value.minute.toString().padLeft(2,'0')}";
+  //
+  //     // ✅ Encode boolean as JSON
+  //     request.fields['allTimeAvailability'] = jsonEncode(isOpen24_7.value);
+  //
+  //     // ✅ Encode array as JSON string
+  //     request.fields['offer_services'] = jsonEncode(selectedServiceIds);
+  //
+  //     // ✅ Encode location as JSON
+  //     request.fields['location'] = jsonEncode({
+  //       "type": "Point",
+  //       "coordinates": [90.4125, 23.8103],
+  //       "address": addressController.text.trim(),
+  //     });
+  //
+  //     // ----------------- FILES -----------------
+  //     if (logo.value.isNotEmpty) {
+  //       request.files.add(await http.MultipartFile.fromPath(
+  //         'company_logo',
+  //         logo.value,
+  //         contentType: MediaType('image', logo.value.split('.').last),
+  //       ));
+  //     } else {
+  //       Get.snackbar("Error", "Company logo is required");
+  //       return;
+  //     }
+  //
+  //     for (var imgPath in images) {
+  //       request.files.add(await http.MultipartFile.fromPath(
+  //         'media',
+  //         imgPath,
+  //         contentType: MediaType('image', imgPath.split('.').last),
+  //       ));
+  //     }
+  //
+  //     // ----------------- DEBUG PRINT PAYLOAD -----------------
+  //     print("------------ PAYLOAD ------------");
+  //     request.fields.forEach((key, value) {
+  //       print("$key: $value");
+  //     });
+  //     for (var file in request.files) {
+  //       print("Field: ${file.field}, Filename: ${file.filename}");
+  //     }
+  //     print("-------------------------------");
+  //
+  //     // ----------------- SEND REQUEST -----------------
+  //     final response = await request.send();
+  //     final body = await response.stream.bytesToString();
+  //
+  //     print("STATUS: ${response.statusCode}");
+  //     print("BODY: $body");
+  //
+  //     final responseJson = body.isNotEmpty ? jsonDecode(body) : {};
+  //
+  //     // ✅ Both success conditions
+  //     if (response.statusCode == 201 && responseJson['success'] == true) {
+  //       final data = responseJson['data'];
+  //       Get.snackbar("Success", "Service created successfully");
+  //       print("Created Service ID: ${data['_id']}");
+  //     } else {
+  //       Get.snackbar("Error", responseJson['message'] ?? "Unknown error");
+  //     }
+  //   } catch (e) {
+  //     print("🔥 SUBMIT ERROR: $e");
+  //     Get.snackbar("Error", e.toString());
+  //   }
+  // }
+
+
+
+  Future<void> submitService() async {
     try {
-      var request = http.MultipartRequest(
+      final token = StorageService().accessToken;
+      if (token == null || token.isEmpty) return;
+
+      // ----------------- JSON PAYLOAD -----------------
+      final payload = {
+        "service_name": serviceNameController.text.trim(),
+        "service_category": selectedCategoryId.value,
+        "offer_services": selectedServiceIds, // array
+        "phone": contactController.text.replaceAll('+', '').trim(),
+        "service_address": addressController.text.trim(),
+        "about": aboutController.text.trim(),
+        "website_link": websiteController.text.trim(),
+        "openingTime":
+        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+        "closingTime":
+        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+        "allTimeAvailability": isOpen24_7.value, // boolean
+        "location": {
+          "type": "Point",
+          "coordinates": [90.4125, 23.8103],
+          "address": addressController.text.trim()
+        }
+      };
+
+      print("------------ JSON PAYLOAD ------------");
+      print(jsonEncode(payload));
+      print("-------------------------------------");
+
+      // ----------------- SEND JSON -----------------
+      final request = http.MultipartRequest(
         'POST',
-        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
+        Uri.parse(
+          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create",
+        ),
       );
 
-      request.fields['service_name'] = serviceNameController.text;
-      request.fields['service_category'] = selectedCategoryId.value;
-      request.fields['phone'] = contactController.text;
-      request.fields['service_address'] = addressController.text;
-      request.fields['about'] = aboutController.text;
-      request.fields['website_link'] = websiteController.text;
+      request.headers['Authorization'] =
+      token.startsWith("Bearer ") ? token : 'Bearer $token';
+      // Important: backend expects multipart for files
+      request.fields['data'] = jsonEncode(payload);
 
-      request.fields['openingTime'] =
-      "${openingTime.value.hour}:${openingTime.value.minute}";
-      request.fields['closingTime'] =
-      "${closingTime.value.hour}:${closingTime.value.minute}";
-
-      request.fields['allTimeAvailability'] =
-          isOpen24_7.value.toString();
-
-      // 🔥 location (IMPORTANT FORMAT)
-      request.fields['location[type]'] = 'Point';
-      request.fields['location[coordinates][0]'] = '90.4125';
-      request.fields['location[coordinates][1]'] = '23.8103';
-
-      // 🔥 offer services array
-      for (int i = 0; i < selectedServiceIds.length; i++) {
-        request.fields['offer_services[$i]'] = selectedServiceIds[i];
-      }
-
-      // 🔥 logo
+      // ----------------- ADD LOGO -----------------
       if (logo.value.isNotEmpty) {
-        request.files.add(
-          await http.MultipartFile.fromPath('company_logo', logo.value),
-        );
-      }
-
-      // 🔥 media images
-      for (var img in images) {
-        request.files.add(
-          await http.MultipartFile.fromPath('media', img),
-        );
-      }
-
-      var response = await request.send();
-
-      if (response.statusCode == 201) {
-        Get.snackbar("Success", "Service created successfully");
+        final logoFile = File(logo.value);
+        request.files.add(await http.MultipartFile.fromPath(
+          'company_logo',
+          logoFile.path,
+          contentType:
+          MediaType('image', logoFile.path.split('.').last.toLowerCase()),
+        ));
       } else {
-        Get.snackbar("Error", "Failed to create service");
+        Get.snackbar("Error", "Company logo is required");
+        return;
+      }
+
+      // ----------------- ADD MEDIA -----------------
+      for (var imgPath in images) {
+        final imgFile = File(imgPath);
+        request.files.add(await http.MultipartFile.fromPath(
+          'media',
+          imgFile.path,
+          contentType:
+          MediaType('image', imgFile.path.split('.').last.toLowerCase()),
+        ));
+      }
+
+      // ----------------- DEBUG PRINT -----------------
+      print("------------ MULTIPART FIELDS ------------");
+      request.fields.forEach((key, value) => print("$key: $value"));
+      request.files.forEach((file) =>
+          print("Field: ${file.field}, Filename: ${file.filename}"));
+      print("-----------------------------------------");
+
+      // ----------------- SEND REQUEST -----------------
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+
+      print("STATUS: ${response.statusCode}");
+      print("BODY: $body");
+
+      final responseJson = body.isNotEmpty ? jsonDecode(body) : {};
+
+      if (response.statusCode == 201 && responseJson['success'] == true) {
+        final data = responseJson['data'];
+        Get.snackbar("Success", "Service created successfully");
+        print("Created Service ID: ${data['_id']}");
+      } else {
+        Get.snackbar("Error", responseJson['message'] ?? "Unknown error");
       }
     } catch (e) {
+      print("🔥 SUBMIT ERROR: $e");
       Get.snackbar("Error", e.toString());
     }
   }
+
+
+
 
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
@@ -248,10 +382,7 @@ class ServiceProviderController extends GetxController {
 
     if (pickedFile != null) {
       final file = File(pickedFile.path);
-      final extension = pickedFile.name
-          .split('.')
-          .last
-          .toLowerCase();
+      final extension = pickedFile.name.split('.').last.toLowerCase();
       final sizeInMb = file.lengthSync() / (1024 * 1024);
 
       if (extension != "jpg" && extension != "jpeg" && extension != "png") {

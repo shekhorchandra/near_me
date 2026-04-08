@@ -12,13 +12,11 @@ class StorageService {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'userId';
 
-  late final GetStorage _box;
+  final GetStorage _box = GetStorage();
 
   // Initialize the storage
   Future<void> init() async {
     await GetStorage.init();
-    _box = GetStorage();
-
     log('======= GetStorage Initialized =======');
   }
 

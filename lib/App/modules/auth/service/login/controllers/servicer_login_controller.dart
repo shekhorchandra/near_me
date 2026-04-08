@@ -28,7 +28,6 @@ class ServicerLoginController extends GetxController {
 
   final isLoading = false.obs;
 
-  final box = GetStorage();
   late final selectedRole;
 
   final authService = AuthService();
@@ -36,7 +35,7 @@ class ServicerLoginController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    selectedRole = box.read("selectedRole"); // ✅ safe now
+    selectedRole = StorageService().read("selectedRole");
   }
 
   void togglePassword() {
@@ -63,27 +62,58 @@ class ServicerLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      final data = result["data"];
-      final message = data["message"];
-      final role = data["data"]?["user"]?["role"];
+      print("FULL LOGIN RESPONSE:------------------------------------------ $result");
 
-      if (result["statusCode"] == 200 && data["success"]) {
-        // 🔥 Optional: check selected role
+      final responseData = result["data"];
+
+      if (result["statusCode"] == 200 && responseData["success"]) {
+        final data = responseData["data"];
+
+        // ✅ SAFE TOKEN EXTRACTION
+        final accessToken =
+            data?["accessToken"] ?? data?["token"]?["accessToken"];
+
+        final refreshToken =
+            data?["refreshToken"] ?? data?["token"]?["refreshToken"];
+
+        final role = data?["user"]?["role"];
+
+        if (accessToken == null) {
+          AppSnackbar.error("Token not found");
+          return;
+        }
+
+        // 🔥 CLEAR OLD TOKEN FIRST
+        await _storageService.clear();
+
+        // 🔥 SAVE NEW TOKEN
+        await _storageService.setAccessToken(accessToken);
+        await _storageService.setRefreshToken(refreshToken ?? "");
+
+        print("✅ SAVED TOKEN: $accessToken");
+        print("✅ STORED TOKEN: ${StorageService().accessToken}");
+
+        // ✅ ROLE CHECK
         if (selectedRole == "PROVIDER" && role != "PROVIDER") {
-          AppSnackbar.error("Please login from correct panel");
+          AppSnackbar.error("Wrong panel login");
           return;
         }
 
         if (role == "PROVIDER") {
-          AppSnackbar.success(message);
-          Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+          AppSnackbar.success(responseData["message"]);
+
+          Get.offAllNamed(
+            AppRoutes.SERVICER_VERIFY_ACCOUNT,
+            arguments: {"email": emailController.text.trim()},
+          );
         } else {
-          AppSnackbar.error("You are not a service provider");
+          AppSnackbar.error("Not a provider account");
         }
       } else {
-        AppSnackbar.error(message);
+        AppSnackbar.error(responseData["message"] ?? "Login failed");
       }
     } catch (e) {
+      print("LOGIN ERROR: $e");
       AppSnackbar.error("Something went wrong");
     } finally {
       isLoading.value = false;
@@ -111,8 +141,8 @@ class ServicerLoginController extends GetxController {
               AppSnackbar.error("Not a provider account");
               return;
             }
-            _storageService.setAccessToken(accessToken);
-            _storageService.setRefreshToken(refreshToken);
+            await _storageService.setAccessToken(accessToken);
+            await _storageService.setRefreshToken(refreshToken);
 
             // _storeUserId();
 

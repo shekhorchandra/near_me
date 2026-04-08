@@ -1,17 +1,19 @@
 import 'package:http/http.dart' as http;
-import 'package:get_storage/get_storage.dart';
+import '../../../data/services/storage_service.dart';
+
 
 class ApiService {
-  final box = GetStorage();
 
   Map<String, String> get headers {
-    final token = box.read("accessToken");
+    final token = StorageService().accessToken;
 
     return {
       "Content-Type": "application/json",
-      if (token != null) "Authorization": "Bearer $token",
+      if (token != null && token.isNotEmpty)
+        "Authorization": "Bearer $token",
     };
   }
+
 
   Future<http.Response> getRequest(String url) {
     return http.get(Uri.parse(url), headers: headers);
