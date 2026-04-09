@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../../data/services/storage_service.dart';
+import '../../../../../routes/app_routes.dart';
 import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
 
@@ -341,6 +342,7 @@ class ServiceProviderController extends GetxController {
       if (response.statusCode == 201 && responseJson['success'] == true) {
         final data = responseJson['data'];
         Get.snackbar("Success", "Service created successfully");
+        Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
         print("Created Service ID: ${data['_id']}");
       } else {
         Get.snackbar("Error", responseJson['message'] ?? "Unknown error");

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:near_me/App/routes/app_routes.dart';
 
 class UserVerifyAccountController extends GetxController {
@@ -8,6 +11,9 @@ class UserVerifyAccountController extends GetxController {
 
   // Focus nodes for each OTP field
   late List<FocusNode> focusNodes;
+
+  // User email (dynamic)
+  late String email;
 
   // Loading state for verify button
   var isVerifying = false.obs;
@@ -30,18 +36,66 @@ class UserVerifyAccountController extends GetxController {
   String get otpCode => otp.map((e) => e.value).join();
 
   // Verify OTP action
-  void verifyOtp() async {
-    if (otpCode.length < 4) {
-      Get.snackbar('Error', 'Please enter 4-digit code');
+  // void verifyOtp() async {
+  //   if (otpCode.length < 4) {
+  //     Get.snackbar('Error', 'Please enter 4-digit code');
+  //     return;
+  //   }
+  //
+  //   isVerifying.value = true;
+  //   await Future.delayed(const Duration(seconds: 2)); // simulate API
+  //   isVerifying.value = false;
+  //
+  //   // TODO: Navigate to next page
+  //   Get.offAllNamed(AppRoutes.USER_LOGIN);
+  // }
+
+  void userverifyOtp() async {
+    if (email.isEmpty) {
+      Get.snackbar('Error', 'Email not found. Cannot verify OTP.');
       return;
     }
 
-    isVerifying.value = true;
-    await Future.delayed(const Duration(seconds: 2)); // simulate API
-    isVerifying.value = false;
+    final otp = otpCode.trim();
 
-    // TODO: Navigate to next page
-    Get.offAllNamed(AppRoutes.USER_LOGIN);
+    if (otp.length != 4) {
+      Get.snackbar('Error', 'Please enter valid 4-digit code');
+      return;
+    }
+
+    try {
+      isVerifying.value = true;
+
+      final url = Uri.parse(
+        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/user/verify",
+      );
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "email": email.trim(),
+          "otp": otp,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        Get.snackbar("Success", data["message"] ?? "OTP verified");
+
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
+      } else {
+        Get.snackbar("Error", data["message"] ?? "OTP verification failed");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Network error or server issue");
+      print("VERIFY OTP ERROR: $e");
+    } finally {
+      isVerifying.value = false;
+    }
   }
 
   // Resend OTP

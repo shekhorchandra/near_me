@@ -65,7 +65,6 @@ class ServicerSignupController extends GetxController {
 
       if (response.statusCode == 201 && data["success"] == true) {
         AppSnackbar.success(message);
-        // Get.toNamed(AppRoutes.SERVICER_VERIFY_ACCOUNT);
         Get.toNamed(AppRoutes.SERVICER_LOGIN);
       } else {
         AppSnackbar.error(message);

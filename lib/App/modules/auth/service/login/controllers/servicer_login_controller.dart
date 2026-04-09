@@ -23,8 +23,8 @@ class ServicerLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(text: "provider@gmail.com");
-  final passwordController = TextEditingController(text: "Ovi123456@");
+  final emailController = TextEditingController(text: "shekhorsaha058@gmail.com");
+  final passwordController = TextEditingController(text: "Tonoy@#123");
 
   final isLoading = false.obs;
 
@@ -77,6 +77,7 @@ class ServicerLoginController extends GetxController {
         final role = data?["user"]?["role"];
 
         final isVerified = data?["user"]?["isVerified"] ?? false;
+        final hasService = data?["user"]?["hasService"] ?? false;
 
         if (accessToken == null) {
           AppSnackbar.error("Token not found");
@@ -103,10 +104,18 @@ class ServicerLoginController extends GetxController {
           AppSnackbar.success(responseData["message"]);
 
           if (isVerified == true) {
-            // ✅ Already verified → go to dashboard
-            Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+            if (hasService == true) {
+              // ✅ Verified + has service → Dashboard
+              Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+            } else {
+              // ❗ Verified but no service → Choose plan
+              Get.offAllNamed(
+                AppRoutes.SERVICE_CHOOSE_PLAN,
+                arguments: {"email": emailController.text.trim()},
+              );
+            }
           } else {
-            // ❗ Not verified → go to verify screen
+            // ❗ Not verified → Choose plan (or verify page)
             Get.offAllNamed(
               AppRoutes.SERVICER_VERIFY_ACCOUNT,
               arguments: {"email": emailController.text.trim()},
