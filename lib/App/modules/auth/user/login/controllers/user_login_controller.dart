@@ -30,7 +30,7 @@ class UserLoginController extends GetxController {
 
   void initControllers() {
     if (kDebugMode) {
-      emailController.text = "tonoy@gmail.com";
+      emailController.text = "shekhorsaha058@gmail.com";
       passwordController.text = "Tonoy123@#";
     }
   }
@@ -141,6 +141,8 @@ class UserLoginController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      print("FULL LOGIN RESPONSE:------------------------------------------ $result");
 
       final data = result["data"];
       final message = data["message"];

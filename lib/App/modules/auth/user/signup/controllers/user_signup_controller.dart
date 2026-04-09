@@ -32,12 +32,14 @@ class UserSignupController extends GetxController {
     try {
       isLoading.value = true;
 
+      final email = emailController.text.trim(); // ✅ store once
+
       final response = await http.post(
         Uri.parse(ApiConstants.user_register),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "name": nameController.text.trim(),
-          "email": emailController.text.trim(),
+          "email": email,
           "password": passwordController.text.trim(),
           "role": "USER",
         }),
@@ -52,7 +54,12 @@ class UserSignupController extends GetxController {
 
       if (response.statusCode == 201 && data["success"] == true) {
         AppSnackbar.success(message);
-        Get.toNamed(AppRoutes.USER_VERIFY_ACCOUNT);
+
+        // ✅ PASS EMAIL HERE
+        Get.toNamed(
+          AppRoutes.USER_VERIFY_ACCOUNT,
+          arguments: email,
+        );
       } else {
         AppSnackbar.error(message);
       }

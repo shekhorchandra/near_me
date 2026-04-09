@@ -69,7 +69,7 @@ class UserVerifyAccountView extends GetView<UserVerifyAccountController> {
               Obx(
                     () => AppButton(
                   text: controller.isVerifying.value ? 'Verifying...' : 'Verify',
-                  onPressed: controller.userverifyOtp,
+                  onPressed: controller.verifyOtp,
                 ),
               ),
         

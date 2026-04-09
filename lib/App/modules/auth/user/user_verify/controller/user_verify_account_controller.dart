@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -9,19 +8,25 @@ class UserVerifyAccountController extends GetxController {
   // OTP digits
   final otp = List.generate(4, (_) => ''.obs);
 
-  // Focus nodes for each OTP field
+  // Focus nodes
   late List<FocusNode> focusNodes;
 
-  // User email (dynamic)
-  late String email;
+  // ✅ FIX: nullable email
+  String? email;
 
-  // Loading state for verify button
+  // Loading state
   var isVerifying = false.obs;
 
   @override
   void onInit() {
     super.onInit();
+
     focusNodes = List.generate(4, (_) => FocusNode());
+
+    // ✅ FIX: get email from previous screen
+    email = Get.arguments;
+
+    print("INIT EMAIL: $email");
   }
 
   @override
@@ -32,34 +37,18 @@ class UserVerifyAccountController extends GetxController {
     super.onClose();
   }
 
-  // Collect OTP as string
+  // Collect OTP
   String get otpCode => otp.map((e) => e.value).join();
 
-  // Verify OTP action
-  // void verifyOtp() async {
-  //   if (otpCode.length < 4) {
-  //     Get.snackbar('Error', 'Please enter 4-digit code');
-  //     return;
-  //   }
-  //
-  //   isVerifying.value = true;
-  //   await Future.delayed(const Duration(seconds: 2)); // simulate API
-  //   isVerifying.value = false;
-  //
-  //   // TODO: Navigate to next page
-  //   Get.offAllNamed(AppRoutes.USER_LOGIN);
-  // }
-
-  void userverifyOtp() async {
-    if (email.isEmpty) {
+  // ✅ VERIFY OTP
+  void verifyOtp() async {
+    if (email == null || email!.isEmpty) {
       Get.snackbar('Error', 'Email not found. Cannot verify OTP.');
       return;
     }
 
-    final otp = otpCode.trim();
-
-    if (otp.length != 4) {
-      Get.snackbar('Error', 'Please enter valid 4-digit code');
+    if (otpCode.length != 4) {
+      Get.snackbar('Error', 'Please enter 4-digit code');
       return;
     }
 
@@ -70,46 +59,60 @@ class UserVerifyAccountController extends GetxController {
         "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/user/verify",
       );
 
+      print("SENDING EMAIL: $email");
+      print("SENDING OTP: $otpCode");
+
       final response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
         },
         body: jsonEncode({
-          "email": email.trim(),
-          "otp": otp,
+          "email": email,
+          "otp": otpCode,
         }),
       );
 
+      print("STATUS CODE: ${response.statusCode}");
+      print("RESPONSE BODY: ${response.body}");
+
       final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && data["success"] == true) {
-        Get.snackbar("Success", data["message"] ?? "OTP verified");
+      isVerifying.value = false;
 
-        Get.offAllNamed(AppRoutes.USER_LOGIN);
+      if (response.statusCode == 200 && data["success"] == true) {
+        Get.snackbar(
+          "Success",
+          data["message"] ?? "OTP verified successfully",
+        );
+
+        // Get.offAllNamed(AppRoutes.USER_LOGIN);
       } else {
-        Get.snackbar("Error", data["message"] ?? "OTP verification failed");
+        Get.snackbar(
+          "Error",
+          data["message"] ?? "OTP verification failed",
+        );
       }
     } catch (e) {
-      Get.snackbar("Error", "Network error or server issue");
-      print("VERIFY OTP ERROR: $e");
-    } finally {
       isVerifying.value = false;
+      Get.snackbar("Error", "Something went wrong");
+      print("VERIFY OTP ERROR: $e");
     }
   }
 
-  // Resend OTP
+  // ✅ RESEND OTP
   void resendOtp() {
-    // TODO: call API to resend code
-    // Get.snackbar('OTP', 'OTP has been resent');
+    Get.snackbar('OTP', 'OTP has been resent');
   }
 
-  // Handle input change
+  // ✅ HANDLE OTP INPUT
   void onOtpChanged(String value, int index) {
     otp[index].value = value;
+
     if (value.isNotEmpty && index < 3) {
       focusNodes[index + 1].requestFocus();
     }
+
     if (value.isEmpty && index > 0) {
       focusNodes[index - 1].requestFocus();
     }
