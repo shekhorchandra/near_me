@@ -70,13 +70,13 @@ class ServicerLoginController extends GetxController {
         final data = responseData["data"];
 
         // ✅ SAFE TOKEN EXTRACTION
-        final accessToken =
-            data?["accessToken"] ?? data?["token"]?["accessToken"];
+        final accessToken = data?["accessToken"] ?? data?["token"]?["accessToken"];
 
-        final refreshToken =
-            data?["refreshToken"] ?? data?["token"]?["refreshToken"];
+        final refreshToken = data?["refreshToken"] ?? data?["token"]?["refreshToken"];
 
         final role = data?["user"]?["role"];
+
+        final isVerified = data?["user"]?["isVerified"] ?? false;
 
         if (accessToken == null) {
           AppSnackbar.error("Token not found");
@@ -102,10 +102,16 @@ class ServicerLoginController extends GetxController {
         if (role == "PROVIDER") {
           AppSnackbar.success(responseData["message"]);
 
-          Get.offAllNamed(
-            AppRoutes.SERVICER_VERIFY_ACCOUNT,
-            arguments: {"email": emailController.text.trim()},
-          );
+          if (isVerified == true) {
+            // ✅ Already verified → go to dashboard
+            Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+          } else {
+            // ❗ Not verified → go to verify screen
+            Get.offAllNamed(
+              AppRoutes.SERVICER_VERIFY_ACCOUNT,
+              arguments: {"email": emailController.text.trim()},
+            );
+          }
         } else {
           AppSnackbar.error("Not a provider account");
         }
@@ -136,7 +142,6 @@ class ServicerLoginController extends GetxController {
           final role = uri.queryParameters['role'];
 
           if (accessToken != null && refreshToken != null) {
-
             if (role != "PROVIDER") {
               AppSnackbar.error("Not a provider account");
               return;
@@ -182,9 +187,7 @@ class ServicerLoginController extends GetxController {
       });
 
       // Step 2: Open browser with your API
-      final url = Uri.parse(
-        '${ApiConstants.baseUrl}/auth/google?role=PROVIDER',
-      );
+      final url = Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER');
 
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         Get.snackbar("Error", "Could not launch login URL");
@@ -196,9 +199,6 @@ class ServicerLoginController extends GetxController {
       loading.value = false;
     }
   }
-
-
-
 
   /// In app
 
