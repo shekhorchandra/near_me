@@ -14,10 +14,7 @@ class UserOtpVerificationView extends GetView<UserOtpController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(
-        backgroundColor: Colors.white,
-        title: "User Account Verify OTP",
-      ),
+      appBar: const CommonAppBar(backgroundColor: Colors.white, title: "User Account Verify OTP"),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -25,30 +22,29 @@ class UserOtpVerificationView extends GetView<UserOtpController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-        
+
               // Image
               Image.asset(
                 AppAssets.verifyAccount, // reuse same image
                 height: 300,
                 width: double.infinity,
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Subtitle
               Text(
-                'Enter the 4-digit code sent to your email',
+                'Enter the 6-digit code sent to your email',
                 textAlign: TextAlign.center,
-                style: AppText.body1.regular
-                    .copyWith(color: AppColor.neutral.s700),
+                style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // OTP Fields
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (index) {
+                children: List.generate(6, (index) {
                   return Container(
                     width: 50,
                     height: 50,
@@ -58,55 +54,47 @@ class UserOtpVerificationView extends GetView<UserOtpController> {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       maxLength: 1,
-                      onChanged: (value) =>
-                          controller.onOtpChanged(value, index),
+                      onChanged: (value) => controller.onOtpChanged(value, index),
                       decoration: InputDecoration(
                         counterText: '',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                          BorderSide(color: AppColor.neutral.s300),
                         ),
                       ),
                     ),
                   );
                 }),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Verify Button
               Obx(
-                    () => AppButton(
-                  text: controller.isLoading.value
-                      ? 'Verifying...'
-                      : 'Verify',
+                () => AppButton(
+                  text: controller.isLoading.value ? 'Verifying...' : 'Verify',
                   loading: controller.isLoading.value,
                   onPressed: controller.verifyOtp,
                 ),
               ),
-        
+
               const SizedBox(height: 16),
-        
+
               // Resend OTP
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: "Don't receive the code? ",
-                  style: AppText.body2.regular
-                      .copyWith(color: AppColor.neutral.s600),
+                  style: AppText.body2.regular.copyWith(color: AppColor.neutral.s600),
                   children: [
                     TextSpan(
                       text: "Resend",
-                      style: AppText.body2.semiBold
-                          .copyWith(color: AppColor.primary),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = controller.resendOtp,
+                      style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+                      recognizer: TapGestureRecognizer()..onTap = controller.resendOtp,
                     ),
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 40),
             ],
           ),

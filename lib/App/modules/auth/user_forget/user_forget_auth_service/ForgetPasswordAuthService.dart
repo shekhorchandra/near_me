@@ -28,3 +28,39 @@ class ForgetAuthService {
     }
   }
 }
+
+class OtpAuthService {
+  static Future<String> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    final url = Uri.parse(
+      "${ApiConstants.baseUrl}/api/v1/auth/verify-otp",
+    );
+
+    print("REQUEST URL: $url");
+    print("EMAIL: $email");
+    print("OTP: $otp");
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+        "otp": otp,
+      }),
+    );
+
+    print("STATUS: ${response.statusCode}");
+    print("BODY: ${response.body}");
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data["success"] == true) {
+      return data["data"];
+    } else {
+      throw Exception(data["message"]);
+    }
+  }
+}
+
