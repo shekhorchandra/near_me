@@ -156,105 +156,6 @@ class ServiceProviderController extends GetxController {
     return result;
   }
 
-
-
-
-
-  // Future<void> submitService() async {
-  //   try {
-  //     final token = StorageService().accessToken;
-  //     if (token == null || token.isEmpty) return;
-  //
-  //     var request = http.MultipartRequest(
-  //       'POST',
-  //       Uri.parse(
-  //         "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create",
-  //       ),
-  //     );
-  //
-  //     request.headers['Authorization'] =
-  //     token.startsWith("Bearer ") ? token : 'Bearer $token';
-  //
-  //     // ----------------- STRING & BOOLEAN -----------------
-  //     request.fields['service_name'] = serviceNameController.text.trim();
-  //     request.fields['service_category'] = selectedCategoryId.value;
-  //     request.fields['phone'] = contactController.text.replaceAll('+', '').trim();
-  //     request.fields['service_address'] = addressController.text.trim();
-  //     request.fields['about'] = aboutController.text.trim();
-  //     request.fields['website_link'] = websiteController.text.trim();
-  //     request.fields['openingTime'] =
-  //     "${openingTime.value.hour.toString().padLeft(2,'0')}:${openingTime.value.minute.toString().padLeft(2,'0')}";
-  //     request.fields['closingTime'] =
-  //     "${closingTime.value.hour.toString().padLeft(2,'0')}:${closingTime.value.minute.toString().padLeft(2,'0')}";
-  //
-  //     // ✅ Encode boolean as JSON
-  //     request.fields['allTimeAvailability'] = jsonEncode(isOpen24_7.value);
-  //
-  //     // ✅ Encode array as JSON string
-  //     request.fields['offer_services'] = jsonEncode(selectedServiceIds);
-  //
-  //     // ✅ Encode location as JSON
-  //     request.fields['location'] = jsonEncode({
-  //       "type": "Point",
-  //       "coordinates": [90.4125, 23.8103],
-  //       "address": addressController.text.trim(),
-  //     });
-  //
-  //     // ----------------- FILES -----------------
-  //     if (logo.value.isNotEmpty) {
-  //       request.files.add(await http.MultipartFile.fromPath(
-  //         'company_logo',
-  //         logo.value,
-  //         contentType: MediaType('image', logo.value.split('.').last),
-  //       ));
-  //     } else {
-  //       Get.snackbar("Error", "Company logo is required");
-  //       return;
-  //     }
-  //
-  //     for (var imgPath in images) {
-  //       request.files.add(await http.MultipartFile.fromPath(
-  //         'media',
-  //         imgPath,
-  //         contentType: MediaType('image', imgPath.split('.').last),
-  //       ));
-  //     }
-  //
-  //     // ----------------- DEBUG PRINT PAYLOAD -----------------
-  //     print("------------ PAYLOAD ------------");
-  //     request.fields.forEach((key, value) {
-  //       print("$key: $value");
-  //     });
-  //     for (var file in request.files) {
-  //       print("Field: ${file.field}, Filename: ${file.filename}");
-  //     }
-  //     print("-------------------------------");
-  //
-  //     // ----------------- SEND REQUEST -----------------
-  //     final response = await request.send();
-  //     final body = await response.stream.bytesToString();
-  //
-  //     print("STATUS: ${response.statusCode}");
-  //     print("BODY: $body");
-  //
-  //     final responseJson = body.isNotEmpty ? jsonDecode(body) : {};
-  //
-  //     // ✅ Both success conditions
-  //     if (response.statusCode == 201 && responseJson['success'] == true) {
-  //       final data = responseJson['data'];
-  //       Get.snackbar("Success", "Service created successfully");
-  //       print("Created Service ID: ${data['_id']}");
-  //     } else {
-  //       Get.snackbar("Error", responseJson['message'] ?? "Unknown error");
-  //     }
-  //   } catch (e) {
-  //     print("🔥 SUBMIT ERROR: $e");
-  //     Get.snackbar("Error", e.toString());
-  //   }
-  // }
-
-
-
   Future<void> submitService() async {
     try {
       final token = StorageService().accessToken;
@@ -270,15 +171,15 @@ class ServiceProviderController extends GetxController {
         "about": aboutController.text.trim(),
         "website_link": websiteController.text.trim(),
         "openingTime":
-        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+            "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
         "closingTime":
-        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+            "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
         "allTimeAvailability": isOpen24_7.value, // boolean
         "location": {
           "type": "Point",
           "coordinates": [90.4125, 23.8103],
-          "address": addressController.text.trim()
-        }
+          "address": addressController.text.trim(),
+        },
       };
 
       print("------------ JSON PAYLOAD ------------");
@@ -288,25 +189,23 @@ class ServiceProviderController extends GetxController {
       // ----------------- SEND JSON -----------------
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create",
-        ),
+        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
       );
 
-      request.headers['Authorization'] =
-      token.startsWith("Bearer ") ? token : 'Bearer $token';
+      request.headers['Authorization'] = token.startsWith("Bearer ") ? token : 'Bearer $token';
       // Important: backend expects multipart for files
       request.fields['data'] = jsonEncode(payload);
 
       // ----------------- ADD LOGO -----------------
       if (logo.value.isNotEmpty) {
         final logoFile = File(logo.value);
-        request.files.add(await http.MultipartFile.fromPath(
-          'company_logo',
-          logoFile.path,
-          contentType:
-          MediaType('image', logoFile.path.split('.').last.toLowerCase()),
-        ));
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'company_logo',
+            logoFile.path,
+            contentType: MediaType('image', logoFile.path.split('.').last.toLowerCase()),
+          ),
+        );
       } else {
         Get.snackbar("Error", "Company logo is required");
         return;
@@ -315,19 +214,19 @@ class ServiceProviderController extends GetxController {
       // ----------------- ADD MEDIA -----------------
       for (var imgPath in images) {
         final imgFile = File(imgPath);
-        request.files.add(await http.MultipartFile.fromPath(
-          'media',
-          imgFile.path,
-          contentType:
-          MediaType('image', imgFile.path.split('.').last.toLowerCase()),
-        ));
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'media',
+            imgFile.path,
+            contentType: MediaType('image', imgFile.path.split('.').last.toLowerCase()),
+          ),
+        );
       }
 
       // ----------------- DEBUG PRINT -----------------
       print("------------ MULTIPART FIELDS ------------");
       request.fields.forEach((key, value) => print("$key: $value"));
-      request.files.forEach((file) =>
-          print("Field: ${file.field}, Filename: ${file.filename}"));
+      request.files.forEach((file) => print("Field: ${file.field}, Filename: ${file.filename}"));
       print("-----------------------------------------");
 
       // ----------------- SEND REQUEST -----------------
@@ -352,9 +251,6 @@ class ServiceProviderController extends GetxController {
       Get.snackbar("Error", e.toString());
     }
   }
-
-
-
 
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 80);

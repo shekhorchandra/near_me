@@ -8,9 +8,7 @@ class ForgetAuthService {
   static Future<void> forgetPassword(String email) async {
     final encodedEmail = Uri.encodeComponent(email);
 
-    final url = Uri.parse(
-      "${ApiConstants.userforgetPassword}$encodedEmail",
-    );
+    final url = Uri.parse("${ApiConstants.userforgetPassword}$encodedEmail");
 
     print("URL: $url");
 
@@ -30,13 +28,8 @@ class ForgetAuthService {
 }
 
 class OtpAuthService {
-  static Future<String> verifyOtp({
-    required String email,
-    required String otp,
-  }) async {
-    final url = Uri.parse(
-      "${ApiConstants.userforgetPasswordverify}",
-    );
+  static Future<String> verifyOtp({required String email, required String otp}) async {
+    final url = Uri.parse("${ApiConstants.userforgetPasswordverify}");
 
     print("REQUEST URL: $url");
     print("EMAIL: $email");
@@ -45,10 +38,7 @@ class OtpAuthService {
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "email": email,
-        "otp": otp,
-      }),
+      body: jsonEncode({"email": email, "otp": otp}),
     );
 
     print("STATUS: ${response.statusCode}");
@@ -65,13 +55,8 @@ class OtpAuthService {
 }
 
 class ResetPasswordService {
-  static Future<void> resetPassword({
-    required String token,
-    required String newPassword,
-  }) async {
-    final url = Uri.parse(
-      "${ApiConstants.baseUrl}/api/v1/auth/reset-password",
-    );
+  static Future<void> resetPassword({required String token, required String newPassword}) async {
+    final url = Uri.parse("${ApiConstants.userforgetPasswordreset}");
 
     print("TOKEN SENT:------------------------------ $token");
 
@@ -82,9 +67,7 @@ class ResetPasswordService {
         // "Authorization": "Bearer $token",
         "token": token,
       },
-      body: jsonEncode({
-        "newPassword": newPassword,
-      }),
+      body: jsonEncode({"newPassword": newPassword}),
     );
 
     print("BODY----------------------------------------: ${response.body}");
@@ -100,4 +83,3 @@ class ResetPasswordService {
     }
   }
 }
-

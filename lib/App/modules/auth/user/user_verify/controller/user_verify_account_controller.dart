@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:near_me/App/modules/services/contants/api_constants.dart';
 import 'package:near_me/App/routes/app_routes.dart';
 
 class UserVerifyAccountController extends GetxController {
@@ -56,7 +57,7 @@ class UserVerifyAccountController extends GetxController {
       isVerifying.value = true;
 
       final url = Uri.parse(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/user/verify",
+        "${ApiConstants.user_account_verify}",
       );
 
       print("SENDING EMAIL: $email");
