@@ -77,7 +77,7 @@ class ServicerForgotPasswordView extends GetView<ServicerForgotPasswordControlle
                         style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Get.toNamed(isUser ? AppRoutes.USER_LOGIN : '/service_login');
+                            Get.toNamed(isUser ? AppRoutes.USER_LOGIN : AppRoutes.SERVICER_LOGIN);
                           },
                       ),
                     ],

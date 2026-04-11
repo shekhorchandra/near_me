@@ -6,18 +6,23 @@ import '../../../services/contants/api_constants.dart';
 class ForgetAuthService {
   /// Send OTP to email
   static Future<void> forgetPassword(String email) async {
-    final url = Uri.parse(ApiConstants.baseUrl + ApiConstants.forgetPassword);
+    final encodedEmail = Uri.encodeComponent(email);
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email}),
+    final url = Uri.parse(
+      "${ApiConstants.forgetPassword}$encodedEmail",
     );
+
+    print("URL: $url");
+
+    final response = await http.get(url);
+
+    print("Status: ${response.statusCode}");
+    print("Body: ${response.body}");
 
     final data = jsonDecode(response.body);
 
     if (response.statusCode == 200 && data["success"] == true) {
-      return; // success
+      return;
     } else {
       throw Exception(data["message"] ?? "Failed to send OTP");
     }
