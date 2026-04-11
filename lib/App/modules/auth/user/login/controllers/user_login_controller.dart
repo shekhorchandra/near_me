@@ -31,7 +31,7 @@ class UserLoginController extends GetxController {
   void initControllers() {
     if (kDebugMode) {
       emailController.text = "shekhorsaha058@gmail.com";
-      passwordController.text = "Tonoy123@#";
+      passwordController.text = "Tonoy@#123";
     }
   }
 
@@ -170,8 +170,8 @@ class UserLoginController extends GetxController {
 
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
+    emailController.clear();
+    passwordController.clear();
     super.onClose();
   }
 }
