@@ -9,7 +9,7 @@ class ForgetAuthService {
     final encodedEmail = Uri.encodeComponent(email);
 
     final url = Uri.parse(
-      "${ApiConstants.forgetPassword}$encodedEmail",
+      "${ApiConstants.userforgetPassword}$encodedEmail",
     );
 
     print("URL: $url");
@@ -35,7 +35,7 @@ class OtpAuthService {
     required String otp,
   }) async {
     final url = Uri.parse(
-      "${ApiConstants.baseUrl}/api/v1/auth/verify-otp",
+      "${ApiConstants.userforgetPasswordverify}",
     );
 
     print("REQUEST URL: $url");
@@ -60,6 +60,43 @@ class OtpAuthService {
       return data["data"];
     } else {
       throw Exception(data["message"]);
+    }
+  }
+}
+
+class ResetPasswordService {
+  static Future<void> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    final url = Uri.parse(
+      "${ApiConstants.baseUrl}/api/v1/auth/reset-password",
+    );
+
+    print("TOKEN SENT:------------------------------ $token");
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        // "Authorization": "Bearer $token",
+        "token": token,
+      },
+      body: jsonEncode({
+        "newPassword": newPassword,
+      }),
+    );
+
+    print("BODY----------------------------------------: ${response.body}");
+
+    final data = jsonDecode(response.body);
+
+    print("RESET RESPONSE: $data");
+
+    if (response.statusCode == 200 && data["success"] == true) {
+      return;
+    } else {
+      throw Exception(data["message"] ?? "Password reset failed");
     }
   }
 }

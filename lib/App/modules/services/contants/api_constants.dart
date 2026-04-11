@@ -13,5 +13,8 @@ class ApiConstants {
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
 
   /// forget password
-  static const String forgetPassword = "$baseUrl/api/v1/auth/forget-password/";
+  static const String userforgetPassword = "$baseUrl/api/v1/auth/forget-password/";
+
+  /// forget password
+  static const String userforgetPasswordverify = "$baseUrl/api/v1/auth/verify-otp";
 }

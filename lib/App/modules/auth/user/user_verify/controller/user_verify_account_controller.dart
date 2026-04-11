@@ -64,13 +64,8 @@ class UserVerifyAccountController extends GetxController {
 
       final response = await http.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "email": email,
-          "otp": otpCode,
-        }),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "otp": otpCode}),
       );
 
       print("STATUS CODE: ${response.statusCode}");
@@ -81,17 +76,11 @@ class UserVerifyAccountController extends GetxController {
       isVerifying.value = false;
 
       if (response.statusCode == 200 && data["success"] == true) {
-        Get.snackbar(
-          "Success",
-          data["message"] ?? "OTP verified successfully",
-        );
+        Get.snackbar("Success", data["message"] ?? "OTP verified successfully");
 
-        // Get.offAllNamed(AppRoutes.USER_LOGIN);
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
       } else {
-        Get.snackbar(
-          "Error",
-          data["message"] ?? "OTP verification failed",
-        );
+        Get.snackbar("Error", data["message"] ?? "OTP verification failed");
       }
     } catch (e) {
       isVerifying.value = false;

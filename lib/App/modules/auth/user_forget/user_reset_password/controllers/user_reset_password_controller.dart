@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../user_forget_auth_service/ForgetPasswordAuthService.dart';
 
 class UserResetPasswordController extends GetxController {
 
@@ -41,15 +42,24 @@ class UserResetPasswordController extends GetxController {
 
     isLoading.value = true;
 
-    // Simulate API delay
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      // 🔥 GET TOKEN FROM OTP SCREEN
+      final token = Get.arguments as String;
 
-    isLoading.value = false;
+      await ResetPasswordService.resetPassword(
+        token: token,
+        newPassword: newPassword,
+      );
 
-    Get.snackbar("Success", "Password reset successfully");
+      Get.snackbar("Success", "Password reset successfully");
 
-    // Go to User Login (STATIC)
-    Get.offAllNamed(AppRoutes.USER_LOGIN);
+      // Go to login
+      Get.offAllNamed(AppRoutes.USER_LOGIN);
+    } catch (e) {
+      Get.snackbar("Error", e.toString().replaceAll("Exception: ", ""));
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
