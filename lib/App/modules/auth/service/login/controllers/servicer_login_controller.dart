@@ -23,8 +23,8 @@ class ServicerLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(text: "shekhorsaha058@gmail.com");
-  final passwordController = TextEditingController(text: "Tonoy@#123");
+  final emailController = TextEditingController(text: "");
+  final passwordController = TextEditingController(text: "");
 
   final isLoading = false.obs;
 
@@ -75,6 +75,7 @@ class ServicerLoginController extends GetxController {
         final refreshToken = data?["refreshToken"] ?? data?["token"]?["refreshToken"];
 
         final role = data?["user"]?["role"];
+        final serviceId = data?["user"]?["service"];
 
         final isVerified = data?["user"]?["isVerified"] ?? false;
         final hasService = data?["user"]?["hasService"] ?? false;
@@ -90,6 +91,7 @@ class ServicerLoginController extends GetxController {
         // 🔥 SAVE NEW TOKEN
         await _storageService.setAccessToken(accessToken);
         await _storageService.setRefreshToken(refreshToken ?? "");
+        await _storageService.setServiceId(serviceId ?? "");
 
         print("✅ SAVED TOKEN: $accessToken");
         print("✅ STORED TOKEN: ${StorageService().accessToken}");

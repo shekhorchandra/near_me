@@ -21,7 +21,7 @@ class ServiceItem {
     return ServiceItem(
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      imageUrl: json['imageUrl'], // API sends image URL
+      imageUrl: json['image'], // ✅ FIXED HERE
     );
   }
 

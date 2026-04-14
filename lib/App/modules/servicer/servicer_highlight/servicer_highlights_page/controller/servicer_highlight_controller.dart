@@ -1,73 +1,66 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:near_me/App/data/services/storage_service.dart';
+import 'package:http/http.dart' as http;
 
 import '../model/servicer_highlight_model.dart';
 
 class ServiceHighlightController extends GetxController {
-  final picker = ImagePicker();
-
   final services = <ServiceItem>[].obs;
+  final StorageService storage = StorageService();
 
   @override
   void onInit() {
     super.onInit();
-    initServices();
+    // debugServiceId();
+    fetchHighlights(); // 👈 call API
   }
 
-  void initServices() {
-    services.assignAll([
-      ServiceItem(title: "Massage Therapy"),
-      ServiceItem(title: "Home Cleaning"),
-      ServiceItem(title: "AC Repair"),
-      ServiceItem(title: "Plumbing"),
-    ]);
-  }
+  // void debugServiceId() {
+  //   print("SERVICE ID:----------------------------- ${storage.serviceId}");
+  // }
 
-  /// Show option dialog
-  void pickImage(int index) {
-    Get.bottomSheet(
-      SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Camera"),
-                onTap: () {
-                  Get.back();
-                  _getImage(index, ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text("Gallery"),
-                onTap: () {
-                  Get.back();
-                  _getImage(index, ImageSource.gallery);
-                },
-              ),
-              // SizedBox(height: 100,)
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true, // allows full-height bottom sheet if keyboard opens
-    );
-  }
+  Future<void> fetchHighlights() async {
+    try {
+      // 🔥 DEBUG MODE (hardcoded)
+      // const debugServiceId = "69dcb85c6198dd4c5c23e4a4";
 
-  Future<void> _getImage(int index, ImageSource source) async {
-    final picked = await picker.pickImage(source: source);
+      final token = storage.accessToken;
+      final serviceId = storage.serviceId;
 
-    if (picked != null) {
-      services[index].imageFile = File(picked.path);
-      services.refresh();
+      log("SERVICE ID FROM STORAGE:---------- $serviceId");
+      log("STORED SERVICE ID:------------- ${StorageService().serviceId}");
+      log("TOKEN: $token");
+
+      if (serviceId == null || serviceId.isEmpty || token == null) {
+        log("❌ Missing serviceId or token");
+        return;
+      }
+
+      final url =
+          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/service/$serviceId";
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {"Authorization": token, "Content-Type": "application/json"},
+      );
+
+      log("STATUS CODE: ${response.statusCode}");
+      log("RESPONSE: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        final List list = data['data'] ?? [];
+
+        services.assignAll(list.map((e) => ServiceItem.fromJson(e)).toList());
+      } else {
+        Get.snackbar("Error", "Failed to load highlights");
+      }
+    } catch (e) {
+      log("ERROR: $e");
+      Get.snackbar("Error", e.toString());
     }
   }
 }

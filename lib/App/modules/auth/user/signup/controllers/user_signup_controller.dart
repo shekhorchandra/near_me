@@ -64,7 +64,7 @@ class UserSignupController extends GetxController {
         AppSnackbar.error(message);
       }
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+      AppSnackbar.error("Something went wrong. Please try again.");
     } finally {
       isLoading.value = false;
     }
