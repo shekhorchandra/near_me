@@ -19,114 +19,120 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
           return LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(
-                  bottom: MediaQuery.of(context).viewPadding.bottom + 16, // safe area for bottom
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16)
+                    .copyWith(bottom: MediaQuery.of(context).viewPadding.bottom + 16),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: constraints.maxHeight - 40,
                   ),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// IMAGE PICKER
-                        GestureDetector(
-                          onTap: controller.pickImage,
-                          child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
+                      /// IMAGE PICKER
+                      GestureDetector(
+                        onTap: controller.pickImage,
+                        child: Obx(() {
+                          return Container(
                             height: 160,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               color: Colors.grey.shade200,
-                              image: controller.service.imageFile != null
+                              image: controller.imageFile.value != null
                                   ? DecorationImage(
-                                image: FileImage(controller.service.imageFile!),
+                                image: FileImage(
+                                    controller.imageFile.value!),
+                                fit: BoxFit.cover,
+                              )
+                                  : (controller.imageUrl.value != null &&
+                                  controller.imageUrl.value!.isNotEmpty)
+                                  ? DecorationImage(
+                                image: NetworkImage(
+                                    controller.imageUrl.value!),
                                 fit: BoxFit.cover,
                               )
                                   : null,
                             ),
-                            child: controller.service.imageFile == null
+                            child: controller.imageFile.value == null &&
+                                (controller.imageUrl.value == null ||
+                                    controller.imageUrl.value!.isEmpty)
                                 ? const Center(
                               child: Icon(Icons.add_a_photo, size: 40),
                             )
                                 : null,
-                          ),
+                          );
+                        }),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      /// TITLE
+                      const Text(
+                        "Service Highlights Title",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                      const SizedBox(height: 6),
+                      CustomTextField(
+                        controller: controller.titleController,
+                        hint: 'Enter service title',
+                      ),
 
-                        const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                        /// TITLE
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Service Highlights Title",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            CustomTextField(
-                              controller: controller.titleController,
-                              hint: 'Enter service title',
-                            ),
-                          ],
+                      /// DESCRIPTION
+                      const Text(
+                        "Service Highlights Description",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                      const SizedBox(height: 6),
+                      CustomTextField(
+                        controller: controller.descController,
+                        maxLines: 8,
+                        hint: 'Service Highlights Description',
+                      ),
 
-                        const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
-                        /// DESCRIPTION
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Service Highlights Description",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            CustomTextField(
-                              controller: controller.descController,
-                              maxLines: 15,
-                              hint: 'Service Highlights Description',
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        /// BUTTONS
-                        Row(
-                          children: [
-                            Expanded(
-                              child: AppButton(
+                      /// BUTTONS
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Obx(() {
+                              return AppButton(
                                 height: 40,
-                                onPressed: controller.deleteService,
+                                loading: controller.isDeleting.value,
+                                onPressed: controller.isDeleting.value
+                                    ? () {}
+                                    : controller.deleteService,
                                 text: 'Delete',
                                 backgroundColor: Colors.red,
                                 textColor: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: AppButton(
+                              );
+                            }),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Obx(() {
+                              return AppButton(
                                 height: 40,
-                                onPressed: controller.saveService,
+                                loading: controller.isSaving.value,
+                                onPressed: controller.isSaving.value
+                                    ? () {}
+                                    : controller.saveService,
                                 text: 'Save',
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                              );
+                            }),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               );

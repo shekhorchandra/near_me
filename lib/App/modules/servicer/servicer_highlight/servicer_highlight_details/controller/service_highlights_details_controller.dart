@@ -1,121 +1,141 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../servicer_highlights_page/controller/servicer_highlight_controller.dart';
-import '../models/service_highlights_details_model.dart';
+import 'package:http/http.dart' as http;
+import 'package:near_me/App/data/services/storage_service.dart';
 
 class ServiceHightlightsDetailsController extends GetxController {
   final picker = ImagePicker();
-
-  late int index;
-  late ServiceHightlightsDetailsModel service;
+  final StorageService storage = StorageService();
 
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
-  final highlightController = Get.find<ServiceHighlightController>();
+  final Rxn<File> imageFile = Rxn<File>();
+  final RxnString imageUrl = RxnString();
+  final isSaving = false.obs;
+  final isDeleting = false.obs;
+
+  late String highlightId;
 
   @override
   void onInit() {
     super.onInit();
 
-    index = Get.arguments['index'];
+    highlightId = Get.arguments; // ONLY ID
 
-    final item = highlightController.services[index];
-
-    service = ServiceHightlightsDetailsModel(
-      imageFile: item.imageFile,
-      title: item.title,
-      description: item.description,
-    );
-
-    titleController.text = service.title;
-    descController.text = service.description;
+    fetchSingleHighlight();
   }
 
-  /// Pick Image
-  void pickImage() {
-    Get.bottomSheet(
-      SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("Camera"),
-                onTap: () {
-                  Get.back();
-                  _getImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text("Gallery"),
-                onTap: () {
-                  Get.back();
-                  _getImage(ImageSource.gallery);
-                },
-              ),
-              // No more SizedBox needed
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true, // allows full-height bottom sheet if keyboard opens
-    );
-  }
+  // ================= GET SINGLE =================
+  Future<void> fetchSingleHighlight() async {
+    try {
+      final token = storage.accessToken;
 
-  Future<void> _getImage(ImageSource source) async {
-    final picked = await picker.pickImage(source: source);
+      final url =
+          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
 
-    if (picked != null) {
-      service.imageFile = File(picked.path);
-      update();
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {"Authorization": token ?? "", "Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body)['data'];
+
+        titleController.text = data['title'] ?? '';
+        descController.text = data['description'] ?? '';
+        imageUrl.value = data['image'];
+      } else {
+        Get.snackbar("Error", "Failed to load highlight");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
     }
   }
 
-  /// Save
-  void saveService() {
-    highlightController.services[index].title = titleController.text;
-    highlightController.services[index].description =
-        descController.text;
-    highlightController.services[index].imageFile =
-        service.imageFile;
+  // ================= PICK IMAGE =================
+  void pickImage() async {
+    final picked = await picker.pickImage(source: ImageSource.gallery);
 
-    highlightController.services.refresh();
-
-    Get.back();
-    Get.snackbar("Success", "Service updated");
+    if (picked != null) {
+      imageFile.value = File(picked.path);
+    }
   }
 
-  /// Delete
-  void deleteService() {
+  // ================= SAVE (UPDATE API) =================
+  Future<void> saveService() async {
+    try {
+      isSaving.value = true;
+
+      final token = storage.accessToken;
+
+      final uri = Uri.parse(
+        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId",
+      );
+
+      var request = http.MultipartRequest("PATCH", uri);
+
+      request.headers['Authorization'] = token ?? "";
+
+      request.fields['data'] = jsonEncode({
+        "title": titleController.text.trim(),
+        "description": descController.text.trim(),
+      });
+
+      if (imageFile.value != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath("image", imageFile.value!.path),
+        );
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        Get.back();
+        Get.snackbar("Success", "Updated successfully");
+      } else {
+        Get.snackbar("Error", "Update failed");
+      }
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  // ================= DELETE =================
+  Future<void> deleteService() async {
     Get.defaultDialog(
       title: "Delete Service",
-      middleText: "Are you sure you want to delete?",
+      middleText: "Are you sure?",
       textConfirm: "Yes",
       textCancel: "No",
-      confirmTextColor: Colors.white,
-      onConfirm: () {
-        highlightController.services[index] =
-        highlightController.services[index] =
-        highlightController.services[index]
-          ..title = "Empty Service"
-          ..description = ""
-          ..imageFile = null;
+      onConfirm: () async {
+        try {
+          isDeleting.value = true;
 
-        highlightController.services.refresh();
+          final token = storage.accessToken;
 
-        Get.back(); // dialog
-        Get.back(); // page
+          final url =
+              "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
 
-        Get.snackbar("Deleted", "Service removed");
+          final response = await http.delete(
+            Uri.parse(url),
+            headers: {"Authorization": token ?? ""},
+          );
+
+          if (response.statusCode == 200) {
+            Get.back(); // dialog
+            Get.back(); // page
+            Get.snackbar("Deleted", "Highlight removed");
+          } else {
+            Get.snackbar("Error", "Delete failed");
+          }
+        } finally {
+          isDeleting.value = false;
+        }
       },
     );
   }
