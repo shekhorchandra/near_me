@@ -16,6 +16,7 @@ class ServiceHighlightController extends GetxController {
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final selectedImage = Rxn<File>();
+  final isLoading = false.obs;
 
 
   final picker = ImagePicker();
@@ -31,9 +32,7 @@ class ServiceHighlightController extends GetxController {
 
   Future<void> fetchHighlights() async {
     try {
-      // 🔥 DEBUG MODE (hardcoded)
-      // const debugServiceId = "69dcb85c6198dd4c5c23e4a4";
-
+      isLoading.value = true;
       final token = storage.accessToken;
       final serviceId = storage.serviceId;
 
@@ -69,6 +68,9 @@ class ServiceHighlightController extends GetxController {
     } catch (e) {
       log("ERROR: $e");
       Get.snackbar("Error", e.toString());
+    }
+    finally {
+      isLoading.value = false; // ✅ ALWAYS STOP LOADER
     }
   }
 

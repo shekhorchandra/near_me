@@ -49,6 +49,7 @@ dependencies:
   http: ^1.6.0
   app_links: ^7.0.0
   google_sign_in: ^6.2.1
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

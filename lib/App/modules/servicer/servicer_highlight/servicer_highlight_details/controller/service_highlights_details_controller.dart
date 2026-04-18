@@ -19,6 +19,7 @@ class ServiceHightlightsDetailsController extends GetxController {
   final isDeleting = false.obs;
 
   late String highlightId;
+  final isLoading = true.obs;
 
   @override
   void onInit() {
@@ -53,6 +54,9 @@ class ServiceHightlightsDetailsController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
+    }
+    finally {
+      isLoading.value = false;
     }
   }
 

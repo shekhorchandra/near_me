@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
 import 'package:near_me/App/routes/app_routes.dart';
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../controller/servicer_highlight_controller.dart';
 
 class ServiceHighlightView extends GetView<ServiceHighlightController> {
@@ -33,8 +34,11 @@ class ServiceHighlightView extends GetView<ServiceHighlightController> {
 
                 const SizedBox(height: 16),
 
+                /// ✅ LOADING STATE (SKELETON)
+                if (controller.isLoading.value)
+                  Expanded(child: SkeletonLoader.grid())
                 /// EMPTY STATE
-                if (controller.services.isEmpty)
+                else if (controller.services.isEmpty)
                   Expanded(
                     child: Center(
                       child: Column(
@@ -90,23 +94,22 @@ class ServiceHighlightView extends GetView<ServiceHighlightController> {
                                     color: Colors.grey.shade200,
                                     image: service.imageFile != null
                                         ? DecorationImage(
-                                      image: FileImage(service.imageFile!),
-                                      fit: BoxFit.cover,
-                                    )
-                                        : (service.imageUrl != null &&
-                                        service.imageUrl!.isNotEmpty)
+                                            image: FileImage(service.imageFile!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : (service.imageUrl != null && service.imageUrl!.isNotEmpty)
                                         ? DecorationImage(
-                                      image: NetworkImage(service.imageUrl!),
-                                      fit: BoxFit.cover,
-                                    )
+                                            image: NetworkImage(service.imageUrl!),
+                                            fit: BoxFit.cover,
+                                          )
                                         : null,
                                   ),
-                                  child: service.imageFile == null &&
-                                      (service.imageUrl == null ||
-                                          service.imageUrl!.isEmpty)
+                                  child:
+                                      service.imageFile == null &&
+                                          (service.imageUrl == null || service.imageUrl!.isEmpty)
                                       ? const Center(
-                                    child: Icon(Icons.add_a_photo, color: Colors.grey),
-                                  )
+                                          child: Icon(Icons.add_a_photo, color: Colors.grey),
+                                        )
                                       : null,
                                 ),
 
@@ -153,7 +156,4 @@ class ServiceHighlightView extends GetView<ServiceHighlightController> {
       ),
     );
   }
-
 }
-
-
