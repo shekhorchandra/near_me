@@ -37,7 +37,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                 icon: Icons.search,
               ),
               const SizedBox(height: 10),
-        
+
               // Dropdown filters
               Obx(
                 () => Row(
@@ -70,9 +70,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 10),
-        
+
               Expanded(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start, // align top
@@ -109,7 +109,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                     );
                                   }).toList(),
                                 ),
-        
+
                                 // Electrical dropdown
                                 ExpansionTile(
                                   title: const Text(
@@ -123,7 +123,8 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                       children: [
                                         Checkbox(
                                           value: controller.electricalOptions[option],
-                                          onChanged: (v) => controller.electricalOptions[option] = v!,
+                                          onChanged: (v) =>
+                                              controller.electricalOptions[option] = v!,
                                         ),
                                         Expanded(child: Text(option, softWrap: true)),
                                       ],
@@ -136,9 +137,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                         ),
                       ),
                     ),
-        
+
                     const SizedBox(width: 4),
-        
+
                     /// Right column: services
                     Expanded(
                       child: Obx(
@@ -170,22 +171,13 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                       softWrap: true,
                                     ),
                                     const SizedBox(height: 4),
-                                    InfoRow(
-                                      icon: Icons.star,
-                                      text: service.rating.toString(),
-                                    ),
+                                    InfoRow(icon: Icons.star, text: service.rating.toString()),
                                     InfoRow(
                                       icon: Icons.location_on,
                                       text: '${service.distance} km',
                                     ),
-                                    InfoRow(
-                                      icon: Icons.schedule,
-                                      text: service.schedule,
-                                    ),
-                                    InfoRow(
-                                      icon: Icons.location_city,
-                                      text: service.location,
-                                    ),
+                                    InfoRow(icon: Icons.schedule, text: service.schedule),
+                                    InfoRow(icon: Icons.location_city, text: service.location),
                                     const SizedBox(height: 8),
                                     Align(
                                       alignment: Alignment.centerRight,
@@ -203,7 +195,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                               'schedule': service.schedule,
                                               'location': service.location,
                                               'about': service.about,
-        
+
                                               // MUST BE LIST
                                               'servicesOffered': [
                                                 'Accounting & Finance Services',
@@ -211,7 +203,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                                 'Education & Tutoring',
                                                 'Specialist Services',
                                               ],
-        
+
                                               // MUST BE LIST
                                               'highlights': [
                                                 'assets/images/trade&service.png',
@@ -219,7 +211,7 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                                 'assets/images/trade&service.png',
                                                 'assets/images/trade&service.png',
                                               ],
-        
+
                                               // MUST BE LIST OF ReviewModel
                                               'reviews': [
                                                 ReviewModel(
@@ -285,10 +277,7 @@ class InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: TextStyle(
-              fontSize: fontSize,
-              color: textColor,
-            ),
+            style: TextStyle(fontSize: fontSize, color: textColor),
             overflow: TextOverflow.ellipsis,
           ),
         ),

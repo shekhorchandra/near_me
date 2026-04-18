@@ -8,6 +8,7 @@ class SkeletonLoader {
     double aspectRatio = 0.85,
   }) {
     return GridView.builder(
+      shrinkWrap: true,
       itemCount: itemCount,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

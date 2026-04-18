@@ -276,7 +276,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     ),
                                   ),
                                   child: const Text(
-                                    'View Replies ➤',
+                                    'Give Review ➤',
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ),

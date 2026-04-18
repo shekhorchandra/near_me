@@ -15,7 +15,7 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
       appBar: CommonAppBar(title: 'Service Highlights Details'),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Padding(
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +55,7 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
                 onTap: controller.pickImage,
                 child: Obx(() {
                   return Container(
-                    height: 400,
+                    height: 300,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
