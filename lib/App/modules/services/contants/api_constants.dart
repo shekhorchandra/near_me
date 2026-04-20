@@ -23,4 +23,27 @@ class ApiConstants {
 
   ///user logout
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
+
+  // PLANS
+  static const String getPlans = "$baseUrl/api/v1/plans";
+
+  // Get all category
+  static const String categoryTree = "$baseUrl/api/v1/category/tree";
+
+  // Service Create
+  static const String createService = "$baseUrl/api/v1/service/create";
+
+  // Service account verify
+  static const String userAccountVerify = "$baseUrl/api/v1/user/verify";
+
+  //Service create highlights
+  static const String highlightServiceBase = "$baseUrl/api/v1/highlight-service";
+
+  static String serviceHighlight(String serviceId) => "$baseUrl/api/v1/highlight-service/service/$serviceId";
+
+  static String highlightService(String id) => "$baseUrl/api/v1/highlight-service/$id";
+
+  static String serviceById(String id) => "$baseUrl/api/v1/service/$id";
+
+
 }

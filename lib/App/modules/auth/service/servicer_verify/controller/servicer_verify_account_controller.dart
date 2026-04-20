@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:near_me/App/routes/app_routes.dart';
 
+import '../../../../services/contants/api_constants.dart';
+
 class ServicerVerifyAccountController extends GetxController {
   // OTP digits
   final otp = List.generate(4, (_) => ''.obs);
@@ -59,9 +61,11 @@ class ServicerVerifyAccountController extends GetxController {
     try {
       isVerifying.value = true;
 
-      final url = Uri.parse(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/user/verify",
-      );
+      // final url = Uri.parse(
+      //   "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/user/verify",
+      // );
+
+      final url = Uri.parse(ApiConstants.userAccountVerify);
 
       print("SENDING OTP: $otpCode");
       print("SENDING EMAIL: $email");

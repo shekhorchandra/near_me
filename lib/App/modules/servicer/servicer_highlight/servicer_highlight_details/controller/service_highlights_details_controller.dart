@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:near_me/App/data/services/storage_service.dart';
 
+import '../../../../services/contants/api_constants.dart';
+
 class ServiceHightlightsDetailsController extends GetxController {
   final picker = ImagePicker();
   final StorageService storage = StorageService();
@@ -35,9 +37,10 @@ class ServiceHightlightsDetailsController extends GetxController {
     try {
       final token = storage.accessToken;
 
-      final url =
-          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
+      // final url =
+      //     "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
 
+      final url = ApiConstants.highlightService(highlightId);
       final response = await http.get(
         Uri.parse(url),
         headers: {"Authorization": token ?? "", "Content-Type": "application/json"},
@@ -54,8 +57,7 @@ class ServiceHightlightsDetailsController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", e.toString());
-    }
-    finally {
+    } finally {
       isLoading.value = false;
     }
   }
@@ -76,9 +78,11 @@ class ServiceHightlightsDetailsController extends GetxController {
 
       final token = storage.accessToken;
 
-      final uri = Uri.parse(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId",
-      );
+      // final uri = Uri.parse(
+      //   "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId",
+      // );
+
+      final uri = Uri.parse(ApiConstants.highlightService(highlightId));
 
       var request = http.MultipartRequest("PATCH", uri);
 
@@ -90,9 +94,7 @@ class ServiceHightlightsDetailsController extends GetxController {
       });
 
       if (imageFile.value != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath("image", imageFile.value!.path),
-        );
+        request.files.add(await http.MultipartFile.fromPath("image", imageFile.value!.path));
       }
 
       final streamedResponse = await request.send();
@@ -122,8 +124,10 @@ class ServiceHightlightsDetailsController extends GetxController {
 
           final token = storage.accessToken;
 
-          final url =
-              "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
+          // final url =
+          //     "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/$highlightId";
+
+          final url = ApiConstants.highlightService(highlightId);
 
           final response = await http.delete(
             Uri.parse(url),

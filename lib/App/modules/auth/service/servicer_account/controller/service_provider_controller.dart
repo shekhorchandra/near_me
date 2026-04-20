@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../../../services/contants/api_constants.dart';
 import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
 
@@ -62,9 +63,11 @@ class ServiceProviderController extends GetxController {
 
   Future<void> fetchCategories() async {
     try {
-      final response = await http.get(
-        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/category/tree"),
-      );
+      // final response = await http.get(
+      //   Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/category/tree"),
+      // );
+
+      final response = await http.get(Uri.parse(ApiConstants.categoryTree));
 
       final data = jsonDecode(response.body);
 
@@ -187,10 +190,12 @@ class ServiceProviderController extends GetxController {
       print("-------------------------------------");
 
       // ----------------- SEND JSON -----------------
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
-      );
+      // final request = http.MultipartRequest(
+      //   'POST',
+      //   Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
+      // );
+
+      final request = http.MultipartRequest('POST', Uri.parse(ApiConstants.createService));
 
       request.headers['Authorization'] = token.startsWith("Bearer ") ? token : 'Bearer $token';
       // Important: backend expects multipart for files

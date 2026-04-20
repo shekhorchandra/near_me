@@ -8,6 +8,7 @@ import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/data/services/storage_service.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../services/contants/api_constants.dart';
 import '../model/servicer_highlight_model.dart';
 
 class ServiceHighlightController extends GetxController {
@@ -18,7 +19,6 @@ class ServiceHighlightController extends GetxController {
   final selectedImage = Rxn<File>();
   final isLoading = false.obs;
 
-
   final picker = ImagePicker();
   final isCreating = false.obs;
 
@@ -28,7 +28,6 @@ class ServiceHighlightController extends GetxController {
 
     fetchHighlights();
   }
-
 
   Future<void> fetchHighlights() async {
     try {
@@ -45,8 +44,10 @@ class ServiceHighlightController extends GetxController {
         return;
       }
 
-      final url =
-          "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/service/$serviceId";
+      // final url =
+      //     "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/service/$serviceId";
+
+      final url = ApiConstants.serviceHighlight(serviceId);
 
       final response = await http.get(
         Uri.parse(url),
@@ -68,8 +69,7 @@ class ServiceHighlightController extends GetxController {
     } catch (e) {
       log("ERROR: $e");
       Get.snackbar("Error", e.toString());
-    }
-    finally {
+    } finally {
       isLoading.value = false; // ✅ ALWAYS STOP LOADER
     }
   }
@@ -121,27 +121,23 @@ class ServiceHighlightController extends GetxController {
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.grey.shade200,
                       image: file != null
-                          ? DecorationImage(
-                        image: FileImage(file),
-                        fit: BoxFit.cover,
-                      )
+                          ? DecorationImage(image: FileImage(file), fit: BoxFit.cover)
                           : null,
                     ),
                     child: file == null
                         ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_a_photo, color: Colors.grey),
-                          SizedBox(height: 6),
-                          Text("Upload Image",
-                              style: TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    )
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add_a_photo, color: Colors.grey),
+                                SizedBox(height: 6),
+                                Text("Upload Image", style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          )
                         : null,
                   );
-                })
+                }),
               ),
 
               const SizedBox(height: 16),
@@ -222,9 +218,11 @@ class ServiceHighlightController extends GetxController {
 
       isCreating.value = true;
 
-      final uri = Uri.parse(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/",
-      );
+      // final uri = Uri.parse(
+      //   "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/",
+      // );
+
+      final uri = Uri.parse(ApiConstants.highlightServiceBase);
 
       var request = http.MultipartRequest("POST", uri);
       request.headers['Authorization'] = token;
@@ -235,12 +233,7 @@ class ServiceHighlightController extends GetxController {
         "description": descController.text,
       });
 
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          "image",
-          selectedImage.value!.path,
-        ),
-      );
+      request.files.add(await http.MultipartFile.fromPath("image", selectedImage.value!.path));
 
       final response = await request.send();
       final resBody = await response.stream.bytesToString();
@@ -267,7 +260,4 @@ class ServiceHighlightController extends GetxController {
   Future<void> refreshHighlights() async {
     await fetchHighlights();
   }
-
-
 }
-
