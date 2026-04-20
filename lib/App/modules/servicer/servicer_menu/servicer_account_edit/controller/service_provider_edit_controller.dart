@@ -178,11 +178,7 @@ class ServiceProviderEditController extends GetxController {
       logoUrl.value = data["company_logo"] ?? "";
 
       mediaUrls.assignAll(
-        (data["media"] as List?)
-            ?.map((e) => e.toString())
-            .toSet()
-            .toList() ??
-            [],
+        (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ?? [],
       );
 
       mediaFiles.clear();
@@ -286,10 +282,7 @@ class ServiceProviderEditController extends GetxController {
 
       /// OLD SERVER IMAGES -> reupload
       for (final url in mediaUrls) {
-        final response = await dio.get(
-          url,
-          options: Options(responseType: ResponseType.bytes),
-        );
+        final response = await dio.get(url, options: Options(responseType: ResponseType.bytes));
 
         final bytes = response.data;
 
@@ -306,12 +299,7 @@ class ServiceProviderEditController extends GetxController {
 
       /// NEW LOCAL IMAGES
       for (final file in mediaFiles) {
-        formData.files.add(
-          MapEntry(
-            "media",
-            await MultipartFile.fromFile(file.path),
-          ),
-        );
+        formData.files.add(MapEntry("media", await MultipartFile.fromFile(file.path)));
       }
 
       // for (final file in mediaFiles) {

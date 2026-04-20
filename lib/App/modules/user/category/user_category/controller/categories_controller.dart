@@ -33,6 +33,9 @@ class CategoriesController extends GetxController {
         },
       );
 
+      /// PRINT FULL RESPONSE BODY
+      print("Full Response Body----------------------------------------: ${response.data}");
+
       if (response.statusCode == 200 &&
           response.data["success"] == true) {
         final List data = response.data["data"];

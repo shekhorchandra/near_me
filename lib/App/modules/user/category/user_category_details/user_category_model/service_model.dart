@@ -37,9 +37,8 @@ class ServiceModel {
       category: json['servicer_highlight'] ?? '',
       about: json['about'] ?? '',
       servicesOffered: json['servicesOffered'] ?? '',
-      highlights: (json['highlights'] as List<dynamic>?)
-          ?.map((e) => HighlightModel.fromJson(e))
-          .toList() ??
+      highlights:
+          (json['highlights'] as List<dynamic>?)?.map((e) => HighlightModel.fromJson(e)).toList() ??
           [],
       reviews: List<String>.from(json['reviews'] ?? []),
     );
@@ -60,25 +59,15 @@ class ServiceModel {
   };
 }
 
-
 class HighlightModel {
   final String image;
   final String title;
 
-  HighlightModel({
-    required this.image,
-    required this.title,
-  });
+  HighlightModel({required this.image, required this.title});
 
   factory HighlightModel.fromJson(Map<String, dynamic> json) {
-    return HighlightModel(
-      image: json['image'],
-      title: json['title'],
-    );
+    return HighlightModel(image: json['image'], title: json['title']);
   }
 
-  Map<String, dynamic> toJson() => {
-    'image': image,
-    'title': title,
-  };
+  Map<String, dynamic> toJson() => {'image': image, 'title': title};
 }
