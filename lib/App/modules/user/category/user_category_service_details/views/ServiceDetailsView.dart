@@ -11,7 +11,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-          () => Scaffold(
+      () => Scaffold(
         appBar: CommonAppBar(title: controller.title.value),
 
         // ================= BOTTOM BUTTONS =================
@@ -54,290 +54,329 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
         // ================= BODY =================
         body: controller.isLoading.value
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator(color: Colors.black,))
             : SingleChildScrollView(
-          child: Column(
-            children: [
-              // ================= IMAGE CAROUSEL =================
-              SizedBox(
-                height: 220,
-                width: double.infinity,
-                child: Stack(
+                child: Column(
                   children: [
-                    PageView.builder(
-                      controller: controller.pageController,
-                      itemCount: controller.media.length,
-                      itemBuilder: (context, index) {
-                        final img = controller.media[index];
+                    // ================= IMAGE CAROUSEL =================
+                    SizedBox(
+                      height: 220,
+                      width: double.infinity,
+                      child: Stack(
+                        children: [
+                          PageView.builder(
+                            controller: controller.pageController,
+                            itemCount: controller.media.length,
+                            itemBuilder: (context, index) {
+                              final img = controller.media[index];
 
-                        return Image.network(
-                          img,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: Colors.grey.shade300,
-                            child: const Icon(Icons.image, size: 50),
+                              return Image.network(
+                                img,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: Colors.grey.shade300,
+                                  child: const Icon(Icons.image, size: 50),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
 
-                    // LEFT BUTTON
-                    Positioned(
-                      left: 5,
-                      top: 0,
-                      bottom: 0,
-                      child: Center(
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                          onPressed: () {
-                            controller.pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
+                          // LEFT BUTTON
+                          Positioned(
+                            left: 5,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                                onPressed: () {
+                                  controller.pageController.previousPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
+                          // RIGHT BUTTON
+                          Positioned(
+                            right: 5,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                onPressed: () {
+                                  controller.pageController.nextPage(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                    // RIGHT BUTTON
-                    Positioned(
-                      right: 5,
-                      top: 0,
-                      bottom: 0,
-                      child: Center(
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                          onPressed: () {
-                            controller.pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
+                    // ================= CURVED WHITE SECTION =================
+                    Transform.translate(
+                      offset: const Offset(0, -20),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // ================= PROFILE =================
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage: NetworkImage(controller.image.value),
+                                  ),
+                                  const SizedBox(width: 12),
+
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          controller.title.value,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          controller.category.value,
+                                          style: const TextStyle(color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.star, size: 16),
+                                            const SizedBox(width: 4),
+                                            Text(controller.rating.value.toString()),
+                                            const SizedBox(width: 12),
+                                            const Icon(Icons.schedule, size: 16),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                controller.schedule.value,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const Divider(),
+
+                              // ================= ABOUT =================
+                              const Text(
+                                "About",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(controller.about.value),
+
+                              const SizedBox(height: 15),
+
+                              // ================= SERVICES =================
+                              const Text(
+                                "Services Offered",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: controller.servicesOffered
+                                    .map(
+                                      (service) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(service),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              // ================= HIGHLIGHTS =================
+                              const Text(
+                                "Service Highlights",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: controller.highlightServices.length,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 1.00, // taller card
+                                ),
+                                itemBuilder: (context, index) {
+                                  final item = controller.highlightServices[index];
+
+                                  return Card(
+                                    elevation: 3,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // ================= IMAGE =================
+                                        Expanded(
+                                          child: Image.network(
+                                            item["image"] ?? '',
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Container(
+                                              color: Colors.grey.shade300,
+                                              child: const Icon(Icons.image, size: 40),
+                                            ),
+                                          ),
+                                        ),
+
+                                        // ================= TEXT SECTION =================
+                                        Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item["title"] ?? '',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+
+                                              // const SizedBox(height: 4),
+                                              //
+                                              // Text(
+                                              //   item["description"] ?? '',
+                                              //   style: const TextStyle(
+                                              //     fontSize: 12,
+                                              //     color: Colors.grey,
+                                              //   ),
+                                              //   maxLines: 2,
+                                              //   overflow: TextOverflow.ellipsis,
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              // ================= LOCATION =================
+                              const Text(
+                                "Location",
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 5),
+
+                              Container(
+                                width: double.infinity,
+                                height: 150,
+                                color: Colors.grey.shade300,
+                                child: Center(child: Text(controller.location.value)),
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              // ================= REVIEWS =================
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Reviews",
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Get.toNamed(AppRoutes.REVIEWS);
+                                    },
+                                    child: const Text("View All"),
+                                  ),
+                                ],
+                              ),
+
+                              ...controller.reviews.map(
+                                (review) => Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          review.userName,
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(review.review),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: TextButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (_) => const ReplyDialogView(),
+                                              );
+                                            },
+                                            child: const Text("Give Review"),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 80),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // ================= CURVED WHITE SECTION =================
-              Transform.translate(
-                offset: const Offset(0, -20),
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        // ================= PROFILE =================
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(controller.image.value),
-                            ),
-                            const SizedBox(width: 12),
-
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    controller.title.value,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    controller.category.value,
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star, size: 16),
-                                      const SizedBox(width: 4),
-                                      Text(controller.rating.value.toString()),
-                                      const SizedBox(width: 12),
-                                      const Icon(Icons.schedule, size: 16),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          controller.schedule.value,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const Divider(),
-
-                        // ================= ABOUT =================
-                        const Text(
-                          "About",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(controller.about.value),
-
-                        const SizedBox(height: 15),
-
-                        // ================= SERVICES =================
-                        const Text(
-                          "Services Offered",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: controller.servicesOffered
-                              .map(
-                                (service) => Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(service),
-                            ),
-                          )
-                              .toList(),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        // ================= HIGHLIGHTS =================
-                        const Text(
-                          "Service Highlights",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: controller.highlights.length,
-                          gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 1.2,
-                          ),
-                          itemBuilder: (context, index) {
-                            final image = controller.highlights[index];
-
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                image,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: Colors.grey.shade300,
-                                  child: const Icon(Icons.image),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        // ================= LOCATION =================
-                        const Text(
-                          "Location",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 5),
-
-                        Container(
-                          width: double.infinity,
-                          height: 150,
-                          color: Colors.grey.shade300,
-                          child: Center(child: Text(controller.location.value)),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        // ================= REVIEWS =================
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Reviews",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Get.toNamed(AppRoutes.REVIEWS);
-                              },
-                              child: const Text("View All"),
-                            ),
-                          ],
-                        ),
-
-                        ...controller.reviews.map(
-                              (review) => Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    review.userName,
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(review.review),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: TextButton(
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (_) => const ReplyDialogView(),
-                                        );
-                                      },
-                                      child: const Text("Give Review"),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 80),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

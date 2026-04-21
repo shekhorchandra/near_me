@@ -85,6 +85,7 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/images/
+    - assets/images/placeholder2.jpg
 #    - assets/images/onboarding/onboarding.png
 #    - assets/images/splash/splash.png
 

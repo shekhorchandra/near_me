@@ -28,7 +28,7 @@ class ServiceDetailsController extends GetxController {
   var media = <String>[].obs;
 
   RxList<String> servicesOffered = <String>[].obs;
-  RxList<String> highlights = <String>[].obs;
+  var highlightServices = <Map<String, dynamic>>[].obs;
   RxList<ReviewModel> reviews = <ReviewModel>[].obs;
 
   final PageController pageController = PageController();
@@ -78,6 +78,9 @@ class ServiceDetailsController extends GetxController {
             (data["offer_services"] as List)
                 .map((e) => e["name"].toString())
                 .toList();
+
+        highlightServices.value =
+        List<Map<String, dynamic>>.from(data["highlight_services"] ?? []);
 
         // Highlights = media
         media.value = List<String>.from(data["media"] ?? []);

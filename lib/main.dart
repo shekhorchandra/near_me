@@ -16,10 +16,7 @@ void main() async {
   await storageService.init();
 
   //  REGISTER IN GETX
-  Get.put<StorageService>(
-    storageService,
-    permanent: true,
-  );
+  Get.put<StorageService>(storageService, permanent: true);
 
   runApp(const NearMeeApp());
 }
