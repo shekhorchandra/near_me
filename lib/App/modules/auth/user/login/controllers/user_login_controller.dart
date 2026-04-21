@@ -51,7 +51,6 @@ class UserLoginController extends GetxController {
     Get.snackbar("Error", "Something went wrong. Please try again.");
   }
 
-
   Future<void> loginWithGoogleUserDeepLink() async {
     loading.value = true;
 
@@ -113,9 +112,7 @@ class UserLoginController extends GetxController {
       });
 
       // Step 2: Open browser with your API
-      final url = Uri.parse(
-        '${ApiConstants.baseUrl}/auth/google?role=USER',
-      );
+      final url = Uri.parse('${ApiConstants.baseUrl}/auth/google?role=USER');
 
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         Get.snackbar("Error", "Could not launch login URL");
@@ -149,7 +146,6 @@ class UserLoginController extends GetxController {
       final role = data["data"]?["user"]?["role"];
 
       if (result["statusCode"] == 200 && data["success"]) {
-
         // 🔥 Role validation
         if (role == "USER") {
           AppSnackbar.success(message);
@@ -157,7 +153,6 @@ class UserLoginController extends GetxController {
         } else {
           AppSnackbar.error("Please login from correct panel");
         }
-
       } else {
         AppSnackbar.error(message);
       }

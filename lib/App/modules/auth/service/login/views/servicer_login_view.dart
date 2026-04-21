@@ -149,8 +149,8 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   children: [
                     Flexible(
                       child: SocialButton(text: "Google", iconPath: AppAssets.google,
-                          onPressed: () => Get.find<ServicerLoginController>().loginWithGoogleProviderDeepLink(),
-                        // onPressed: () => controller.loginWithGoogle(role: "PROVIDER"),
+                          // onPressed: () => Get.find<ServicerLoginController>().loginWithGoogleProviderDeepLink(),
+                        onPressed: () => controller.loginWithGoogle(role: "PROVIDER"),
                       ),
                     ),
                     const SizedBox(width: 12),

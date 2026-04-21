@@ -115,7 +115,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                       color: Colors.white,
                       child: Obx(() {
                         if (controller.isLoadingTree.value) {
-                          return const Center(child: CircularProgressIndicator(color: Colors.black,));
+                          return const Center(
+                            child: CircularProgressIndicator(color: Colors.black),
+                          );
                         }
 
                         final tree = controller.categoryTree.value;
@@ -140,7 +142,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                           Expanded(
                             child: Obx(() {
                               if (controller.isLoadingServices.value) {
-                                return const Center(child: CircularProgressIndicator(color: Colors.black,));
+                                return const Center(
+                                  child: CircularProgressIndicator(color: Colors.black),
+                                );
                               }
 
                               if (controller.services.isEmpty) {
@@ -161,9 +165,13 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                         children: [
                                           Image.network(
                                             service.image,
-                                            width: double.infinity,
-                                            height: 150,
                                             fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return Image.asset(
+                                                "assets/images/placeholder.jpg",
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                           ),
 
                                           const SizedBox(height: 8),
@@ -203,16 +211,12 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                               height: 32,
                                               text: "View Details",
                                               onPressed: () {
-                                                // Get.toNamed(
-                                                //   AppRoutes.SERVICE_DETAILS,
-                                                //   arguments: {
-                                                //     "image": service.image,
-                                                //     "title": service.title,
-                                                //     "rating": service.rating,
-                                                //     "schedule": service.schedule,
-                                                //     "location": service.location,
-                                                //   },
-                                                // );
+                                                Get.toNamed(
+                                                  AppRoutes.SERVICE_DETAILS,
+                                                  arguments: {
+                                                    "id": service.id,
+                                                  },
+                                                );
                                               },
                                             ),
                                           ),

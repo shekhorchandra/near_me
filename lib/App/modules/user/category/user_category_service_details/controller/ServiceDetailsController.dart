@@ -1,72 +1,121 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../user_category_details/user_category_model/service_model.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../../data/services/storage_service.dart';
+import '../../../../services/contants/api_constants.dart';
 import '../models/ReviewModel.dart';
 
 class ServiceDetailsController extends GetxController {
-  late String image;
-  late String title;
-  late String category;
-  late double rating;
-  late String schedule;
-  late String location;
-  late String about;
-  late List<String> servicesOffered;
-  late List<HighlightModel> highlights;
-  late List<ReviewModel> reviews;
+  final Dio dio = Dio();
+  final StorageService storage = Get.find<StorageService>();
+
+  RxBool isLoading = false.obs;
+
+  late String serviceId;
+
+  RxString image = ''.obs;
+  RxString title = ''.obs;
+  RxString category = ''.obs;
+  RxDouble rating = 0.0.obs;
+  RxString schedule = ''.obs;
+  RxString location = ''.obs;
+  RxString about = ''.obs;
+  RxString website = ''.obs;
+  RxString phone = ''.obs;
+
+  var media = <String>[].obs;
+
+  RxList<String> servicesOffered = <String>[].obs;
+  RxList<String> highlights = <String>[].obs;
+  RxList<ReviewModel> reviews = <ReviewModel>[].obs;
+
+  final PageController pageController = PageController();
 
   @override
   void onInit() {
     super.onInit();
+
     final args = Get.arguments ?? {};
+    serviceId = args["id"] ?? '';
 
-    image = args['image'] ?? '';
-    title = args['title'] ?? '';
-    category = args['servicer_highlight'] ?? '';
-    rating = (args['rating'] ?? 0.0).toDouble();
-    schedule = args['schedule'] ?? '';
-    location = args['location'] ?? '';
-    about = args['about'] ?? '';
+    fetchServiceDetails();
+  }
 
-    // Services Offered
-    servicesOffered = (args['servicesOffered'] as List<dynamic>?)
-        ?.map((e) => e.toString())
-        .toList() ??
-        [];
+  Future<void> fetchServiceDetails() async {
+    try {
+      isLoading.value = true;
 
-    // Highlights
-    highlights = (args['highlights'] as List<dynamic>?)
-        ?.map((e) {
-      if (e is HighlightModel) return e;
-      if (e is Map<String, dynamic>) return HighlightModel.fromJson(e);
-      if (e is String) return HighlightModel(image: e, title: '');
-      throw Exception("Invalid highlight data: $e");
-    })
-        .toList() ??
-        [];
+      final response = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer ${storage.accessToken}",
+            "accesstoken": storage.accessToken,
+          },
+        ),
+      );
 
-    // Reviews
-    reviews = (args['reviews'] as List<dynamic>?)
-        ?.map((e) {
-      if (e is ReviewModel) return e;
-      if (e is Map<String, dynamic>) {
-        return ReviewModel(
-          userImage: e['userImage'] ?? 'assets/images/user.png',
-          userName: e['userName'] ?? 'Anonymous',
-          review: e['review'] ?? '',
-          daysAgo: (e['daysAgo'] ?? 0) as int,
-        );
+      if (response.statusCode == 200 &&
+          response.data["success"] == true) {
+        final data = response.data["data"];
+
+        image.value = data["company_logo"] ?? '';
+        title.value = data["service_name"] ?? '';
+        category.value = data["service_category"]?["name"] ?? '';
+        about.value = data["about"] ?? '';
+        website.value = data["website_link"] ?? '';
+        phone.value = data["phone"].toString();
+
+        location.value = data["location"]?["address"] ?? '';
+
+        schedule.value =
+        "${data["openingTime"]} - ${data["closingTime"]}";
+
+        // Services Offered
+        servicesOffered.value =
+            (data["offer_services"] as List)
+                .map((e) => e["name"].toString())
+                .toList();
+
+        // Highlights = media
+        media.value = List<String>.from(data["media"] ?? []);
       }
-      if (e is String) {
-        return ReviewModel(
-          userImage: 'assets/images/user.png',
-          userName: 'Anonymous',
-          review: e,
-          daysAgo: 0,
+    } catch (e) {
+      print("ERROR DETAILS: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> callNumber(String phone) async {
+    final cleanPhone = phone.startsWith('+') ? phone : '+$phone';
+
+    final Uri uri = Uri.parse("tel:$cleanPhone");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> openWebsite(String url) async {
+    try {
+      final Uri uri = Uri.parse(
+        url.startsWith('http') ? url : 'https://$url',
+      );
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
         );
+      } else {
+        Get.snackbar("Error", "Cannot open website");
       }
-      throw Exception("Invalid review data: $e");
-    })
-        .toList() ??
-        [];
+    } catch (e) {
+      Get.snackbar("Error", "Invalid URL");
+      print("Launch error: $e");
+    }
   }
 }

@@ -138,138 +138,138 @@ class ServicerLoginController extends GetxController {
   }
 
   /// using url
-  Future<void> loginWithGoogleProviderDeepLink() async {
-    loading.value = true;
-
-    final AppLinks appLinks = AppLinks();
-    StreamSubscription<Uri>? sub;
-
-    try {
-      // Step 1: Listen for deep link callback
-      sub = appLinks.uriLinkStream.listen((Uri uri) async {
-        if (uri.scheme == "Nearme" && uri.path == "/auth/google") {
-          final accessToken = uri.queryParameters['access'];
-          final refreshToken = uri.queryParameters['refresh'];
-          final role = uri.queryParameters['role'];
-
-          if (accessToken != null && refreshToken != null) {
-            if (role != "PROVIDER") {
-              AppSnackbar.error("Not a provider account");
-              return;
-            }
-            await _storageService.setAccessToken(accessToken);
-            await _storageService.setRefreshToken(refreshToken);
-
-            // _storeUserId();
-
-            // Register FCM and Device
-            //
-            // bool fcmRegistered = await _registerFCM();
-            //
-
-            // if (!fcmRegistered) {
-            //
-            //   Get.snackbar('Error', 'An error occurred while initializing notifications!');
-            //   return;
-            // }
-
-            //
-            // bool deviceRegistered = await _registerDevice(data);
-            //
-
-            // if (!deviceRegistered) {
-            //
-            //   Get.snackbar('Error', 'An error occurred while registering the device.');
-            //   return;
-            // }
-
-            _storageService.write('loggedIn', true);
-            Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
-
-            // isVerifiedOrIsShopCreated();
-
-            Get.snackbar("Login Successful", "");
-          } else {
-            Get.snackbar("Error", "Failed to get token from Google login");
-          }
-
-          await sub?.cancel();
-        }
-      });
-
-      // Step 2: Open browser with your API
-      final url = Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER');
-
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        Get.snackbar("Error", "Could not launch login URL");
-        return;
-      }
-    } catch (e, st) {
-      _handleException(e, st);
-    } finally {
-      loading.value = false;
-    }
-  }
+  // Future<void> loginWithGoogleProviderDeepLink() async {
+  //   loading.value = true;
+  //
+  //   final AppLinks appLinks = AppLinks();
+  //   StreamSubscription<Uri>? sub;
+  //
+  //   try {
+  //     // Step 1: Listen for deep link callback
+  //     sub = appLinks.uriLinkStream.listen((Uri uri) async {
+  //       if (uri.scheme == "Nearme" && uri.path == "/auth/google") {
+  //         final accessToken = uri.queryParameters['access'];
+  //         final refreshToken = uri.queryParameters['refresh'];
+  //         final role = uri.queryParameters['role'];
+  //
+  //         if (accessToken != null && refreshToken != null) {
+  //           if (role != "PROVIDER") {
+  //             AppSnackbar.error("Not a provider account");
+  //             return;
+  //           }
+  //           await _storageService.setAccessToken(accessToken);
+  //           await _storageService.setRefreshToken(refreshToken);
+  //
+  //           // _storeUserId();
+  //
+  //           // Register FCM and Device
+  //           //
+  //           // bool fcmRegistered = await _registerFCM();
+  //           //
+  //
+  //           // if (!fcmRegistered) {
+  //           //
+  //           //   Get.snackbar('Error', 'An error occurred while initializing notifications!');
+  //           //   return;
+  //           // }
+  //
+  //           //
+  //           // bool deviceRegistered = await _registerDevice(data);
+  //           //
+  //
+  //           // if (!deviceRegistered) {
+  //           //
+  //           //   Get.snackbar('Error', 'An error occurred while registering the device.');
+  //           //   return;
+  //           // }
+  //
+  //           _storageService.write('loggedIn', true);
+  //           Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+  //
+  //           // isVerifiedOrIsShopCreated();
+  //
+  //           Get.snackbar("Login Successful", "");
+  //         } else {
+  //           Get.snackbar("Error", "Failed to get token from Google login");
+  //         }
+  //
+  //         await sub?.cancel();
+  //       }
+  //     });
+  //
+  //     // Step 2: Open browser with your API
+  //     final url = Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER');
+  //
+  //     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+  //       Get.snackbar("Error", "Could not launch login URL");
+  //       return;
+  //     }
+  //   } catch (e, st) {
+  //     _handleException(e, st);
+  //   } finally {
+  //     loading.value = false;
+  //   }
+  // }
 
   /// In app
 
-  // Future<void> loginWithGoogle({required String role}) async {
-  //   try {
-  //     isLoading.value = true;
-  //
-  //     final GoogleSignIn googleSignIn = GoogleSignIn();
-  //
-  //     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-  //
-  //     if (googleUser == null) {
-  //       AppSnackbar.error("Login cancelled");
-  //       return;
-  //     }
-  //
-  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  //
-  //     final idToken = googleAuth.idToken;
-  //
-  //     // 🔥 Send token to backend
-  //     final response = await http.post(
-  //       // Uri.parse(ApiConstants.google_login),
-  //       Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER'),
-  //
-  //       headers: {"Content-Type": "application/json"},
-  //       body: jsonEncode({
-  //         "idToken": idToken,
-  //         "role": role, // 🔥 IMPORTANT
-  //       }),
-  //     );
-  //
-  //     final data = jsonDecode(response.body);
-  //
-  //     if (response.statusCode == 200 && data["success"]) {
-  //       final accessToken = data["data"]["accessToken"];
-  //       final refreshToken = data["data"]["refreshToken"];
-  //       final userRole = data["data"]["user"]["role"];
-  //
-  //       await box.write("accessToken", accessToken);
-  //       await box.write("refreshToken", refreshToken);
-  //       await box.write("role", userRole);
-  //
-  //       // 🔥 ROLE BASE NAVIGATION
-  //       if (userRole == "USER") {
-  //         Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
-  //       } else if (userRole == "PROVIDER") {
-  //         Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
-  //       } else {
-  //         AppSnackbar.error("Unknown role");
-  //       }
-  //     } else {
-  //       AppSnackbar.error(data["message"]);
-  //     }
-  //   } catch (e) {
-  //     AppSnackbar.error("Google login failed");
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
+  Future<void> loginWithGoogle({required String role}) async {
+    try {
+      isLoading.value = true;
+
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        AppSnackbar.error("Login cancelled");
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final idToken = googleAuth.idToken;
+
+      // 🔥 Send token to backend
+      final response = await http.post(
+        // Uri.parse(ApiConstants.google_login),
+        Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER'),
+
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "idToken": idToken,
+          "role": role, // 🔥 IMPORTANT
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"]) {
+        final accessToken = data["data"]["accessToken"];
+        final refreshToken = data["data"]["refreshToken"];
+        final userRole = data["data"]["user"]["role"];
+
+        // await box.write("accessToken", accessToken);
+        // await box.write("refreshToken", refreshToken);
+        // await box.write("role", userRole);
+
+        // 🔥 ROLE BASE NAVIGATION
+        if (userRole == "USER") {
+          Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
+        } else if (userRole == "PROVIDER") {
+          Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+        } else {
+          AppSnackbar.error("Unknown role");
+        }
+      } else {
+        AppSnackbar.error(data["message"]);
+      }
+    } catch (e) {
+      AppSnackbar.error("Google login failed");
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   @override
   void onClose() {
