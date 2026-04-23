@@ -1,8 +1,21 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import '../../../../../data/services/storage_service.dart';
+import '../../../../services/contants/api_constants.dart';
+import '../../user_category_service_details/models/ReviewModel.dart';
+
 
 class ReviewsController extends GetxController {
+  final Dio dio = Dio();
+  final StorageService storage = Get.find();
 
-  var selectedTab = 0.obs;
+  RxBool isLoading = false.obs;
+  RxInt selectedTab = 0.obs;
+
+  late String serviceId;
+  late String userId;
+
+  RxList<ReviewModel> reviews = <ReviewModel>[].obs;
 
   final tabs = [
     "All",
@@ -10,56 +23,97 @@ class ReviewsController extends GetxController {
     "★★★★",
     "★★★",
     "★★",
-    "★"
+    "★",
   ];
 
-  final totalReviews = 45.obs;
+  @override
+  void onInit() {
+    super.onInit();
 
-  final ratingCount = {
-    5: 25,
-    4: 5,
-    3: 5,
-    2: 5,
-    1: 5
-  };
+    final args = Get.arguments ?? {};
+    serviceId = args["serviceId"];
+    userId = args["userId"];
 
-  final reviews = [
-    {
-      "name": "John Doe",
-      "rating": 5,
-      "time": "2 days ago",
-      "review": "Amazing service. Highly recommended!",
-      "image": "https://i.pravatar.cc/150?img=1"
-    },
-    {
-      "name": "Emma Watson",
-      "rating": 4,
-      "time": "3 days ago",
-      "review": "Very good experience",
-      "image": "https://i.pravatar.cc/150?img=2"
-    },
-    {
-      "name": "David Smith",
-      "rating": 3,
-      "time": "5 days ago",
-      "review": "Average service",
-      "image": "https://i.pravatar.cc/150?img=3"
-    },
-  ].obs;
+    fetchReviews();
+  }
 
-  List<Map> get filteredReviews {
+  Future<void> fetchReviews() async {
+    try {
+      isLoading.value = true;
 
-    if (selectedTab.value == 0) {
-      return reviews;
+      final res = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/review/service/$serviceId",
+        options: Options(
+          headers: {"accesstoken": storage.accessToken},
+        ),
+      );
+
+      if (res.data["success"] == true) {
+        final List data = res.data["data"];
+
+        reviews.value =
+            data.map((e) => ReviewModel.fromJson(e)).toList();
+      }
+    } finally {
+      isLoading.value = false;
     }
+  }
 
-    int rating = 6 - selectedTab.value;
+  Future<void> createReview({
+    required String comment,
+    int? rating,
+    String? parentReview,
+  }) async {
+    try {
+      await dio.post(
+        "${ApiConstants.baseUrl}/api/v1/review/create",
+        data: {
+          "user": userId,
+          "service": serviceId,
+          "comment": comment,
+          if (rating != null) "rating": rating,
+          if (parentReview != null) "parentReview": parentReview,
+        },
+        options: Options(
+          headers: {"accesstoken": storage.accessToken},
+        ),
+      );
 
-    return reviews.where((r) => r["rating"] == rating).toList();
+      fetchReviews();
+      Get.back();
+      Get.snackbar("Success", "Submitted");
+    } catch (e) {
+      Get.snackbar("Error", "Failed");
+    }
   }
 
   void changeTab(int index) {
     selectedTab.value = index;
   }
 
+  List<ReviewModel> get filteredReviews {
+    if (selectedTab.value == 0) return reviews;
+
+    int rating = 6 - selectedTab.value;
+
+    return reviews.where((e) => e.rating == rating).toList();
+  }
+
+  int get totalReviews => reviews.length;
+
+  Map<int, int> get ratingCount {
+    Map<int, int> map = {
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    };
+
+    for (var item in reviews) {
+      map[item.rating] = map[item.rating]! + 1;
+    }
+
+    return map;
+  }
 }

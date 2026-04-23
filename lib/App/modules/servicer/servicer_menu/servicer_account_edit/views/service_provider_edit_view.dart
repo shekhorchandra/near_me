@@ -65,61 +65,105 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                 const SizedBox(height: 12),
 
                 /// ================= CATEGORY
-                const Text("Category", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                const Text(
+                  "Category",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
                 const SizedBox(height: 6),
 
                 Obx(() {
                   final categories = controller.categoryTree;
 
-                  return CustomDropdownField(
-                    hint: "Select Category",
-                    value: controller.selectedCategoryId.value.isEmpty
-                        ? null
-                        : controller.selectedCategoryId.value,
-                    items: categories.map((e) {
-                      return DropdownMenuItem(value: e.id, child: Text(e.name));
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        controller.selectCategory(val);
-                      }
-                    },
-                    icon: Icons.category,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomDropdownField(
+                        hint: "Select Category",
+                        value: controller.selectedCategoryId.value.isEmpty
+                            ? null
+                            : controller.selectedCategoryId.value,
+                        items: categories.map((e) {
+                          return DropdownMenuItem(
+                            value: e.id,
+                            child: Text(e.name),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            controller.selectCategory(val);
+                          }
+                        },
+                        icon: Icons.category,
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      /// ================= OFFER SERVICES UNDER CATEGORY
+                      const Text(
+                        "Offer Services",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: controller.categoryTree
+                            .where((cat) =>
+                        cat.id == controller.selectedCategoryId.value)
+                            .expand((cat) => cat.children)
+                            .map((service) {
+                          final selected = controller.selectedOfferServices
+                              .contains(service.id);
+
+                          return FilterChip(
+                            label: Text(service.name),
+                            selected: selected,
+                            onSelected: (_) =>
+                                controller.toggleService(service.id),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   );
                 }),
 
                 const SizedBox(height: 12),
 
                 /// ================= OFFER SERVICES
-                const Text(
-                  "Services You Offer",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-
-                const SizedBox(height: 8),
-
-                Obx(() {
-                  final services = controller.categoryTree
-                      .expand((e) => e.children)
-                      .expand((e) => e.children)
-                      .toList();
-
-                  return Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: services.map((e) {
-                      final selected = controller.selectedOfferServices.contains(e.id);
-
-                      return FilterChip(
-                        label: Text(e.name),
-                        selected: selected,
-                        onSelected: (_) => controller.toggleService(e.id),
-                      );
-                    }).toList(),
-                  );
-                }),
-
-                const SizedBox(height: 12),
+                // const Text(
+                //   "Services You Offer",
+                //   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                // ),
+                //
+                // const SizedBox(height: 8),
+                //
+                // Obx(() {
+                //   final services = controller.categoryTree
+                //       .expand((e) => e.children)
+                //       .expand((e) => e.children)
+                //       .toList();
+                //
+                //   return Wrap(
+                //     spacing: 8,
+                //     runSpacing: 8,
+                //     children: services.map((e) {
+                //       final selected = controller.selectedOfferServices.contains(e.id);
+                //
+                //       return FilterChip(
+                //         label: Text(e.name),
+                //         selected: selected,
+                //         onSelected: (_) => controller.toggleService(e.id),
+                //       );
+                //     }).toList(),
+                //   );
+                // }),
+                //
+                // const SizedBox(height: 12),
 
                 /// ================= CONTACT
                 SectionLabelWithEdit(
@@ -201,16 +245,12 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                 const SizedBox(height: 12),
 
                 /// ================= MEDIA =================
-                const Text(
-                  "Media (Max 3)",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                const Text("Media (Max 3)", style: TextStyle(fontWeight: FontWeight.bold)),
 
                 const SizedBox(height: 10),
 
                 Obx(() {
-                  final totalImages =
-                      controller.mediaUrls.length + controller.mediaFiles.length;
+                  final totalImages = controller.mediaUrls.length + controller.mediaFiles.length;
 
                   return Wrap(
                     spacing: 8,
@@ -225,12 +265,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                url,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),
+                              child: Image.network(url, height: 100, width: 100, fit: BoxFit.cover),
                             ),
 
                             /// REMOVE OLD IMAGE
@@ -245,11 +280,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                                     color: Colors.black54,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
+                                  child: const Icon(Icons.close, size: 16, color: Colors.white),
                                 ),
                               ),
                             ),
@@ -266,12 +297,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
-                                file,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),
+                              child: Image.file(file, height: 100, width: 100, fit: BoxFit.cover),
                             ),
 
                             /// REMOVE NEW IMAGE
@@ -286,11 +312,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                                     color: Colors.black54,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
+                                  child: const Icon(Icons.close, size: 16, color: Colors.white),
                                 ),
                               ),
                             ),

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:near_me/App/core/widgets/App_button.dart';
+import '../../../../core/widgets/App_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../routes/app_routes.dart';
 import '../controller/home_controller.dart';
@@ -15,30 +15,17 @@ class HomeView extends GetView<HomeController> {
 
   LinearGradient getBadgeGradient(String type) {
     switch (type) {
-      case 'Elite':
-        return LinearGradient(
-          colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'Pro':
-        return LinearGradient(
-          colors: [Color(0xFFFFEA00), Color(0xFFFFA600)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'Basic':
-        return LinearGradient(
-          colors: [Color.fromARGB(255, 72, 248, 140), Color(0xFF4B9868)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
+      case "Elite":
+        return const LinearGradient(colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)]);
+
+      case "Pro":
+        return const LinearGradient(colors: [Color(0xFFFFEA00), Color(0xFFFFA600)]);
+
+      case "Basic":
+        return const LinearGradient(colors: [Color(0xFF48F88C), Color(0xFF4B9868)]);
+
       default:
-        return LinearGradient(
-          colors: [Colors.transparent, Colors.transparent], // Hide if no plan is enrolled
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
+        return const LinearGradient(colors: [Colors.transparent, Colors.transparent]);
     }
   }
 
@@ -48,79 +35,80 @@ class HomeView extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
-            /// MAP (No Obx around GoogleMap!)
+            /// GOOGLE MAP
             Obx(
               () => GoogleMap(
                 initialCameraPosition: const CameraPosition(
-                  target: LatLng(51.5074, -0.1278),
-                  zoom: 13,
+                  target: LatLng(23.8700, 90.4800),
+                  zoom: 10,
                 ),
                 markers: controller.markers.value,
-                onMapCreated: (GoogleMapController map) {
+                circles: controller.circles.value,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                zoomControlsEnabled: true,
+                onMapCreated: (map) {
                   controller.mapController = map;
                 },
-                myLocationEnabled: true,
-                myLocationButtonEnabled: false,
               ),
             ),
 
-            /// TOP UI: buttons + search
+            /// TOP UI
             Column(
               children: [
-                // Login / Register buttons
+                /// LOGIN / REGISTER
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.all(8),
                   child: Row(
                     children: [
                       Expanded(
                         child: AppButton(
-                          height: 30,
+                          height: 34,
+                          text: "Login / Create an user account",
                           onPressed: () {
-                            box.write("selectedRole", "USER"); // 🔥 save role
+                            box.write("selectedRole", "USER");
                             Get.toNamed(AppRoutes.USER_LOGIN);
                           },
-                          text: 'Login / Create an user account',
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: AppButton(
-                          height: 30,
+                          height: 34,
+                          text: "Login / Register a Service",
                           onPressed: () {
-                            box.write("selectedRole", "PROVIDER"); // 🔥 save role
+                            box.write("selectedRole", "PROVIDER");
                             Get.toNamed(AppRoutes.SERVICER_LOGIN);
                           },
-                          text: 'Register Service',
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // 🔍 SEARCH BAR
+                /// SEARCH + FILTER
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
                     children: [
                       Expanded(
                         child: SizedBox(
                           height: 50,
                           child: CustomTextField(
-                            hint: 'Search near me',
+                            hint: "Search near me",
                             icon: Icons.search,
-
                             suffix: InkWell(
-                              onTap: () => controller.showFilterBottomSheet(),
+                              onTap: controller.showFilterBottomSheet,
                               child: const Padding(
-                                padding: EdgeInsets.only(right: 10),
-                                child: Icon(Icons.tune, color: Colors.grey),
+                                padding: EdgeInsets.only(right: 12),
+                                child: Icon(Icons.tune),
                               ),
                             ),
                           ),
                         ),
                       ),
 
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 6),
 
                       // LOCATION BUTTON
                       Container(
@@ -131,12 +119,13 @@ class HomeView extends GetView<HomeController> {
                         ),
                         child: IconButton(
                           icon: const Icon(Icons.my_location, color: Colors.black),
-                          onPressed: () {},
+                          onPressed: () {
+                            controller.loadNearestServices();
+                          },
                         ),
                       ),
 
-                      const SizedBox(width: 4),
-
+                      const SizedBox(width: 6),
                       // NOTIFICATION BUTTON
                       Container(
                         decoration: BoxDecoration(
@@ -153,193 +142,123 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
 
-                // YOUR CIRCULAR CATEGORY ROW HERE
+                const SizedBox(height: 10),
+
+                /// TOP RATED BADGE SERVICES
                 SizedBox(
                   height: 120,
                   child: Obx(() {
-                    final categories = controller.services.toList();
+                    final list = controller.services.where((e) => e.rating >= 4.0).toList();
 
-                    if (categories.isEmpty) return const SizedBox.shrink();
-
-                    final visibleIndexes = List.generate(categories.length, (i) => i).where((i) {
-                      final service = categories[i];
-
-                      if (service.rating >= 4.7) return true;
-                      if (service.rating >= 4.3) return true;
-                      if (service.available) return false;
-                      return false;
-                    }).toList();
+                    if (list.isEmpty) return const SizedBox();
 
                     return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 12),
-                      itemBuilder: (context, i) {
-                        if (i >= visibleIndexes.length) return const SizedBox.shrink();
-
-                        final index = visibleIndexes[i]; // original index
-                        final service = categories[index];
+                      itemCount: list.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final service = list[index];
 
                         String type;
-                        IconData badgeIcon;
-                        Gradient badgeGradient;
 
                         if (service.rating >= 4.7) {
-                          type = 'Elite';
-                          badgeIcon = Iconsax.crown1;
-                          badgeGradient = getBadgeGradient(type);
-                        } else if (service.rating >= 4.3) {
-                          type = 'Pro';
-                          badgeIcon = Iconsax.star1;
-                          badgeGradient = getBadgeGradient(type);
-                        } else if (service.available) {
-                          type = 'Basic';
-                          badgeIcon = Iconsax.shield_security;
-                          badgeGradient = getBadgeGradient(type);
+                          type = "Elite";
+                        } else if (service.rating >= 4.0) {
+                          type = "Pro";
                         } else {
-                          type = 'Other';
-                          badgeIcon = badgeIcon = Iconsax.crown;
-                          badgeGradient = getBadgeGradient(type);
+                          type = "Basic";
                         }
 
                         return GestureDetector(
                           onTap: () => controller.focusService(service, index: index),
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Image + Badge + Rating
                               Stack(
-                                clipBehavior: Clip.none,
-                                alignment: Alignment.center,
                                 children: [
-                                  // Circle Image
                                   Container(
+                                    padding: const EdgeInsets.all(3),
                                     decoration: BoxDecoration(
-                                      gradient: badgeGradient,
-                                      shape: .circle,
+                                      shape: BoxShape.circle,
+                                      gradient: getBadgeGradient(type),
                                     ),
-                                    padding: EdgeInsets.all(3),
-                                    child: Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                            // "https://img.freepik.com/free-vector/top-service-badge_1284-5019.jpg",
-                                            service.image,
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black12,
-                                            blurRadius: 6,
-                                            offset: Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
+                                    child: CircleAvatar(
+                                      radius: 28,
+                                      backgroundImage: NetworkImage(service.image),
                                     ),
                                   ),
 
-                                  // Badge
                                   Positioned(
-                                    top: 4,
-                                    left: -4,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      alignment: .center,
-                                      decoration: BoxDecoration(
-                                        gradient: badgeGradient,
-                                        shape: BoxShape.circle,
-                                      ),
+                                    top: 0,
+                                    left: 0,
+                                    child: CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor: Colors.black,
                                       child: Icon(
-                                        badgeIcon,
-                                        size: 16,
-                                        color: type == "Other"
-                                            ? Colors.transparent
-                                            : Colors.white.withAlpha(240), // Icon color
+                                        type == "Elite" ? Iconsax.crown1 : Iconsax.star1,
+                                        size: 12,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
 
-                                  // Rating Overlay
                                   Positioned(
                                     bottom: 0,
+                                    left: 12,
                                     child: Container(
-                                      width: 30,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 4,
-                                        vertical: 4,
+                                        horizontal: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.7),
-                                        borderRadius: BorderRadius.circular(6),
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(20),
                                       ),
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              children: List.generate(
-                                                1, // 5 stars
-                                                (i) => Icon(
-                                                  i < service.rating.floor()
-                                                      ? Icons.star
-                                                      : (i < service.rating
-                                                            ? Icons.star_half
-                                                            : Icons.star_border),
-                                                  size: 10,
-                                                  color: Colors.orange,
-                                                ),
-                                              ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.star,
+                                            size: 12,
+                                            color: Colors.amber,
+                                          ),
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            service.rating.toStringAsFixed(1),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
                                             ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              service.rating.toStringAsFixed(1),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
 
-                              const SizedBox(height: 4),
-                              // Title below the image + rating
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 2,
-                                ), // optional padding
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(
-                                    6,
-                                  ), // optional rounded corners
-                                ),
-                                width: 100,
-                                child: Text(
-                                  service.title,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  softWrap: true,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                              const SizedBox(height: 3),
+
+                              SizedBox(
+                                width: 90,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6,),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    service.title,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white
+                                    ),
                                   ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         );
@@ -350,27 +269,62 @@ class HomeView extends GetView<HomeController> {
               ],
             ),
 
-            /// SERVICE CARDS (PageView)
+            /// BOTTOM SERVICE CARDS
             Positioned(
-              bottom: 10,
               left: 0,
               right: 0,
+              bottom: 10,
               child: SizedBox(
                 height: 220,
                 child: Obx(() {
-                  final services = controller.filteredServices.value.isNotEmpty
-                      ? controller.filteredServices.value
-                      : controller.services.value;
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator(color: Colors.black));
+                  }
+
+                  final services = controller.filteredServices;
 
                   if (services.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No services found",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                    return Center(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.inbox_outlined, size: 80, color: Colors.black),
+                              const SizedBox(height: 16),
+
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  children: const [
+                                    Text(
+                                      "No Services Found",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "We couldn't find any services at the moment.\nTry again later or adjust your filters.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 14, color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     );
                   }
-
                   return PageView.builder(
                     controller: controller.pageController,
                     itemCount: services.length,
@@ -381,106 +335,70 @@ class HomeView extends GetView<HomeController> {
                       final service = services[index];
 
                       return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: const [
-                            BoxShadow(blurRadius: 10, color: Colors.black12, offset: Offset(0, 3)),
-                          ],
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            /// TITLE
                             Text(
                               service.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
 
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 10),
 
-                            /// Company
-                            Text(
-                              "Company Name will show here", // TODO: show company name dynamically
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            /// RATING
                             Row(
                               children: [
-                                Row(
-                                  children: List.generate(
-                                    5,
-                                    (i) => Icon(
-                                      i < service.rating.round() ? Icons.star : Icons.star_border,
-                                      size: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  service.rating.toStringAsFixed(1),
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
-                                ),
+                                const Icon(Icons.star, size: 16, color: Colors.orange),
+                                const SizedBox(width: 4),
+                                Text(service.rating.toStringAsFixed(1)),
                               ],
                             ),
 
                             const SizedBox(height: 8),
 
-                            /// DISTANCE
                             Row(
                               children: [
-                                const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                                const Icon(Icons.location_on, size: 16, color: Colors.black),
                                 const SizedBox(width: 4),
-                                Text(
-                                  "${service.distance.toStringAsFixed(1)} miles away",
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
+                                Text("${service.distance.toStringAsFixed(1)} miles away"),
                               ],
                             ),
 
                             const SizedBox(height: 10),
 
-                            /// STATUS
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
                                 color: service.available
-                                    ? Colors.green.withOpacity(0.15)
-                                    : Colors.red.withOpacity(0.15),
+                                    ? Colors.green.withOpacity(.1)
+                                    : Colors.red.withOpacity(.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                service.available ? "Available" : "Closed",
+                                service.available ? "Open Now" : "Closed",
                                 style: TextStyle(
+                                  color: service.available ? Colors.green : Colors.red,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: service.available ? Colors.green : Colors.red,
                                 ),
                               ),
                             ),
 
                             const Spacer(),
 
-                            /// BUTTON
                             SizedBox(
                               width: double.infinity,
                               child: AppButton(
-                                height: 38,
                                 text: "View Details",
+                                height: 38,
                                 onPressed: () {
                                   controller.openService(service);
                                 },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/modules/user/category/user_category_service_details/models/ReviewModel.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../routes/app_routes.dart';
@@ -54,7 +55,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
         // ================= BODY =================
         body: controller.isLoading.value
-            ? const Center(child: CircularProgressIndicator(color: Colors.black,))
+            ? const Center(child: CircularProgressIndicator(color: Colors.black))
             : SingleChildScrollView(
                 child: Column(
                   children: [
@@ -320,51 +321,46 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
                               const SizedBox(height: 15),
 
-                              // ================= REVIEWS =================
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Reviews",
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Get.toNamed(AppRoutes.REVIEWS);
-                                    },
-                                    child: const Text("View All"),
-                                  ),
-                                ],
-                              ),
-
-                              ...controller.reviews.map(
-                                (review) => Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              // ================= REVIEWS SECTION =================
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          review.userName,
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                          "Reviews (${controller.reviews.length})",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        const SizedBox(height: 5),
-                                        Text(review.review),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: TextButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (_) => const ReplyDialogView(),
-                                              );
-                                            },
-                                            child: const Text("Give Review"),
+                                        TextButton(
+                                          onPressed: () {
+                                            // View All Logic
+                                          },
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "View all (${controller.reviews.length})",
+                                                style: TextStyle(color: Colors.grey[600]),
+                                              ),
+                                              const Icon(
+                                                Icons.chevron_right,
+                                                size: 20,
+                                                color: Colors.grey,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                    const SizedBox(height: 10),
+                                    ...controller.reviews.map(
+                                      (review) => buildReviewCard(context, review),
+                                    ),
+                                  ],
                                 ),
                               ),
 
@@ -377,6 +373,134 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  // --- Helper function to build the card ---
+  Widget buildReviewCard(BuildContext context, dynamic review) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Avatar, Name, Time, Stars
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const CircleAvatar(
+                radius: 24,
+                backgroundImage: NetworkImage(
+                  'https://via.placeholder.com/150',
+                ), // Replace with review.userImage
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: review.userName,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                            children: const [
+                              TextSpan(
+                                text: " (You)",
+                                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Text(
+                          "2 days ago", // Replace with review.createdAt
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: List.generate(5, (index) {
+                        return Icon(
+                          index < 5 ? Icons.star : Icons.star_border, // Use review.rating
+                          color: Colors.amber,
+                          size: 18,
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Review Text
+          Text(
+            review.comment,
+            style: TextStyle(color: Colors.grey[800], fontSize: 14, height: 1.4),
+          ),
+          const SizedBox(height: 16),
+
+          // Footer: Like, Reply, View Replies
+          Row(
+            children: [
+              // Like Icon
+              const Icon(Icons.favorite_border, size: 20, color: Colors.black87),
+              const SizedBox(width: 5),
+              const Text("124", style: TextStyle(fontSize: 13)), // Replace with review.likes
+              const SizedBox(width: 20),
+
+              // Reply Icon
+              const Icon(Icons.reply_outlined, size: 20, color: Colors.black87),
+              const SizedBox(width: 5),
+              const Text("01", style: TextStyle(fontSize: 13)), // Replace with review.repliesCount
+
+              const Spacer(),
+
+              // View Replies Button
+              InkWell(
+                onTap: () {
+                  // Open replies or show dialog
+                  showDialog(
+                    context: context,
+                    builder: (_) => ReplyDialogView(
+                        serviceId: controller.serviceId, // Pass the real ID
+                        parentId: review.id,
+                        isReview: false
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[700],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Row(
+                    children: [
+                      Text("View replies", style: TextStyle(color: Colors.white, fontSize: 12)),
+                      SizedBox(width: 4),
+                      Icon(Icons.chevron_right, color: Colors.white, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

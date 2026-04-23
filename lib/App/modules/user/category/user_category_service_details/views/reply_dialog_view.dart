@@ -1,72 +1,116 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:near_me/App/core/widgets/App_button.dart';
-import 'package:near_me/App/core/widgets/custom_text_field.dart';
+import 'package:get/get.dart';
+import '../../../../../data/services/storage_service.dart';
+import '../../../../services/contants/api_constants.dart';
 
 class ReplyDialogView extends StatefulWidget {
-  const ReplyDialogView({super.key});
+  final String? parentId;
+  final String serviceId; // Added this
+  final bool isReview;
+
+  const ReplyDialogView({
+    super.key,
+    required this.serviceId, // Make it required
+    this.parentId,
+    this.isReview = false,
+  });
 
   @override
   State<ReplyDialogView> createState() => _ReplyDialogViewState();
 }
 
 class _ReplyDialogViewState extends State<ReplyDialogView> {
-  final TextEditingController replyController = TextEditingController();
-  int rating = 0;
+  final text = TextEditingController();
+  int rating = 5;
 
-  Widget buildStar(int index) {
-    return IconButton(
-      onPressed: () {
-        setState(() {
-          rating = index + 1;
-        });
-      },
-      icon: Icon(index < rating ? Icons.star : Icons.star_border, color: Colors.black),
-    );
+  Future<void> submit() async {
+    try {
+      final dio = Dio();
+      final storage = Get.find<StorageService>();
+      final token = storage.accessToken;
+      final userId = storage.userId;
+
+      if (token == null || token.isEmpty) {
+        Get.snackbar("Error", "Please login first");
+        return;
+      }
+
+      final response = await dio.post(
+        "${ApiConstants.baseUrl}/api/v1/review/create",
+        data: {
+          "user": userId,
+          "service": widget.serviceId, // Use the dynamic ID here
+          "comment": text.text,
+          if (widget.isReview) "rating": rating,
+          if (widget.parentId != null) "parentReview": widget.parentId,
+        },
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        Get.back();
+        Get.snackbar("Success", "Submitted successfully");
+      }
+    } catch (e) {
+      if (e is DioException) {
+        // FIX: This will show "Upgrade to Pro..." instead of just "Failed"
+        String serverMessage = e.response?.data['message'] ?? "Failed to submit";
+        Get.snackbar("Action Denied", serverMessage,
+            backgroundColor: Colors.red, colorText: Colors.white);
+
+        print("🔴 SERVER ERROR: $serverMessage");
+      } else {
+        Get.snackbar("Error", "An unexpected error occurred");
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        "Write your Review Comment",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
+      title: Text(widget.isReview ? "Write Review" : "Write Reply"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          /// Star Rating
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) => buildStar(index)),
+          if (widget.isReview)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                5,
+                    (i) => IconButton(
+                  onPressed: () {
+                    setState(() => rating = i + 1);
+                  },
+                  icon: Icon(
+                    i < rating ? Icons.star : Icons.star_border,
+                  ),
+                ),
+              ),
+            ),
+
+          TextField(
+            controller: text,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              hintText: "Write here",
+            ),
           ),
-
-          const SizedBox(height: 10),
-
-          /// Comment Field
-          CustomTextField(controller: replyController, maxLines: 3, hint: "Write a Review..."),
         ],
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+          onPressed: () => Get.back(),
+          child: const Text("Cancel"),
         ),
-        AppButton(
-          width: 100,
-          height: 40,
-          onPressed: () {
-            String reply = replyController.text;
-
-            if (reply.isNotEmpty) {
-              print("Rating: $rating");
-              print("Reply: $reply");
-            }
-
-            Navigator.pop(context);
-          },
-          text: 'Send',
+        ElevatedButton(
+          onPressed: submit,
+          child: const Text("Send"),
         ),
       ],
     );

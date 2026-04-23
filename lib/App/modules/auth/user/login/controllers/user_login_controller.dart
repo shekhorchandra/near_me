@@ -139,24 +139,42 @@ class UserLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      print("FULL LOGIN RESPONSE:------------------------------------------ $result");
+      print("FULL USER LOGIN RESPONSE: $result");
 
       final data = result["data"];
       final message = data["message"];
-      final role = data["data"]?["user"]?["role"];
+      final loginData = data["data"];
+
+      final role = loginData?["user"]?["role"];
+      final accessToken = loginData?["accessToken"];
+      final refreshToken = loginData?["refreshToken"];
+      final userId = loginData?["user"]?["_id"];
 
       if (result["statusCode"] == 200 && data["success"]) {
-        // 🔥 Role validation
         if (role == "USER") {
+
+          final storage = Get.find<StorageService>();
+
+          await storage.setAccessToken(accessToken);
+          await storage.setRefreshToken(refreshToken);
+          await storage.setUserId(userId);
+
+          print("TOKEN SAVED: ${storage.accessToken}");
+          print("USER ID SAVED: ${storage.userId}");
+
           AppSnackbar.success(message);
+
           Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
+
         } else {
           AppSnackbar.error("Please login from correct panel");
         }
       } else {
         AppSnackbar.error(message);
       }
+
     } catch (e) {
+      print(e);
       AppSnackbar.error("Something went wrong");
     } finally {
       isLoading.value = false;

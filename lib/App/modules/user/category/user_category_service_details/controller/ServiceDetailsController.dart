@@ -41,6 +41,7 @@ class ServiceDetailsController extends GetxController {
     serviceId = args["id"] ?? '';
 
     fetchServiceDetails();
+    fetchReviews();
   }
 
   Future<void> fetchServiceDetails() async {
@@ -57,8 +58,7 @@ class ServiceDetailsController extends GetxController {
         ),
       );
 
-      if (response.statusCode == 200 &&
-          response.data["success"] == true) {
+      if (response.statusCode == 200 && response.data["success"] == true) {
         final data = response.data["data"];
 
         image.value = data["company_logo"] ?? '';
@@ -70,17 +70,14 @@ class ServiceDetailsController extends GetxController {
 
         location.value = data["location"]?["address"] ?? '';
 
-        schedule.value =
-        "${data["openingTime"]} - ${data["closingTime"]}";
+        schedule.value = "${data["openingTime"]} - ${data["closingTime"]}";
 
         // Services Offered
-        servicesOffered.value =
-            (data["offer_services"] as List)
-                .map((e) => e["name"].toString())
-                .toList();
+        servicesOffered.value = (data["offer_services"] as List)
+            .map((e) => e["name"].toString())
+            .toList();
 
-        highlightServices.value =
-        List<Map<String, dynamic>>.from(data["highlight_services"] ?? []);
+        highlightServices.value = List<Map<String, dynamic>>.from(data["highlight_services"] ?? []);
 
         // Highlights = media
         media.value = List<String>.from(data["media"] ?? []);
@@ -104,21 +101,34 @@ class ServiceDetailsController extends GetxController {
 
   Future<void> openWebsite(String url) async {
     try {
-      final Uri uri = Uri.parse(
-        url.startsWith('http') ? url : 'https://$url',
-      );
+      final Uri uri = Uri.parse(url.startsWith('http') ? url : 'https://$url');
 
       if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         Get.snackbar("Error", "Cannot open website");
       }
     } catch (e) {
       Get.snackbar("Error", "Invalid URL");
       print("Launch error: $e");
+    }
+  }
+
+  // reviews part
+  Future<void> fetchReviews() async {
+    try {
+      final response = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/review/service/$serviceId",
+        options: Options(headers: {"accesstoken": storage.accessToken}),
+      );
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        final List data = response.data["data"];
+
+        reviews.value = data.map((e) => ReviewModel.fromJson(e)).toList();
+      }
+    } catch (e) {
+      print("Review Error: $e");
     }
   }
 }
