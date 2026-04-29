@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-
 import 'App/core/theme/checkbox_theme.dart';
 import 'App/core/values/app_strings.dart';
 import 'App/data/services/storage_service.dart';

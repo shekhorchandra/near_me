@@ -40,10 +40,11 @@ class HomeView extends GetView<HomeController> {
               () => GoogleMap(
                 initialCameraPosition: const CameraPosition(
                   target: LatLng(23.8700, 90.4800),
-                  zoom: 10,
+                  zoom: 12,
                 ),
                 markers: controller.markers.value,
                 circles: controller.circles.value,
+                polylines: controller.polylines.value,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 zoomControlsEnabled: true,
@@ -334,77 +335,93 @@ class HomeView extends GetView<HomeController> {
                     itemBuilder: (context, index) {
                       final service = services[index];
 
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              service.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            Row(
-                              children: [
-                                const Icon(Icons.star, size: 16, color: Colors.orange),
-                                const SizedBox(width: 4),
-                                Text(service.rating.toStringAsFixed(1)),
-                              ],
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on, size: 16, color: Colors.black),
-                                const SizedBox(width: 4),
-                                Text("${service.distance.toStringAsFixed(1)} miles away"),
-                              ],
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: service.available
-                                    ? Colors.green.withOpacity(.1)
-                                    : Colors.red.withOpacity(.1),
-                                borderRadius: BorderRadius.circular(20),
+                      return GestureDetector(
+                        onTap: () {
+                          Get.toNamed(
+                            AppRoutes.SERVICE_DETAILS,
+                            arguments: {"id": service.id},
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                service.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              child: Text(
-                                service.available ? "Open Now" : "Closed",
-                                style: TextStyle(
-                                  color: service.available ? Colors.green : Colors.red,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                        
+                              const SizedBox(height: 10),
+                        
+                              Row(
+                                children: [
+                                  const Icon(Icons.star, size: 16, color: Colors.orange),
+                                  const SizedBox(width: 4),
+                                  Text(service.rating.toStringAsFixed(1)),
+                                ],
+                              ),
+                        
+                              const SizedBox(height: 8),
+                        
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on, size: 16, color: Colors.black),
+                                  const SizedBox(width: 4),
+                                  Text("${service.distance.toStringAsFixed(1)} miles away"),
+                                ],
+                              ),
+                        
+                              const SizedBox(height: 10),
+                        
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: service.available
+                                      ? Colors.green.withOpacity(.1)
+                                      : Colors.red.withOpacity(.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  service.available ? "Open Now" : "Closed",
+                                  style: TextStyle(
+                                    color: service.available ? Colors.green : Colors.red,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-
-                            const Spacer(),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: AppButton(
-                                text: "View Details",
-                                height: 38,
-                                onPressed: () {
-                                  controller.openService(service);
-                                },
+                        
+                              const Spacer(),
+                        
+                              SizedBox(
+                                width: double.infinity,
+                                child: GestureDetector(
+                                  onTap: () {
+                        
+                                  }, // prevents card tap conflict
+                                  child: AppButton(
+                                    text: "View Route",
+                                    height: 38,
+                                    onPressed: () {
+                                      controller.showRouteToService(
+                                        service.lat,
+                                        service.lng,
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },

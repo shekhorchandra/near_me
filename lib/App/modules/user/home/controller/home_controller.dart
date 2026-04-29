@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
@@ -20,6 +22,8 @@ class HomeController extends GetxController {
   RxList<HomeServiceModel> services = <HomeServiceModel>[].obs;
   RxList<HomeServiceModel> filteredServices = <HomeServiceModel>[].obs;
   RxSet<Marker> markers = <Marker>{}.obs;
+
+  RxSet<Polyline> polylines = <Polyline>{}.obs;
 
   RxList<CategoryModel> categories = <CategoryModel>[].obs;
 
@@ -107,17 +111,21 @@ class HomeController extends GetxController {
 
         await generateMarkers();
 
-        fitMapToServices(services);
+        /// ONLY selected radius show on first load
+        fitMapToRadius(
+          position.latitude,
+          position.longitude,
 
-        if (services.isNotEmpty) {
-          final pos = await getCurrentLocation();
-
-          if (pos != null) {
-            fitMapToRadius(pos.latitude, pos.longitude);
-          }
-
-          focusService(services.first);
-        }
+          // if (services.isNotEmpty) {
+          //   fitMapToRadius(position.latitude, position.longitude);
+          //
+          //   Future.delayed(const Duration(milliseconds: 500), () {
+          //   }
+        );
+        // }
+        // else {
+        //     fitMapToRadius(position.latitude, position.longitude);
+        //   }
       }
     } catch (e) {
       print("Nearest Service Error => $e");
@@ -182,6 +190,83 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<void> showRouteToService(
+      double destLat,
+      double destLng,
+      ) async {
+    final pos = await getCurrentLocation();
+
+    if (pos == null) return;
+
+    PolylinePoints polylinePoints = PolylinePoints(
+      apiKey: "AIzaSyBRyNGrmSA-pXLTC_Y4wj_uzRtivuHXy7E",
+    );
+
+    PolylineResult result =
+    await polylinePoints.getRouteBetweenCoordinates(
+      request: PolylineRequest(
+        origin: PointLatLng(
+          pos.latitude,
+          pos.longitude,
+        ),
+        destination: PointLatLng(
+          destLat,
+          destLng,
+        ),
+        mode: TravelMode.driving,
+      ),
+    );
+
+    if (result.points.isNotEmpty) {
+      final routePoints = result.points
+          .map(
+            (e) => LatLng(
+          e.latitude,
+          e.longitude,
+        ),
+      )
+          .toList();
+
+      polylines.value = {
+        Polyline(
+          polylineId: const PolylineId("route"),
+          points: routePoints,
+          width: 5,
+          color: Colors.black,
+        ),
+      };
+
+      fitPolyline(routePoints);
+    }
+  }
+
+  void fitPolyline(List<LatLng> points) {
+    if (mapController == null ||
+        points.isEmpty) return;
+
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+
+    for (final p in points) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLng) minLng = p.longitude;
+      if (p.longitude > maxLng) maxLng = p.longitude;
+    }
+
+    mapController!.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat, minLng),
+          northeast: LatLng(maxLat, maxLng),
+        ),
+        70,
+      ),
+    );
+  }
+
   /// ==================================================
   /// APPLY FILTER
   /// ==================================================
@@ -244,6 +329,8 @@ class HomeController extends GetxController {
   /// ==================================================
   /// MAP FOCUS
   /// ==================================================
+  // focusService() change korun
+
   void focusService(HomeServiceModel service, {int? index}) {
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -252,20 +339,30 @@ class HomeController extends GetxController {
     );
 
     if (index != null) {
-      pageController.jumpToPage(index);
+      pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   void fitMapToRadius(double lat, double lng) {
-    mapController?.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(lat - 0.1, lng - 0.1),
-          northeast: LatLng(lat + 0.1, lng + 0.1),
-        ),
-        50,
-      ),
+    if (mapController == null) return;
+
+    final radiusMiles = selectedRadius.value;
+    final radiusKm = radiusMiles * 1.60934;
+
+    final latDelta = radiusKm / 111.0;
+
+    final lngDelta = radiusKm / (111.0 * cos(lat * 3.1415926535 / 180));
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(lat - latDelta, lng - lngDelta),
+      northeast: LatLng(lat + latDelta, lng + lngDelta),
     );
+
+    mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60));
   }
 
   /// ==================================================

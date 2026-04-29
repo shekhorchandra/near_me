@@ -24,19 +24,19 @@ class ApiConstants {
   ///user logout
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
 
-  // PLANS
+  /// PLANS
   static const String getPlans = "$baseUrl/api/v1/plans";
 
-  // Get all category
+  /// Get all category
   static const String categoryTree = "$baseUrl/api/v1/category/tree";
 
-  // Service Create
+  /// Service Create
   static const String createService = "$baseUrl/api/v1/service/create";
 
-  // Service account verify
+  /// Service account verify
   static const String userAccountVerify = "$baseUrl/api/v1/user/verify";
 
-  //Service create highlights
+  /// Service create highlights
   static const String highlightServiceBase = "$baseUrl/api/v1/highlight-service";
 
   static String serviceHighlight(String serviceId) => "$baseUrl/api/v1/highlight-service/service/$serviceId";
@@ -44,6 +44,4 @@ class ApiConstants {
   static String highlightService(String id) => "$baseUrl/api/v1/highlight-service/$id";
 
   static String serviceById(String id) => "$baseUrl/api/v1/service/$id";
-
-
 }
