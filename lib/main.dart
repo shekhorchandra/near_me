@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'App/core/theme/checkbox_theme.dart';
 import 'App/core/values/app_strings.dart';
@@ -8,7 +9,8 @@ import 'App/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await dotenv.load(fileName: ".env");
+  print(dotenv.env['GOOGLE_MAPS_API_KEY']);
   //  INIT STORAGE
   final storageService = StorageService();
   await storageService.init();
