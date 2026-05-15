@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:near_me/firebase_options.dart';
 import 'App/core/theme/checkbox_theme.dart';
 import 'App/core/values/app_strings.dart';
 import 'App/data/services/storage_service.dart';
@@ -9,6 +11,9 @@ import 'App/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform
+  );
   await dotenv.load(fileName: ".env");
   print(dotenv.env['GOOGLE_MAPS_API_KEY']);
   //  INIT STORAGE
