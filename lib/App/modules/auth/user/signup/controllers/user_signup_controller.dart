@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:near_me/App/routes/app_routes.dart';
 import '../../../../services/utils/helpers/HttpStatusHandler.dart';
 import '../../../../services/contants/api_constants.dart';
@@ -18,6 +19,8 @@ class UserSignupController extends GetxController {
   final confirmPasswordController = TextEditingController();
 
   var isLoading = false.obs;
+
+  final logger = Logger();
 
   void togglePassword() {
     obscurePassword.value = !obscurePassword.value;
@@ -52,14 +55,19 @@ class UserSignupController extends GetxController {
         apiMessage: data["message"],
       );
 
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
       if (response.statusCode == 201 && data["success"] == true) {
         AppSnackbar.success(message);
 
         // ✅ PASS EMAIL HERE
-        Get.toNamed(
-          AppRoutes.USER_VERIFY_ACCOUNT,
-          arguments: email,
-        );
+        Get.toNamed(AppRoutes.USER_VERIFY_ACCOUNT, arguments: email);
       } else {
         AppSnackbar.error(message);
       }

@@ -92,7 +92,7 @@ class HomeController extends GetxController {
       print(token);
 
       final response = await dio.post(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/nearest",
+        "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev/api/v1/service/nearest",
         data: body,
         options: Options(headers: {"Authorization": token, "Content-Type": "application/json"}),
       );
@@ -178,7 +178,7 @@ class HomeController extends GetxController {
   Future<void> loadCategories() async {
     try {
       final res = await dio.get(
-        "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/category",
+        "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev/api/v1/category",
       );
 
       if (res.statusCode == 200 && res.data["success"] == true) {

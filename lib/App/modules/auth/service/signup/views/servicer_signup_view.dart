@@ -126,6 +126,7 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Get.toNamed(AppRoutes.SERVICER_LOGIN);
+                            // Get.toNamed(AppRoutes.SERVICER_VERIFY_ACCOUNT);
                           },
                       ),
                     ],

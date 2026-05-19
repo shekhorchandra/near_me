@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
@@ -27,6 +30,8 @@ class UserLoginController extends GetxController {
 
   final authService = AuthService();
   final box = GetStorage();
+
+  final logger = Logger();
 
   void initControllers() {
     if (kDebugMode) {
@@ -125,6 +130,7 @@ class UserLoginController extends GetxController {
     }
   }
 
+
   Future<void> loginUser() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       AppSnackbar.error("Email & Password required");
@@ -139,9 +145,18 @@ class UserLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      print("FULL USER LOGIN RESPONSE: $result");
-
       final data = result["data"];
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
+
+
+
       final message = data["message"];
       final loginData = data["data"];
 
@@ -151,6 +166,7 @@ class UserLoginController extends GetxController {
       final userId = loginData?["user"]?["_id"];
 
       if (result["statusCode"] == 200 && data["success"]) {
+
         if (role == "USER") {
 
           final storage = Get.find<StorageService>();
@@ -159,9 +175,6 @@ class UserLoginController extends GetxController {
           await storage.setRefreshToken(refreshToken);
           await storage.setUserId(userId);
 
-          print("TOKEN SAVED: ${storage.accessToken}");
-          print("USER ID SAVED: ${storage.userId}");
-
           AppSnackbar.success(message);
 
           Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
@@ -169,18 +182,21 @@ class UserLoginController extends GetxController {
         } else {
           AppSnackbar.error("Please login from correct panel");
         }
+
       } else {
         AppSnackbar.error(message);
       }
 
     } catch (e) {
-      print(e);
+
+      print("ERROR: $e");
+
       AppSnackbar.error("Something went wrong");
+
     } finally {
       isLoading.value = false;
     }
   }
-
   @override
   void onClose() {
     emailController.clear();

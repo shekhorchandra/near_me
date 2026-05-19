@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:near_me/App/routes/app_routes.dart';
 
 import '../../../../services/contants/api_constants.dart';
@@ -18,8 +19,9 @@ class ServicerVerifyAccountController extends GetxController {
 
   // User email (dynamic)
   late String email;
+  final logger = Logger();
 
-  @override
+
   @override
   void onInit() {
     super.onInit();
@@ -85,6 +87,16 @@ class ServicerVerifyAccountController extends GetxController {
       print("RESPONSE BODY: ${response.body}");
 
       final data = jsonDecode(response.body);
+
+
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
 
       isVerifying.value = false;
 

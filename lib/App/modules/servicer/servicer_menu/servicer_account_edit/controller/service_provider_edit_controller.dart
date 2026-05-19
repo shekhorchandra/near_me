@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 
 import '../../../../../data/services/storage_service.dart';
 import '../../../../services/contants/api_constants.dart';
@@ -40,7 +41,7 @@ class ServiceProviderEditController extends GetxController {
   final logoFile = Rxn<File>();
   final mediaFiles = <File>[].obs;
 
-  final serviceId = StorageService().serviceId;
+  final logger = Logger();
 
   @override
   void onInit() {
@@ -66,11 +67,26 @@ class ServiceProviderEditController extends GetxController {
       );
 
       final data = res.data['data'] as List;
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
       categoryTree.value = data.map((e) => Category.fromJson(e)).toList();
     } catch (e) {
       Get.snackbar("Error", e.toString());
     }
   }
+
+  // List<Category> get allOfferServices {
+  //   return categoryTree
+  //       .expand((cat) => cat.children)
+  //       .expand((child) => child.children.isNotEmpty
+  //       ? child.children
+  //       : [child])
+  //       .toList();
+  // }
 
   // ================= SELECT =================
   void selectCategory(String id) {
@@ -127,12 +143,78 @@ class ServiceProviderEditController extends GetxController {
   }
 
   // ================= FETCH SERVICE =================
+  // Future<void> fetchService() async {
+  //   try {
+  //     isLoading.value = true;
+  //
+  //     final res = await dio.get(
+  //       "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
+  //       options: Options(
+  //         headers: {
+  //           "Authorization": "Bearer ${storage.accessToken}",
+  //           "accesstoken": storage.accessToken,
+  //         },
+  //       ),
+  //     );
+  //
+  //     final data = res.data["data"];
+  //
+  //     nameCtrl.text = data["service_name"] ?? "";
+  //     addressCtrl.text = data["service_address"] ?? "";
+  //     aboutCtrl.text = data["about"] ?? "";
+  //     websiteCtrl.text = data["website_link"] ?? "";
+  //
+  //     contactCtrl.text = normalizeBdPhone(
+  //       data["phone"].toString().startsWith("8801")
+  //           ? "+${data["phone"]}"
+  //           : data["phone"].toString(),
+  //     );
+  //
+  //     openingCtrl.text = data["openingTime"] ?? "";
+  //     closingCtrl.text = data["closingTime"] ?? "";
+  //
+  //     selectedCategoryId.value = data["service_category"]?["_id"]?.toString() ?? "";
+  //
+  //     selectedOfferServices.assignAll(
+  //       (data["offer_services"] as List?)?.map((e) => e["_id"].toString()).toList() ?? [],
+  //     );
+  //
+  //     logoUrl.value = data["company_logo"] ?? "";
+  //
+  //     if (data["openingTime"] != null) {
+  //       final parts = data["openingTime"].split(":");
+  //       openingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  //     }
+  //
+  //     if (data["closingTime"] != null) {
+  //       final parts = data["closingTime"].split(":");
+  //       closingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  //     }
+  //
+  //     logoUrl.value = data["company_logo"] ?? "";
+  //
+  //     mediaUrls.assignAll(
+  //       (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ?? [],
+  //     );
+  //
+  //     mediaFiles.clear();
+  //
+  //     update();
+  //   } catch (e) {
+  //     Get.snackbar("Error", e.toString());
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  // ================= PHONE =================
+
   Future<void> fetchService() async {
     try {
       isLoading.value = true;
 
       final res = await dio.get(
-        "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
+        "${ApiConstants.baseUrl}/api/v1/service/my-service",
         options: Options(
           headers: {
             "Authorization": "Bearer ${storage.accessToken}",
@@ -141,7 +223,13 @@ class ServiceProviderEditController extends GetxController {
         ),
       );
 
+      logger.i("FETCH SERVICE => ${res.data}");
+
       final data = res.data["data"];
+
+      // ✅ SAVE SERVICE ID
+      // IMPORTANT
+      await storage.setServiceId(data["_id"]);
 
       nameCtrl.text = data["service_name"] ?? "";
       addressCtrl.text = data["service_address"] ?? "";
@@ -154,62 +242,70 @@ class ServiceProviderEditController extends GetxController {
             : data["phone"].toString(),
       );
 
-      openingCtrl.text = data["openingTime"] ?? "";
-      closingCtrl.text = data["closingTime"] ?? "";
-
-      selectedCategoryId.value = data["service_category"]?["_id"]?.toString() ?? "";
+      selectedCategoryId.value =
+          data["service_category"]?["_id"]?.toString() ?? "";
 
       selectedOfferServices.assignAll(
-        (data["offer_services"] as List?)?.map((e) => e["_id"].toString()).toList() ?? [],
+        (data["offer_services"] as List?)
+                ?.map((e) => e["_id"].toString())
+                .toList() ??
+            [],
       );
-
-      logoUrl.value = data["company_logo"] ?? "";
-
-      if (data["openingTime"] != null) {
-        final parts = data["openingTime"].split(":");
-        openingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-      }
-
-      if (data["closingTime"] != null) {
-        final parts = data["closingTime"].split(":");
-        closingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-      }
 
       logoUrl.value = data["company_logo"] ?? "";
 
       mediaUrls.assignAll(
-        (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ?? [],
+        (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ??
+            [],
       );
+
+      // opening time
+      if (data["openingTime"] != null) {
+        final parts = data["openingTime"].split(":");
+
+        openingTime.value = TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }
+
+      // closing time
+      if (data["closingTime"] != null) {
+        final parts = data["closingTime"].split(":");
+
+        closingTime.value = TimeOfDay(
+          hour: int.parse(parts[0]),
+          minute: int.parse(parts[1]),
+        );
+      }
 
       mediaFiles.clear();
 
       update();
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      logger.e("FETCH SERVICE ERROR => $e");
+      Get.snackbar("Error", "Failed to fetch service");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ================= PHONE =================
   String normalizeBdPhone(String input) {
     String phone = input.trim();
+
+    // remove spaces, dashes, brackets
     phone = phone.replaceAll(RegExp(r'[\s-]'), '');
-    phone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
 
-    if (phone.startsWith("8801") && phone.length == 13) {
-      phone = "+$phone";
-    }
-
-    if (phone.startsWith("01") && phone.length == 11) {
-      return phone;
-    }
-
-    if (phone.startsWith("+8801") && phone.length == 14) {
-      return phone;
+    // convert 8801XXXXXXXXX → +8801XXXXXXXXX
+    if (RegExp(r'^8801[3-9]\d{8}$').hasMatch(phone)) {
+      return '+$phone';
     }
 
     return phone;
+  }
+
+  bool isValidBdPhone(String phone) {
+    return RegExp(r'^(\+8801|01)[3-9]\d{8}$').hasMatch(phone);
   }
 
   String getServiceNameById(String id) {
@@ -248,14 +344,38 @@ class ServiceProviderEditController extends GetxController {
     try {
       isUpdating.value = true;
 
+      // ✅ ALWAYS GET FRESH SERVICE ID
+      final currentServiceId = storage.serviceId;
+
+      logger.i("SERVICE ID => $currentServiceId");
+
+      if (currentServiceId == null || currentServiceId.isEmpty) {
+        Get.snackbar("Error", "Service ID not found");
+        return;
+      }
+
+      // ✅ normalize first
       final phone = normalizeBdPhone(contactCtrl.text);
 
-      final formData = FormData();
+      logger.i("PHONE AFTER NORMALIZE => $phone");
+
+      // ✅ validate properly
+      if (!isValidBdPhone(phone)) {
+        Get.snackbar(
+          "Error",
+          "Invalid Bangladeshi number. Use 01XXXXXXXXX or +8801XXXXXXXXX",
+        );
+        return;
+      }
+
+      // ✅ remove duplicates
+      final cleanOfferServices =
+      selectedOfferServices.toSet().toList();
 
       final body = {
         "service_name": nameCtrl.text.trim(),
         "service_category": selectedCategoryId.value,
-        "offer_services": selectedOfferServices.toList(),
+        "offer_services": cleanOfferServices,
         "phone": phone,
         "service_address": addressCtrl.text.trim(),
         "about": aboutCtrl.text.trim(),
@@ -265,81 +385,122 @@ class ServiceProviderEditController extends GetxController {
           "coordinates": [90.4125, 23.8103],
         },
         "openingTime":
-            "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
 
         "closingTime":
-            "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+
         "allTimeAvailability": false,
       };
 
-      formData.fields.add(MapEntry("data", jsonEncode(body)));
+      logger.i("UPDATE BODY => ${jsonEncode(body)}");
 
+      final formData = FormData();
+
+      formData.fields.add(
+        MapEntry("data", jsonEncode(body)),
+      );
+
+      // ✅ logo
       if (logoFile.value != null) {
         formData.files.add(
-          MapEntry("company_logo", await MultipartFile.fromFile(logoFile.value!.path)),
-        );
-      }
-
-      /// OLD SERVER IMAGES -> reupload
-      for (final url in mediaUrls) {
-        final response = await dio.get(url, options: Options(responseType: ResponseType.bytes));
-
-        final bytes = response.data;
-
-        formData.files.add(
           MapEntry(
-            "media",
-            MultipartFile.fromBytes(
-              bytes,
-              filename: "old_image_${DateTime.now().millisecondsSinceEpoch}.jpg",
+            "company_logo",
+            await MultipartFile.fromFile(
+              logoFile.value!.path,
             ),
           ),
         );
       }
 
-      /// NEW LOCAL IMAGES
-      for (final file in mediaFiles) {
-        formData.files.add(MapEntry("media", await MultipartFile.fromFile(file.path)));
+      // ✅ old images
+      for (final url in mediaUrls) {
+        try {
+          final response = await dio.get(
+            url,
+            options: Options(
+              responseType: ResponseType.bytes,
+            ),
+          );
+
+          formData.files.add(
+            MapEntry(
+              "media",
+              MultipartFile.fromBytes(
+                response.data,
+                filename:
+                "old_${DateTime.now().millisecondsSinceEpoch}.jpg",
+              ),
+            ),
+          );
+        } catch (e) {
+          logger.w("Skipping image => $url");
+        }
       }
 
-      // for (final file in mediaFiles) {
-      //   formData.files.add(MapEntry("media", await MultipartFile.fromFile(file.path)));
-      // }
+      // ✅ new images
+      for (final file in mediaFiles) {
+        formData.files.add(
+          MapEntry(
+            "media",
+            await MultipartFile.fromFile(file.path),
+          ),
+        );
+      }
 
-      // final res = await dio.patch(
-      //   "ApiConstants.baseUrl/api/v1/service/$serviceId",
-      //   data: formData,
-      //   options: Options(
-      //     headers: {
-      //       "Authorization": "Bearer ${storage.accessToken}",
-      //       "accesstoken": storage.accessToken,
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   ),
-      // );
-
+      // ✅ PATCH API
       final res = await dio.patch(
-        "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
+        "${ApiConstants.baseUrl}/api/v1/service/$currentServiceId",
         data: formData,
         options: Options(
           headers: {
-            "Authorization": "Bearer ${storage.accessToken}",
+            "Authorization":
+            "Bearer ${storage.accessToken}",
             "accesstoken": storage.accessToken,
           },
+          validateStatus: (status) =>
+          status != null && status < 500,
         ),
       );
 
-      if (res.data["success"] == true) {
-        Get.snackbar("Success", "Updated Successfully");
+      final prettyJson =
+      const JsonEncoder.withIndent('    ')
+          .convert(res.data);
+
+      logger.i(prettyJson);
+
+      if (res.statusCode == 200 &&
+          res.data["success"] == true) {
+
+        Get.snackbar(
+          "Success",
+          "Updated Successfully",
+        );
 
         mediaFiles.clear();
         logoFile.value = null;
 
         await fetchService();
+
+      } else {
+
+        Get.snackbar(
+          "Error",
+          res.data["message"] ?? "Update failed",
+        );
       }
+
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+
+      logger.e("UPDATE ERROR => $e");
+
+      Get.snackbar(
+        "Error",
+        "Something went wrong",
+      );
+
     } finally {
+
       isUpdating.value = false;
     }
   }

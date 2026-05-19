@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../services/contants/api_constants.dart';
@@ -40,6 +41,8 @@ class ServiceProviderController extends GetxController {
   var closingTime = TimeOfDay(hour: 18, minute: 0).obs;
   var isOpen24_7 = false.obs;
 
+  final logger = Logger();
+
   // Selected subscription plan
   var selectedPlan = Rx<ServiceProviderModel>(
     ServiceProviderModel(subscriptionPlan: 'Free Plan', subscriptionPrice: 0.0),
@@ -52,12 +55,20 @@ class ServiceProviderController extends GetxController {
     super.onInit();
 
     fetchCategories();
-    final plan = Get.arguments;
-    if (plan != null) {
+
+    final args = Get.arguments;
+
+    if (args != null) {
       selectedPlan.update((val) {
-        val!.subscriptionPlan = plan.name;
-        val.subscriptionPrice = double.tryParse(plan.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+        if (val != null) {
+          val.planId = args["planId"]; // 🔥 REQUIRED
+          val.subscriptionPlan = args["name"] ?? '';
+          val.subscriptionPrice =
+              double.tryParse(args["price"].toString()) ?? 0;
+        }
       });
+    } else {
+      logger.e("Plan arguments is null");
     }
   }
 
@@ -71,8 +82,16 @@ class ServiceProviderController extends GetxController {
 
       final data = jsonDecode(response.body);
 
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
+
       if (data['success']) {
-        categories.value = List.from(data['data']).map((e) => Category.fromJson(e)).toList();
+        categories.value = List.from(
+          data['data'],
+        ).map((e) => Category.fromJson(e)).toList();
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to load categories");
@@ -164,11 +183,20 @@ class ServiceProviderController extends GetxController {
       final token = StorageService().accessToken;
       if (token == null || token.isEmpty) return;
 
+      final plan = selectedPlan.value;
+
+      // ✅ correct validation
+      if (plan.planId.isEmpty) {
+        Get.snackbar("Error", "Plan ID is missing");
+        return;
+      }
+
       // ----------------- JSON PAYLOAD -----------------
       final payload = {
+        "planId": plan.planId,
         "service_name": serviceNameController.text.trim(),
         "service_category": selectedCategoryId.value,
-        "offer_services": selectedServiceIds, // array
+        "offer_services": selectedServiceIds.toList(),
         "phone": contactController.text.replaceAll('+', '').trim(),
         "service_address": addressController.text.trim(),
         "about": aboutController.text.trim(),
@@ -177,7 +205,7 @@ class ServiceProviderController extends GetxController {
             "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
         "closingTime":
             "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
-        "allTimeAvailability": isOpen24_7.value, // boolean
+        "allTimeAvailability": isOpen24_7.value,
         "location": {
           "type": "Point",
           "coordinates": [90.4125, 23.8103],
@@ -189,52 +217,53 @@ class ServiceProviderController extends GetxController {
       print(jsonEncode(payload));
       print("-------------------------------------");
 
-      // ----------------- SEND JSON -----------------
-      // final request = http.MultipartRequest(
-      //   'POST',
-      //   Uri.parse("https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/create"),
-      // );
+      // ----------------- MULTIPART REQUEST -----------------
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiConstants.createService),
+      );
 
-      final request = http.MultipartRequest('POST', Uri.parse(ApiConstants.createService));
+      // AUTH HEADER
+      request.headers['Authorization'] = token.startsWith("Bearer ")
+          ? token
+          : 'Bearer $token';
 
-      request.headers['Authorization'] = token.startsWith("Bearer ") ? token : 'Bearer $token';
-      // Important: backend expects multipart for files
+      // ✅ FIX: PLAN ID SENT SEPARATELY (THIS FIXES YOUR ERROR)
+
+      // JSON payload
       request.fields['data'] = jsonEncode(payload);
 
-      // ----------------- ADD LOGO -----------------
+      // ----------------- LOGO -----------------
       if (logo.value.isNotEmpty) {
         final logoFile = File(logo.value);
+
         request.files.add(
-          await http.MultipartFile.fromPath(
-            'company_logo',
-            logoFile.path,
-            contentType: MediaType('image', logoFile.path.split('.').last.toLowerCase()),
-          ),
+          await http.MultipartFile.fromPath('company_logo', logoFile.path),
         );
       } else {
         Get.snackbar("Error", "Company logo is required");
         return;
       }
 
-      // ----------------- ADD MEDIA -----------------
+      // ----------------- MEDIA -----------------
       for (var imgPath in images) {
         final imgFile = File(imgPath);
+
         request.files.add(
-          await http.MultipartFile.fromPath(
-            'media',
-            imgFile.path,
-            contentType: MediaType('image', imgFile.path.split('.').last.toLowerCase()),
-          ),
+          await http.MultipartFile.fromPath('media', imgFile.path),
         );
       }
 
-      // ----------------- DEBUG PRINT -----------------
+      // ----------------- DEBUG -----------------
       print("------------ MULTIPART FIELDS ------------");
       request.fields.forEach((key, value) => print("$key: $value"));
-      request.files.forEach((file) => print("Field: ${file.field}, Filename: ${file.filename}"));
+
+      request.files.forEach(
+        (file) => print("Field: ${file.field}, Filename: ${file.filename}"),
+      );
       print("-----------------------------------------");
 
-      // ----------------- SEND REQUEST -----------------
+      // ----------------- SEND -----------------
       final response = await request.send();
       final body = await response.stream.bytesToString();
 
@@ -243,11 +272,14 @@ class ServiceProviderController extends GetxController {
 
       final responseJson = body.isNotEmpty ? jsonDecode(body) : {};
 
+      final prettyJson = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(responseJson);
+      logger.i(prettyJson);
+
       if (response.statusCode == 201 && responseJson['success'] == true) {
-        final data = responseJson['data'];
         Get.snackbar("Success", "Service created successfully");
         Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
-        print("Created Service ID: ${data['_id']}");
       } else {
         Get.snackbar("Error", responseJson['message'] ?? "Unknown error");
       }
@@ -258,7 +290,10 @@ class ServiceProviderController extends GetxController {
   }
 
   Future<void> pickImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(source: source, imageQuality: 80);
+    final XFile? pickedFile = await _picker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
 
     if (pickedFile != null) {
       if (images.length < 3) {
@@ -302,9 +337,10 @@ class ServiceProviderController extends GetxController {
     }
 
     /// Set subscription plan
-    void setPlan(String planName, double price) {
+    void setPlan(String planName, double price, String planId) {
       selectedPlan.update((p) {
         if (p != null) {
+          p.planId = planId; // 🔥 IMPORTANT
           p.subscriptionPlan = planName;
           p.subscriptionPrice = price;
         }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../data/services/storage_service.dart';
@@ -23,14 +25,16 @@ class ServicerLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(text: "provider@gmail.com");
-  final passwordController = TextEditingController(text: "Ovi123456@");
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   final isLoading = false.obs;
 
   late final selectedRole;
 
   final authService = AuthService();
+
+  final logger = Logger();
 
   @override
   void onInit() {
@@ -62,17 +66,37 @@ class ServicerLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      print("FULL LOGIN RESPONSE:------------------------------------------ $result");
+      print(
+        "FULL LOGIN RESPONSE:------------------------------------------ $result",
+      );
 
       final responseData = result["data"];
+
+      // final prettyJson =
+      // const JsonEncoder.withIndent('    ').convert(responseData);
+      //
+      // log(
+      //   prettyJson,
+      //   name: "REGISTER_API_RESPONSE",
+      // );
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(responseData);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
 
       if (result["statusCode"] == 200 && responseData["success"]) {
         final data = responseData["data"];
 
         // ✅ SAFE TOKEN EXTRACTION
-        final accessToken = data?["accessToken"] ?? data?["token"]?["accessToken"];
+        final accessToken =
+            data?["accessToken"] ?? data?["token"]?["accessToken"];
 
-        final refreshToken = data?["refreshToken"] ?? data?["token"]?["refreshToken"];
+        final refreshToken =
+            data?["refreshToken"] ?? data?["token"]?["refreshToken"];
 
         final role = data?["user"]?["role"];
         final serviceId = data?["user"]?["service"];
@@ -226,7 +250,8 @@ class ServicerLoginController extends GetxController {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final idToken = googleAuth.idToken;
 

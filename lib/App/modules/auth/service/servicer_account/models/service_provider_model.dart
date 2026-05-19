@@ -1,4 +1,6 @@
 class ServiceProviderModel {
+
+  String planId;
   String serviceName;
   String category;
   List<String> selectedServices;
@@ -16,6 +18,8 @@ class ServiceProviderModel {
   double subscriptionPrice;
 
   ServiceProviderModel({
+
+    this.planId = '',
     this.serviceName = '',
     this.category = '',
     this.selectedServices = const [],

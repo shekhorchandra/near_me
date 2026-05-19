@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Plan {
+  final String id;
   final String name;
   final String price;
   final List<String> features;
   final Color color;
 
   Plan({
+    required this.id,
     required this.name,
     required this.price,
     required this.features,
@@ -35,6 +37,7 @@ class Plan {
     }
 
     return Plan(
+      id: json['_id'] ?? json['id'],
       name: json['title'],
       price: "£${json['price']} / ${json['interval']}",
       features: featureList,

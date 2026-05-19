@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/data/services/storage_service.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +22,8 @@ class ServiceHighlightController extends GetxController {
 
   final picker = ImagePicker();
   final isCreating = false.obs;
+
+  final logger = Logger();
 
   @override
   void onInit() {
@@ -121,7 +124,10 @@ class ServiceHighlightController extends GetxController {
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.grey.shade200,
                       image: file != null
-                          ? DecorationImage(image: FileImage(file), fit: BoxFit.cover)
+                          ? DecorationImage(
+                              image: FileImage(file),
+                              fit: BoxFit.cover,
+                            )
                           : null,
                     ),
                     child: file == null
@@ -131,7 +137,10 @@ class ServiceHighlightController extends GetxController {
                               children: [
                                 Icon(Icons.add_a_photo, color: Colors.grey),
                                 SizedBox(height: 6),
-                                Text("Upload Image", style: TextStyle(color: Colors.grey)),
+                                Text(
+                                  "Upload Image",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
                               ],
                             ),
                           )
@@ -209,49 +218,75 @@ class ServiceHighlightController extends GetxController {
   Future<void> createHighlight() async {
     try {
       final token = storage.accessToken;
-      final serviceId = storage.serviceId;
 
-      if (token == null || serviceId == null || selectedImage.value == null) {
+      // ✅ REAL SERVICE ID
+      final currentServiceId = storage.serviceId;
+
+      logger.i("SERVICE ID => $currentServiceId");
+
+      if (token == null ||
+          currentServiceId == null ||
+          currentServiceId.isEmpty ||
+          selectedImage.value == null) {
         Get.snackbar("Error", "Missing data");
         return;
       }
 
       isCreating.value = true;
 
-      // final uri = Uri.parse(
-      //   "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/highlight-service/",
-      // );
-
       final uri = Uri.parse(ApiConstants.highlightServiceBase);
 
       var request = http.MultipartRequest("POST", uri);
-      request.headers['Authorization'] = token;
 
-      request.fields['data'] = jsonEncode({
-        "service": serviceId,
-        "title": titleController.text,
-        "description": descController.text,
+      // ✅ FIX
+      request.headers.addAll({
+        "Authorization": "Bearer $token",
+        "accesstoken": token,
       });
 
-      request.files.add(await http.MultipartFile.fromPath("image", selectedImage.value!.path));
+      // ✅ IMPORTANT
+      request.fields['data'] = jsonEncode({
+        "service": currentServiceId,
+        "title": titleController.text.trim(),
+        "description": descController.text.trim(),
+      });
+
+      // ✅ IMAGE
+      request.files.add(
+        await http.MultipartFile.fromPath("image", selectedImage.value!.path),
+      );
+
+      logger.i("HIGHLIGHT BODY => ${request.fields}");
 
       final response = await request.send();
+
       final resBody = await response.stream.bytesToString();
 
-      if (response.statusCode == 201) {
+      final decoded = jsonDecode(resBody);
+
+      // ✅ PRETTY LOGGER
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(decoded);
+
+      logger.i(prettyJson);
+
+      if (response.statusCode == 201 && decoded["success"] == true) {
         Get.back();
+
         Get.snackbar("Success", "Highlight created");
 
-        fetchHighlights();
+        await fetchHighlights();
 
         titleController.clear();
         descController.clear();
+
         selectedImage.value = null;
       } else {
-        Get.snackbar("Error", "Failed: $resBody");
+        Get.snackbar("Error", decoded["message"] ?? "Failed");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      logger.e("CREATE HIGHLIGHT ERROR => $e");
+
+      Get.snackbar("Error", "Something went wrong");
     } finally {
       isCreating.value = false;
     }

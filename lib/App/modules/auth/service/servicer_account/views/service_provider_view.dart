@@ -113,23 +113,23 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Child Services You Offer (Max 5)",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 6),
-
-                  MultiSelectDropdownField(
-                    hint: "Select child services",
-                    icon: Icons.design_services,
-                    controller: controller,
-                    isChild: true, // 👈 important
-                  ),
-                ],
-              ),
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     const Text(
+              //       "Child Services You Offer (Max 5)",
+              //       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              //     ),
+              //     const SizedBox(height: 6),
+              //
+              //     MultiSelectDropdownField(
+              //       hint: "Select child services",
+              //       icon: Icons.design_services,
+              //       controller: controller,
+              //       isChild: true, // 👈 important
+              //     ),
+              //   ],
+              // ),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,30 +223,34 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
 
-              Obx(
-                () => Column(
+              const SizedBox(height: 10),
+
+              Obx(() {
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    // Uploaded images
-                    ...controller.images.map((img) {
-                      final index = controller.images.indexOf(img);
+                    /// ================= UPLOADED IMAGES =================
+                    ...controller.images.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final img = entry.value;
+
                       return Stack(
                         children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            width: double.infinity,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400),
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: FileImage(File(img)),
-                                fit: BoxFit.cover,
-                              ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              File(img),
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
                             ),
                           ),
+
+                          /// REMOVE BUTTON
                           Positioned(
-                            top: 4,
-                            right: 4,
+                            top: 5,
+                            right: 5,
                             child: GestureDetector(
                               onTap: () => controller.removeImage(index),
                               child: Container(
@@ -255,62 +259,67 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                                   color: Colors.black54,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
                         ],
                       );
-                    }).toList(),
+                    }),
 
-                    const SizedBox(height: 10),
-
-                    // Full width upload icon
-                    GestureDetector(
-                      onTap: () {
-                        Get.bottomSheet(
-                          Container(
-                            color: Colors.white,
-                            padding: const EdgeInsets.all(16),
-                            child: Wrap(
-                              children: [
-                                ListTile(
-                                  leading: const Icon(Icons.camera_alt),
-                                  title: const Text("Camera"),
-                                  onTap: () {
-                                    Get.back();
-                                    controller.pickImage(ImageSource.camera);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.photo_library),
-                                  title: const Text("Gallery"),
-                                  onTap: () {
-                                    Get.back();
-                                    controller.pickImage(ImageSource.gallery);
-                                  },
-                                ),
-                                const SizedBox(height: 100),
-                              ],
+                    /// ================= ADD BUTTON =================
+                    if (controller.images.length < 3)
+                      GestureDetector(
+                        onTap: () {
+                          Get.bottomSheet(
+                            Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(16),
+                              child: Wrap(
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.camera_alt),
+                                    title: const Text("Camera"),
+                                    onTap: () {
+                                      Get.back();
+                                      controller.pickImage(ImageSource.camera);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.photo_library),
+                                    title: const Text("Gallery"),
+                                    onTap: () {
+                                      Get.back();
+                                      controller.pickImage(ImageSource.gallery);
+                                    },
+                                  ),
+                                  const SizedBox(height: 100),
+                                ],
+                              ),
                             ),
+                          );
+                        },
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade400),
                           ),
-                        );
-                      },
-                      child: Container(
-                        width: double.infinity, // full width
-                        height: 100,
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey.shade400),
+                          child: const Icon(
+                            Icons.add_a_photo,
+                            color: Colors.black,
+                          ),
                         ),
-                        child: const Icon(Icons.add_a_photo, color: Colors.black),
                       ),
-                    ),
                   ],
-                ),
-              ),
+                );
+              }),
 
               const SizedBox(height: 12),
 

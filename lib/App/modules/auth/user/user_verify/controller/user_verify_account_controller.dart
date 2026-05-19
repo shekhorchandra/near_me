@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:near_me/App/modules/services/contants/api_constants.dart';
 import 'package:near_me/App/routes/app_routes.dart';
 
@@ -18,6 +19,7 @@ class UserVerifyAccountController extends GetxController {
   // Loading state
   var isVerifying = false.obs;
 
+  final logger = Logger();
   @override
   void onInit() {
     super.onInit();
@@ -74,6 +76,14 @@ class UserVerifyAccountController extends GetxController {
 
       final data = jsonDecode(response.body);
 
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
       isVerifying.value = false;
 
       if (response.statusCode == 200 && data["success"] == true) {

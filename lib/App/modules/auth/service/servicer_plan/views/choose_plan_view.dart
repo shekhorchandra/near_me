@@ -16,11 +16,14 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
       return GestureDetector(
         onTap: () => controller.selectPlan(plan),
         child: Obx(() {
-          bool isSelected = controller.selectedPlan.value == plan;
+          bool isSelected = controller.selectedPlan.value?.id == plan.id;
 
           return Card(
             shape: RoundedRectangleBorder(
-              side: BorderSide(color: isSelected ? plan.color : Colors.grey.shade300, width: 2),
+              side: BorderSide(
+                color: isSelected ? plan.color : Colors.grey.shade300,
+                width: 2,
+              ),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -31,7 +34,9 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: plan.color,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
                   ),
                   child: Text(
                     plan.name,
@@ -69,14 +74,24 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                             child: Column(
                               children: plan.features.map((f) {
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.check, size: 16, color: plan.color),
+                                      Icon(
+                                        Icons.check,
+                                        size: 16,
+                                        color: plan.color,
+                                      ),
                                       const SizedBox(width: 6),
                                       Expanded(
-                                        child: Text(f, style: const TextStyle(fontSize: 10)),
+                                        child: Text(
+                                          f,
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -93,7 +108,9 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                           height: 34,
                           onPressed: () => controller.selectPlan(plan),
                           text: 'Select Plan',
-                          backgroundColor: isSelected ? plan.color : Colors.grey,
+                          backgroundColor: isSelected
+                              ? plan.color
+                              : Colors.grey,
                         ),
                       ],
                     ),
@@ -113,11 +130,8 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-
-              Expanded( // ✅ IMPORTANT FIX
-
-
-
+              Expanded(
+                // ✅ IMPORTANT FIX
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
@@ -135,14 +149,21 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
 
               AppButton(
                 onPressed: () {
-                  if (controller.selectedPlan.value != null) {
-                    Get.toNamed(
-                      AppRoutes.SERVICE_PROVIDER_ACCOUNT,
-                      arguments: controller.selectedPlan.value,
-                    );
-                  } else {
+                  final plan = controller.selectedPlan.value;
+
+                  if (plan == null) {
                     Get.snackbar("Error", "Please select a plan first");
+                    return;
                   }
+
+                  Get.toNamed(
+                    AppRoutes.SERVICE_PROVIDER_ACCOUNT,
+                    arguments: {
+                      "planId": plan.id,
+                      "name": plan.name,
+                      "price": plan.price,
+                    },
+                  );
                 },
                 text: 'Continue',
               ),
