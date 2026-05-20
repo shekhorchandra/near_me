@@ -113,23 +113,23 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              // Column(
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              //   children: [
-              //     const Text(
-              //       "Child Services You Offer (Max 5)",
-              //       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-              //     ),
-              //     const SizedBox(height: 6),
-              //
-              //     MultiSelectDropdownField(
-              //       hint: "Select child services",
-              //       icon: Icons.design_services,
-              //       controller: controller,
-              //       isChild: true, // 👈 important
-              //     ),
-              //   ],
-              // ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Child Services You Offer (Max 5)",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+
+                  MultiSelectDropdownField(
+                    hint: "Select child services",
+                    icon: Icons.design_services,
+                    controller: controller,
+                    isChild: true, // 👈 important
+                  ),
+                ],
+              ),
 
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -489,9 +489,9 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 6),
 
-              const Text(
-                "You have selected the Free Plan (£0/month). You can continue using the platform with this plan or upgrade anytime for additional features.",
-                style: TextStyle(fontSize: 14, color: Colors.black87),
+              Text(
+                "You have selected the £${controller.selectedPlan.value.subscriptionPrice.toStringAsFixed(2)}/month Plan. You can continue using the platform with this plan or upgrade anytime for additional features.",
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
 
               const SizedBox(height: 12),

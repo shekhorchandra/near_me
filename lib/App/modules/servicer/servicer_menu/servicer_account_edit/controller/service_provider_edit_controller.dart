@@ -41,6 +41,9 @@ class ServiceProviderEditController extends GetxController {
   final logoFile = Rxn<File>();
   final mediaFiles = <File>[].obs;
 
+  RxString selectedSubCategoryId = "".obs;
+  RxString selectedChildCategoryId = "".obs;
+
   final logger = Logger();
 
   @override

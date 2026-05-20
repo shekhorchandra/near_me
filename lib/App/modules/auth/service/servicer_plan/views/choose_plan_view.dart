@@ -59,7 +59,7 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                       children: [
                         // Price
                         Text(
-                          plan.price,
+                          plan.displayPrice,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -156,14 +156,28 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                     return;
                   }
 
-                  Get.toNamed(
-                    AppRoutes.SERVICE_PROVIDER_ACCOUNT,
-                    arguments: {
-                      "planId": plan.id,
-                      "name": plan.name,
-                      "price": plan.price,
-                    },
-                  );
+                  final price = double.tryParse(plan.price.toString()) ?? 0;
+                  final isFreePlan = price <= 0;
+
+                  if (isFreePlan) {
+                    Get.toNamed(
+                      AppRoutes.SERVICE_PROVIDER_ACCOUNT,
+                      arguments: {
+                        "planId": plan.id,
+                        "name": plan.name,
+                        "price": plan.price,
+                      },
+                    );
+                  } else {
+                    Get.toNamed(
+                      AppRoutes.PAYMENT_METHOD,
+                      // arguments: {
+                      //   "planId": plan.id,
+                      //   "name": plan.name,
+                      //   "price": plan.price,
+                      // },
+                    );
+                  }
                 },
                 text: 'Continue',
               ),

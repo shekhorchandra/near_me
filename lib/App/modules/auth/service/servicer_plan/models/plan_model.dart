@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class Plan {
   final String id;
   final String name;
-  final String price;
+  final double price;
+  final String interval;
   final List<String> features;
   final Color color;
 
@@ -11,6 +14,7 @@ class Plan {
     required this.id,
     required this.name,
     required this.price,
+    required this.interval,
     required this.features,
     required this.color,
   });
@@ -21,8 +25,12 @@ class Plan {
     List<String> featureList = [];
 
     // Convert backend features → UI text
-    featureList.add("Max Photos: ${features['maxPhotos'] == -1 ? 'Unlimited' : features['maxPhotos']}");
-    featureList.add("Services: ${features['maxOfferServices'] == -1 ? 'Unlimited' : features['maxOfferServices']}");
+    featureList.add(
+      "Max Photos: ${features['maxPhotos'] == -1 ? 'Unlimited' : features['maxPhotos']}",
+    );
+    featureList.add(
+      "Services: ${features['maxOfferServices'] == -1 ? 'Unlimited' : features['maxOfferServices']}",
+    );
     featureList.add("Badge: ${features['badgeType']}");
     featureList.add("Analytics: ${features['analyticsType']}");
 
@@ -39,23 +47,28 @@ class Plan {
     return Plan(
       id: json['_id'] ?? json['id'],
       name: json['title'],
-      price: "£${json['price']} / ${json['interval']}",
+      price: (json['price'] as num).toDouble(),
+      interval: json['interval'],
       features: featureList,
       color: _getColor(json['name']),
     );
+  }
+
+  String get displayPrice {
+    return "£$price / $interval";
   }
 
   // Keep your design colors same
   static Color _getColor(String name) {
     switch (name) {
       case "free":
-        return const Color(0xFF6B9AF4);
+        return const Color(0xFF3612FF);
       case "basic":
-        return const Color(0xFF2132F3);
+        return const Color(0xFF61FD9D);
       case "pro":
-        return Colors.green;
+        return const Color(0xFFFFA600);
       case "elite":
-        return Colors.orangeAccent;
+        return const Color(0xFF7161AA);
       default:
         return Colors.grey;
     }

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:logger/logger.dart';
 import '../../../../data/services/storage_service.dart';
 import '../../../services/geolocator_helper/current_location_picker.dart';
 import '../controller/marker_generator.dart';
@@ -40,6 +41,8 @@ class HomeController extends GetxController {
   RxDouble selectedRating = 0.0.obs;
   RxDouble selectedRadius = 10.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
+
+  final logger = Logger();
 
   final Dio dio = Dio();
 
@@ -92,9 +95,11 @@ class HomeController extends GetxController {
       print(token);
 
       final response = await dio.post(
-        "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev/api/v1/service/nearest",
+        "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/service/nearest",
         data: body,
-        options: Options(headers: {"Authorization": token, "Content-Type": "application/json"}),
+        options: Options(
+          headers: {"Authorization": token, "Content-Type": "application/json"},
+        ),
       );
 
       /// PRINT RESPONSE
@@ -102,6 +107,14 @@ class HomeController extends GetxController {
       print(response.data);
 
       drawRadiusCircle(position.latitude, position.longitude);
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(response.data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
 
       if (response.statusCode == 200 && response.data["success"] == true) {
         final List data = response.data["data"];
@@ -178,8 +191,14 @@ class HomeController extends GetxController {
   Future<void> loadCategories() async {
     try {
       final res = await dio.get(
-        "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev/api/v1/category",
+        "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/category",
       );
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(res.data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
 
       if (res.statusCode == 200 && res.data["success"] == true) {
         final List data = res.data["data"];
@@ -191,66 +210,52 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> showRouteToService(
-      double destLat,
-      double destLng,
-      ) async {
+  Future<void> showRouteToService(double destLat, double destLng) async {
     final pos = await getCurrentLocation();
 
     if (pos == null) return;
 
-    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
+    // final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
+    final apiKey = "AIzaSyAsQyXRVGiL_q3YRfT9nihCt1AUz7mVuQk";
 
     if (apiKey == null || apiKey.isEmpty) {
-      throw Exception("Google Maps API key not found in .env");
+      throw Exception("Google Maps API key not found");
     }
 
-    PolylinePoints polylinePoints = PolylinePoints(
-      apiKey: apiKey,
-    );
+    PolylinePoints polylinePoints = PolylinePoints(apiKey: apiKey);
 
-
-    PolylineResult result =
-    await polylinePoints.getRouteBetweenCoordinates(
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
-        origin: PointLatLng(
-          pos.latitude,
-          pos.longitude,
-        ),
-        destination: PointLatLng(
-          destLat,
-          destLng,
-        ),
+        origin: PointLatLng(pos.latitude, pos.longitude),
+        destination: PointLatLng(destLat, destLng),
         mode: TravelMode.driving,
       ),
     );
 
+    print("STATUS => ${result.status}");
+    print("ERROR => ${result.errorMessage}");
+    print("POINTS => ${result.points.length}");
+
     if (result.points.isNotEmpty) {
       final routePoints = result.points
-          .map(
-            (e) => LatLng(
-          e.latitude,
-          e.longitude,
-        ),
-      )
+          .map((e) => LatLng(e.latitude, e.longitude))
           .toList();
 
-      polylines.value = {
+      polylines.assignAll({
         Polyline(
           polylineId: const PolylineId("route"),
           points: routePoints,
-          width: 5,
-          color: Colors.black,
+          width: 8,
+          color: Colors.red,
         ),
-      };
+      });
 
       fitPolyline(routePoints);
     }
   }
 
   void fitPolyline(List<LatLng> points) {
-    if (mapController == null ||
-        points.isEmpty) return;
+    if (mapController == null || points.isEmpty) return;
 
     double minLat = points.first.latitude;
     double maxLat = points.first.latitude;
@@ -517,7 +522,10 @@ class HomeController extends GetxController {
               const SizedBox(height: 25),
 
               /// RATING LABEL
-              const Text("Rating", style: TextStyle(fontWeight: FontWeight.w600)),
+              const Text(
+                "Rating",
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: 8),
 
               /// RATING SLIDER
@@ -541,18 +549,27 @@ class HomeController extends GetxController {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Radius", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text(
+                    "Radius",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
 
                   Obx(
                     () => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         "${selectedRadius.value.toInt()} miles",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
@@ -626,9 +643,14 @@ class HomeController extends GetxController {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  child: const Text("Apply Filter", style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "Apply Filter",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -655,7 +677,10 @@ class HomeController extends GetxController {
 
     mapController?.animateCamera(
       CameraUpdate.newLatLngBounds(
-        LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng)),
+        LatLngBounds(
+          southwest: LatLng(minLat, minLng),
+          northeast: LatLng(maxLat, maxLng),
+        ),
         80, // padding
       ),
     );

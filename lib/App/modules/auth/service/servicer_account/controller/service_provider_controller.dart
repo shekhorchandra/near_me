@@ -32,6 +32,10 @@ class ServiceProviderController extends GetxController {
   var selectedServiceIds = <String>[].obs;
   var selectedChildServiceIds = <String>[].obs;
 
+  RxString selectedSubCategoryId = "".obs;
+  RxString selectedChildCategoryId = "".obs;
+
+
   var is24Hours = false.obs;
 
   var images = <String>[].obs;
@@ -114,19 +118,26 @@ class ServiceProviderController extends GetxController {
   void toggleService(String id) {
     if (selectedServiceIds.contains(id)) {
       selectedServiceIds.remove(id);
-      childServices.clear(); // remove child if unselected
+
+      // ✅ REMOVE sub category id if unselected
+      if (selectedSubCategoryId.value == id) {
+        selectedSubCategoryId.value = "";
+      }
+
+      childServices.clear();
     } else {
       if (selectedServiceIds.length < 5) {
         selectedServiceIds.add(id);
 
-        // 🔥 find selected service
+        // ✅ SET selected sub category
+        selectedSubCategoryId.value = id;
+
         final selectedService = services.firstWhere((s) => s.id == id);
 
-        // 🔥 load its children (LEVEL 2)
         childServices.clear();
 
-        for (var id in selectedServiceIds) {
-          final service = services.firstWhere((s) => s.id == id);
+        for (var serviceId in selectedServiceIds) {
+          final service = services.firstWhere((s) => s.id == serviceId);
           childServices.addAll(service.children);
         }
       } else {
@@ -138,9 +149,17 @@ class ServiceProviderController extends GetxController {
   void toggleChildService(String id) {
     if (selectedChildServiceIds.contains(id)) {
       selectedChildServiceIds.remove(id);
+
+      // ✅ REMOVE child category id if unselected
+      if (selectedChildCategoryId.value == id) {
+        selectedChildCategoryId.value = "";
+      }
     } else {
       if (selectedChildServiceIds.length < 5) {
         selectedChildServiceIds.add(id);
+
+        // ✅ SET child category id
+        selectedChildCategoryId.value = id;
       } else {
         Get.snackbar('Limit', 'Max 5 child services');
       }
@@ -191,20 +210,36 @@ class ServiceProviderController extends GetxController {
         return;
       }
 
+      // ✅ ADD THIS VALIDATION BLOCK HERE
+      if (selectedSubCategoryId.value.isEmpty) {
+        Get.snackbar("Error", "Please select sub category");
+        return;
+      }
+
+      if (selectedChildCategoryId.value.isEmpty) {
+        Get.snackbar("Error", "Please select child category");
+        return;
+      }
+
       // ----------------- JSON PAYLOAD -----------------
       final payload = {
         "planId": plan.planId,
         "service_name": serviceNameController.text.trim(),
         "service_category": selectedCategoryId.value,
+
+        // ✅ ADD THESE TWO FIELDS
+        "service_subCategory": selectedSubCategoryId.value,
+        "service_childCategory": selectedChildCategoryId.value,
+
         "offer_services": selectedServiceIds.toList(),
         "phone": contactController.text.replaceAll('+', '').trim(),
         "service_address": addressController.text.trim(),
         "about": aboutController.text.trim(),
         "website_link": websiteController.text.trim(),
         "openingTime":
-            "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
         "closingTime":
-            "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
         "allTimeAvailability": isOpen24_7.value,
         "location": {
           "type": "Point",
@@ -216,6 +251,9 @@ class ServiceProviderController extends GetxController {
       print("------------ JSON PAYLOAD ------------");
       print(jsonEncode(payload));
       print("-------------------------------------");
+
+      print("SUB:----------------------------------- ${selectedSubCategoryId.value}");
+      print("CHILD:-----------------------------------  ${selectedChildCategoryId.value}");
 
       // ----------------- MULTIPART REQUEST -----------------
       final request = http.MultipartRequest(
