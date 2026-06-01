@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../data/services/storage_service.dart';
-import '../../user_chat/services/ChatApiService.dart';
+import '../../servicer_chat/services/ChatApiService.dart';
 import '../model/MessageModel.dart';
 
-
-class ConversationController extends GetxController {
-  final ChatApiService apiService = Get.find();
+class ServicerConversationController extends GetxController {
+  final ServiceChatApiService apiService = Get.find();
 
   final StorageService storage = StorageService();
 
-  TextEditingController messageController =
-  TextEditingController();
+  TextEditingController messageController = TextEditingController();
 
-  final messages = <MessageModel>[].obs;
+  final messages = <ServicerMessageModel>[].obs;
 
   final isLoading = false.obs;
 
@@ -38,10 +36,7 @@ class ConversationController extends GetxController {
 
       if (token == null) return;
 
-      final result = await apiService.getMessages(
-        token: token,
-        userId: userId,
-      );
+      final result = await apiService.getMessages(token: token, userId: userId);
 
       messages.assignAll(result);
     } catch (e) {

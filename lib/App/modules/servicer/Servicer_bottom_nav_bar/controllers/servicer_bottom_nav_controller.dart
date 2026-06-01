@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../servicer_chat/servicer_inbox/views/servicer_chat_view.dart';
+import '../../servicer_chat/servicer_chat/views/chat_view.dart';
 import '../../servicer_dashboard/views/servicer_dashboard_view.dart';
 import '../../servicer_highlight/servicer_highlights_page/views/servicer_highlight_view.dart';
 import '../../servicer_menu/servicer_menu_bar/views/servicer_menu_view.dart';
@@ -21,7 +20,7 @@ class ServicerNavigationBarController extends GetxController {
   final servicer_screens = [
     const ServiceDashboardView(),
     const ServiceHighlightView(),
-    const ServicerChatView(),
+    const ServiceChatView(),
     const ServicerMenuView(),
   ];
 

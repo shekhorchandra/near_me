@@ -5,8 +5,8 @@ import 'package:near_me/App/core/widgets/custom_text_field.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../controller/conversation_controller.dart';
 
-class ConversationView extends GetView<ConversationController> {
-  const ConversationView({super.key});
+class ServicerConversationView extends GetView<ServicerConversationController> {
+  const ServicerConversationView({super.key});
 
   Widget messageBubble(message) {
     final myId = StorageService().userId;

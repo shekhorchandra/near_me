@@ -6,14 +6,22 @@ import '../../../../../routes/app_routes.dart';
 import '../controller/chat_controller.dart';
 import '../helper/TimeFormatter.dart';
 
-class ChatView extends GetView<ChatController> {
-  const ChatView({super.key});
+class ServiceChatView extends GetView<ServiceChatController> {
+  const ServiceChatView({super.key});
 
   Widget chatItem(chat) {
     return ListTile(
+      // onTap: () {
+      //   // Navigate using GetX
+      //   // Get.toNamed(AppRoutes.CONVERSATION);
+      //
+      //   // OR, if using named routes:
+      //   // Get.toNamed(Routes.CONVERSATION, arguments: servicer_chat);
+      // },
+
       onTap: () {
         Get.toNamed(
-          AppRoutes.CONVERSATION,
+          AppRoutes.SERVICER_CONVERSATION,
           arguments: {
             "userId": chat.id,
             "name": chat.name,
@@ -38,7 +46,7 @@ class ChatView extends GetView<ChatController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            TimeFormatter.timeAgo(chat.time),
+            ServiceTimeFormatter.timeAgo(chat.time),
             style: const TextStyle(fontSize: 12),
           ),
           const SizedBox(height: 5),
@@ -62,7 +70,7 @@ class ChatView extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: "Chats", showBack: false),
+      appBar: const CommonAppBar(title: "Service Chats", showBack: false),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

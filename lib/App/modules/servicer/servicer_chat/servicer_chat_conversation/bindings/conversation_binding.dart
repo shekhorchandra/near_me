@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../controller/servicer_conversation_controller.dart';
+import '../controller/conversation_controller.dart';
 
 class ServicerConversationBinding extends Bindings {
   @override

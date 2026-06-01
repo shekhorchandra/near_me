@@ -3,10 +3,10 @@ import '../../../../../data/services/storage_service.dart';
 import '../model/chat_model.dart';
 import '../services/ChatApiService.dart';
 
-class ChatController extends GetxController {
-  final ChatApiService apiService;
+class ServiceChatController extends GetxController {
+  final ServiceChatApiService apiService;
 
-  ChatController({required this.apiService});
+  ServiceChatController({required this.apiService});
 
   var isLoading = false.obs;
   final chats = <ChatModel>[].obs;

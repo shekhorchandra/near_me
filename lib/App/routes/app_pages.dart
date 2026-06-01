@@ -37,10 +37,10 @@ import '../modules/auth/user_forget/user_reset_password/bindings/user_reset_pass
 import '../modules/auth/user_forget/user_reset_password/views/user_reset_password_view.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/bindings/servicer_navigation_bar_binding.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/views/servicer_bottom_nav_view.dart';
-import '../modules/servicer/servicer_chat/servicer_chat_conversation/bindings/servicer_conversation_binding.dart';
-import '../modules/servicer/servicer_chat/servicer_chat_conversation/views/servicer_conversation_view.dart';
-import '../modules/servicer/servicer_chat/servicer_inbox/bindings/servicer_chat_binding.dart';
-import '../modules/servicer/servicer_chat/servicer_inbox/views/servicer_chat_view.dart';
+import '../modules/servicer/servicer_chat/servicer_chat/bindings/chat_binding.dart';
+import '../modules/servicer/servicer_chat/servicer_chat/views/chat_view.dart';
+import '../modules/servicer/servicer_chat/servicer_chat_conversation/bindings/conversation_binding.dart';
+import '../modules/servicer/servicer_chat/servicer_chat_conversation/views/conversation_view.dart';
 import '../modules/servicer/servicer_dashboard/bindings/servicer_dashboard_binding.dart';
 import '../modules/servicer/servicer_dashboard/views/servicer_dashboard_view.dart';
 import '../modules/servicer/servicer_highlight/servicer_highlight_details/binding/service_highlights_details_binding.dart';
@@ -67,7 +67,7 @@ import '../modules/user/category/user_category_serivce_review/bindings/reviews_b
 import '../modules/user/category/user_category_serivce_review/views/reviews_view.dart';
 import '../modules/user/category/user_category_service_details/bindings/ServiceDetailsBinding.dart';
 import '../modules/user/category/user_category_service_details/views/ServiceDetailsView.dart';
-import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart';
+import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart' hide ServicerConversationBinding;
 import '../modules/user/chat/user_chat_conversation/views/conversation_view.dart';
 import '../modules/user/home/bindings/home_binding.dart';
 import '../modules/user/home/views/home_view.dart';
@@ -251,8 +251,8 @@ class AppPages {
     /// Servicer chat
     GetPage(
       name: AppRoutes.SERVICER_CHAT,
-      page: () => const ServicerChatView(),
-      binding: ServicerChatBinding(),
+      page: () => const ServiceChatView(),
+      binding: ServiceChatBinding(),
     ),
 
     /// Servicer Menu

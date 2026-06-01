@@ -65,7 +65,7 @@ class HomeView extends GetView<HomeController> {
                       Expanded(
                         child: AppButton(
                           height: 34,
-                          text: "Login / Create an user account",
+                          text: "Login / Create a user account",
                           onPressed: () {
                             box.write("selectedRole", "USER");
                             Get.toNamed(AppRoutes.USER_LOGIN);

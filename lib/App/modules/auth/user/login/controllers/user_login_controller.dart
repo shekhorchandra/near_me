@@ -35,8 +35,8 @@ class UserLoginController extends GetxController {
 
   void initControllers() {
     if (kDebugMode) {
-      emailController.text = "shekhorchandrasaha@gmail.com";
-      passwordController.text = "Tonoy@#123";
+      emailController.text = "mdmontasirrahmans7@gmail.com";
+      passwordController.text = "Test1234@";
     }
   }
 

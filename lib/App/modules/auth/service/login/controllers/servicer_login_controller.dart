@@ -25,8 +25,8 @@ class ServicerLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(text: "shekhorsaha058@gmail.com");
-  final passwordController = TextEditingController(text: "Tonoy@#123");
+  final emailController = TextEditingController(text: "montasir@gmail.com");
+  final passwordController = TextEditingController(text: "Test1234@");
 
   final isLoading = false.obs;
 
