@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
 import '../../../../../data/services/storage_service.dart';
+import '../../../../user/chat/user_chat/services/ChatApiService.dart';
 import '../model/chat_model.dart';
 import '../services/ChatApiService.dart';
 
 class ServiceChatController extends GetxController {
-  final ServiceChatApiService apiService;
+  final ChatApiService apiService;
 
   ServiceChatController({required this.apiService});
 

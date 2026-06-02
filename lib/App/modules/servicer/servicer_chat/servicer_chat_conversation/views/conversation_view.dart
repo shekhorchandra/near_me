@@ -3,14 +3,15 @@ import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
 import 'package:near_me/App/core/widgets/custom_text_field.dart';
 import '../../../../../data/services/storage_service.dart';
+import '../../../../user/chat/user_chat_conversation/model/MessageModel.dart';
 import '../controller/conversation_controller.dart';
 
 class ServicerConversationView extends GetView<ServicerConversationController> {
   const ServicerConversationView({super.key});
 
-  Widget messageBubble(message) {
-    final myId = StorageService().userId;
-    final bool isMe = message.senderId == myId;
+  Widget messageBubble(MessageModel message, String myId) {
+    final senderId = message.senderId?.toString().trim() ?? "";
+    final isMe = senderId == myId.trim();
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -18,11 +19,11 @@ class ServicerConversationView extends GetView<ServicerConversationController> {
         margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.grey.shade200,
+          color: isMe ? Colors.black : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          message.text,
+          message.text ?? "",
           style: TextStyle(color: isMe ? Colors.white : Colors.black),
         ),
       ),
@@ -88,101 +89,23 @@ class ServicerConversationView extends GetView<ServicerConversationController> {
       body: SafeArea(
         child: Column(
           children: [
-            /// IMAGE WITH BACK BUTTON AND OVERLAY INFO
-            Stack(
-              children: [
-                /// Cover image
-                Image.network(
-                  "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-
-                /// Back button
-                Positioned(
-                  top: 40, // adjust for status bar
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-
-                /// Overlay info (bottom)
-                Positioned(
-                  bottom: 10,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "Burger House",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color: Colors.yellow,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  "4.5",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                SizedBox(width: 12),
-                                Icon(
-                                  Icons.location_on,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  "2.1 km",
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
             /// PROFILE SECTION
             Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                  ),
+                  CircleAvatar(
                     radius: 25,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/150?img=5",
-                    ),
+                    backgroundImage: controller.userImage.isNotEmpty
+                        ? NetworkImage(controller.userImage)
+                        : null,
+                    child: controller.userImage.isEmpty
+                        ? const Icon(Icons.person)
+                        : null,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -196,29 +119,21 @@ class ServicerConversationView extends GetView<ServicerConversationController> {
                             fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(
-                              0.2,
-                            ), // light green background
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ), // rounded corners
-                          ),
-                          child: const Text(
-                            "Available now",
+
+                        Obx(() {
+                          // final online = controller.socketService.onlineUsers
+                          //     .contains(controller.serviceId);
+                          final online = controller.socketService.onlineUsers
+                              .contains(controller.userId);
+
+                          return Text(
+                            online ? "Online" : "Offline",
                             style: TextStyle(
-                              color: Colors.green, // text color
+                              color: online ? Colors.green : Colors.grey,
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -235,22 +150,61 @@ class ServicerConversationView extends GetView<ServicerConversationController> {
             /// CHAT MESSAGES
             Expanded(
               child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                final myId = controller.myId;
 
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: controller.messages.length,
-                  itemBuilder: (context, index) {
-                    return messageBubble(
-                      controller.messages[index],
-                    );
-                  },
+                return Column(
+                  children: [
+                    if (controller.isTyping.value)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          "Typing...",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: controller.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = controller.messages[index];
+
+                          final senderId = message.senderId?.toString().trim();
+                          final isMe = senderId == myId.trim();
+
+                          return Align(
+                            alignment: isMe
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 12,
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isMe ? Colors.black : Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                message.text ?? "",
+                                style: TextStyle(
+                                  color: isMe ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
-              })
+              }),
             ),
 
             /// CHAT INPUT

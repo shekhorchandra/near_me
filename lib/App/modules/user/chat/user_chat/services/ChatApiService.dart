@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-
 import '../../user_chat_conversation/model/MessageModel.dart';
 
 class ChatApiService {
@@ -7,35 +6,48 @@ class ChatApiService {
 
   ChatApiService(this.dio);
 
+  static const baseUrl =
+      "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1";
 
-
+  /// GET CONVERSATIONS
   Future<List<dynamic>> getConversations(String token) async {
     final res = await dio.get(
-      'https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/message/conversations',
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-        },
-      ),
+      "$baseUrl/message/conversations",
+      options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
     if (res.data['success'] == true) {
       return res.data['data'];
-    } else {
-      return [];
     }
+    return [];
   }
 
+  /// GET MESSAGES
   Future<List<MessageModel>> getMessages({
     required String token,
     required String userId,
   }) async {
     final response = await dio.get(
-      'https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/message/$userId',
-      queryParameters: {
-        "page": 1,
-        "limit": 10,
-      },
+      "$baseUrl/message/$userId",
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    final List data = response.data['data'];
+
+    return data.map((e) => MessageModel.fromJson(e)).toList();
+  }
+
+  /// SEND MESSAGE
+  Future<MessageModel> sendMessage({
+    required String token,
+    required String receiverId,
+    required String text,
+  }) async {
+    final response = await dio.post(
+      "$baseUrl/message/send/$receiverId",
+      data: FormData.fromMap({
+        "text": text,
+      }),
       options: Options(
         headers: {
           "Authorization": "Bearer $token",
@@ -43,12 +55,13 @@ class ChatApiService {
       ),
     );
 
-    final messages =
-    response.data['data']['messages'] as List;
+    if (response.statusCode == 200 ||
+        response.statusCode == 201) {
+      return MessageModel.fromJson(
+        response.data["data"],
+      );
+    }
 
-    return messages
-        .map((e) => MessageModel.fromJson(e))
-        .toList();
+    throw Exception("Failed to send message");
   }
-
 }

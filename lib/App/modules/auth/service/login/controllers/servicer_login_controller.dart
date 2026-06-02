@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../data/services/socket_service.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../services/auth_service.dart';
@@ -99,7 +100,7 @@ class ServicerLoginController extends GetxController {
             data?["refreshToken"] ?? data?["token"]?["refreshToken"];
 
         final role = data?["user"]?["role"];
-        final serviceId = data?["user"]?["service"];
+        // final serviceId = data?["user"]?["service"];
 
         final isVerified = data?["user"]?["isVerified"] ?? false;
         final hasService = data?["user"]?["hasService"] ?? false;
@@ -115,7 +116,28 @@ class ServicerLoginController extends GetxController {
         // 🔥 SAVE NEW TOKEN
         await _storageService.setAccessToken(accessToken);
         await _storageService.setRefreshToken(refreshToken ?? "");
+        // await _storageService.setServiceId(serviceId ?? "");
+        await _storageService.setUserId(data?["user"]?["_id"] ?? "");
+
+        print("USER ID SAVED => ${_storageService.userId}");
+
+        // if (!Get.isRegistered<SocketService>()) {
+        //   await Get.putAsync(
+        //         () => SocketService().connect(serviceId),
+        //     permanent: true,
+        //   );
+        // }
+
+        final userId = data?["user"]?["_id"];
+        final serviceId = data?["user"]?["service"];
+
+        await _storageService.setUserId(userId ?? "");
         await _storageService.setServiceId(serviceId ?? "");
+
+        await Get.putAsync(
+              () => SocketService().connect(userId ?? ""),
+          permanent: true,
+        );
 
         print("✅ SAVED TOKEN: $accessToken");
         print("✅ STORED TOKEN: ${StorageService().accessToken}");

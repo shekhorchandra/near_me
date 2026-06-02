@@ -14,15 +14,28 @@ class ChatView extends GetView<ChatController> {
       onTap: () {
         Get.toNamed(
           AppRoutes.CONVERSATION,
-          arguments: {
-            "userId": chat.id,
-            "name": chat.name,
-          },
+          arguments: {"userId": chat.id, "name": chat.name},
         );
       },
       leading: Stack(
         children: [
           CircleAvatar(radius: 25, backgroundImage: NetworkImage(chat.image)),
+
+          // Online indicator
+          if (controller.isUserOnline(chat.id))
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 12,
+                width: 12,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+              ),
+            ),
         ],
       ),
       title: Text(

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../../../user/chat/user_chat/services/ChatApiService.dart';
 import '../controller/chat_controller.dart';
 import 'package:dio/dio.dart';
 
@@ -13,7 +14,7 @@ class ServiceChatBinding extends Bindings {
       ),
     );
 
-    Get.lazyPut(() => ServiceChatApiService(dio));
+    Get.lazyPut(() => ChatApiService(dio));
 
     Get.lazyPut(() => ServiceChatController(apiService: Get.find()));
   }

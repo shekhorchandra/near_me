@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../../data/services/socket_service.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../services/auth_service.dart';
@@ -171,9 +172,25 @@ class UserLoginController extends GetxController {
 
           final storage = Get.find<StorageService>();
 
+          // await storage.setAccessToken(accessToken);
+          // await storage.setRefreshToken(refreshToken);
+          // await storage.setUserId(userId);
+          //
+          // AppSnackbar.success(message);
+          //
+          // Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
+
           await storage.setAccessToken(accessToken);
           await storage.setRefreshToken(refreshToken);
           await storage.setUserId(userId);
+
+          /// CONNECT SOCKET
+          if (!Get.isRegistered<SocketService>()) {
+            await Get.putAsync(
+                  () => SocketService().connect(userId),
+              permanent: true,
+            );
+          }
 
           AppSnackbar.success(message);
 

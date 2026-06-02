@@ -11,20 +11,14 @@ class ServiceChatView extends GetView<ServiceChatController> {
 
   Widget chatItem(chat) {
     return ListTile(
-      // onTap: () {
-      //   // Navigate using GetX
-      //   // Get.toNamed(AppRoutes.CONVERSATION);
-      //
-      //   // OR, if using named routes:
-      //   // Get.toNamed(Routes.CONVERSATION, arguments: servicer_chat);
-      // },
-
       onTap: () {
         Get.toNamed(
           AppRoutes.SERVICER_CONVERSATION,
           arguments: {
-            "userId": chat.id,
+            "serviceId": chat.id,
             "name": chat.name,
+            "image": chat.image,
+            "isOnline": chat.isOnline ?? false,
           },
         );
       },

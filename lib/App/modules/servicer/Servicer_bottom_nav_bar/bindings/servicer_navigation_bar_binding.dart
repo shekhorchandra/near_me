@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
+import '../../../user/chat/user_chat/services/ChatApiService.dart';
 import '../../servicer_chat/servicer_chat/controller/chat_controller.dart';
 import '../../servicer_chat/servicer_chat/services/ChatApiService.dart';
 import '../../servicer_dashboard/controller/servicer_dashboard_controller.dart';
@@ -29,14 +30,14 @@ class ServicerNavigationBinding implements Bindings {
     );
 
     /// ✅ 2. Register API Service
-    Get.lazyPut<ServiceChatApiService>(
-      () => ServiceChatApiService(Get.find<Dio>()),
+    Get.lazyPut<ChatApiService>(
+      () => ChatApiService(Get.find<Dio>()),
     );
 
     /// ✅ 3. Inject into Controller
     Get.lazyPut<ServiceChatController>(
       () =>
-          ServiceChatController(apiService: Get.find<ServiceChatApiService>()),
+          ServiceChatController(apiService: Get.find<ChatApiService>()),
     );
 
     Get.lazyPut<ServicerMenuController>(() => ServicerMenuController());

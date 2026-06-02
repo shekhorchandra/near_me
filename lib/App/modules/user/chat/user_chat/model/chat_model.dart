@@ -1,5 +1,6 @@
 class ChatModel {
   final String id;
+  final String userId;
   final String name;
   final String image;
   final String lastMessage;
@@ -9,6 +10,7 @@ class ChatModel {
 
   ChatModel({
     required this.id,
+    required this.userId,
     required this.name,
     required this.image,
     required this.lastMessage,
@@ -22,6 +24,7 @@ class ChatModel {
 
     return ChatModel(
       id: json['_id'] ?? '',
+      userId: json['user']?['_id'] ?? '',
       name: json['user']?['name'] ?? 'Unknown',
       image: json['user']?['image'] ??
           'https://i.pravatar.cc/150?img=1',

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../../../../data/services/socket_service.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../model/chat_model.dart';
 import '../services/ChatApiService.dart';
@@ -10,6 +11,11 @@ class ChatController extends GetxController {
 
   var isLoading = false.obs;
   final chats = <ChatModel>[].obs;
+  final socketService = Get.find<SocketService>();
+
+  bool isUserOnline(String userId) {
+    return socketService.onlineUsers.contains(userId);
+  }
 
   final storage = StorageService();
 
@@ -42,4 +48,6 @@ class ChatController extends GetxController {
       isLoading.value = false;
     }
   }
+
 }
+
