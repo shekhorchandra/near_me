@@ -45,9 +45,8 @@ class MessageModel {
       image: json['message']?['image']?.toString() ?? '',
       status: json['status']?.toString() ?? 'SENT',
 
-      createdAt: DateTime.tryParse(
-        json['createdAt']?.toString() ?? '',
-      ) ??
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),
     );
   }
@@ -59,9 +58,7 @@ class MessageModel {
 
       senderId: json['sender'] is Map
           ? json['sender']['_id']?.toString() ?? ''
-          : json['sender']?.toString() ??
-          json['senderId']?.toString() ??
-          '',
+          : json['sender']?.toString() ?? json['senderId']?.toString() ?? '',
 
       senderName: json['sender'] is Map
           ? json['sender']['name']?.toString() ?? ''
@@ -70,8 +67,8 @@ class MessageModel {
       receiverId: json['receiver'] is Map
           ? json['receiver']['_id']?.toString() ?? ''
           : json['receiver']?.toString() ??
-          json['receiverId']?.toString() ??
-          '',
+                json['receiverId']?.toString() ??
+                '',
 
       receiverName: json['receiver'] is Map
           ? json['receiver']['name']?.toString() ?? ''
@@ -87,9 +84,8 @@ class MessageModel {
 
       status: json['status']?.toString() ?? 'SENT',
 
-      createdAt: DateTime.tryParse(
-        json['createdAt']?.toString() ?? '',
-      ) ??
+      createdAt:
+          DateTime.tryParse(json['createdAt']?.toString() ?? '') ??
           DateTime.now(),
     );
   }

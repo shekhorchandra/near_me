@@ -9,8 +9,12 @@ import '../controller/ServiceDetailsController.dart';
 class ServiceDetailsView extends GetView<ServiceDetailsController> {
   const ServiceDetailsView({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
+
+
     return Obx(
       () => Scaffold(
         appBar: CommonAppBar(title: controller.title.value),
@@ -24,7 +28,25 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () {
-                    Get.toNamed(AppRoutes.CONVERSATION);
+                    print("providerId = ${controller.providerId.value}");
+                    print("providerName = ${controller.providerName.value}");
+
+                    if (controller.providerId.value.isEmpty) {
+                      Get.snackbar(
+                        "Error",
+                        "Provider information is not loaded yet.",
+                      );
+                      return;
+                    }
+
+                    Get.toNamed(
+                      AppRoutes.CONVERSATION,
+                      arguments: {
+                        "userId": controller.providerId.value,
+                        "name": controller.providerName.value,
+                        "image": controller.image.value,
+                      },
+                    );
                   },
                   icon: const Icon(Icons.chat, color: Colors.white),
                   label: const Text("Chat", style: TextStyle(color: Colors.white)),

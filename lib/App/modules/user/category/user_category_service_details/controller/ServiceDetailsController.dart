@@ -24,6 +24,8 @@ class ServiceDetailsController extends GetxController {
   RxString about = ''.obs;
   RxString website = ''.obs;
   RxString phone = ''.obs;
+  RxString providerId = ''.obs;
+  RxString providerName = ''.obs;
 
   var media = <String>[].obs;
 
@@ -37,8 +39,12 @@ class ServiceDetailsController extends GetxController {
   void onInit() {
     super.onInit();
 
+    print("Get.arguments = ${Get.arguments}");
+
     final args = Get.arguments ?? {};
     serviceId = args["id"] ?? '';
+
+    print("serviceId = $serviceId");
 
     fetchServiceDetails();
     fetchReviews();
@@ -47,6 +53,9 @@ class ServiceDetailsController extends GetxController {
   Future<void> fetchServiceDetails() async {
     try {
       isLoading.value = true;
+
+      print("serviceId = $serviceId");
+      print("URL = ${ApiConstants.baseUrl}/api/v1/service/$serviceId");
 
       final response = await dio.get(
         "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
@@ -58,8 +67,18 @@ class ServiceDetailsController extends GetxController {
         ),
       );
 
+      print("STATUS = ${response.statusCode}");
+      print("DATA = ${response.data}");
+
       if (response.statusCode == 200 && response.data["success"] == true) {
         final data = response.data["data"];
+
+        providerId.value = data["provider"]?["_id"] ?? '';
+        providerName.value = data["provider"]?["name"] ?? '';
+
+        print("API provider = ${data["provider"]}");
+        print("providerId = ${providerId.value}");
+        print("providerName = ${providerName.value}");
 
         image.value = data["company_logo"] ?? '';
         title.value = data["service_name"] ?? '';

@@ -14,12 +14,22 @@ class ChatView extends GetView<ChatController> {
       onTap: () {
         Get.toNamed(
           AppRoutes.CONVERSATION,
-          arguments: {"userId": chat.id, "name": chat.name},
+          arguments: {"userId": chat.userId, "name": chat.name, "image": chat.image,},
         );
       },
       leading: Stack(
         children: [
-          CircleAvatar(radius: 25, backgroundImage: NetworkImage(chat.image)),
+          CircleAvatar(
+            radius: 25,
+            backgroundImage:
+            chat.image.isNotEmpty
+                ? NetworkImage(chat.image)
+                : null,
+            child:
+            chat.image.isEmpty
+                ? const Icon(Icons.person)
+                : null,
+          ),
 
           // Online indicator
           if (controller.isUserOnline(chat.id))
@@ -46,6 +56,10 @@ class ChatView extends GetView<ChatController> {
         chat.lastMessage,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontWeight: chat.unread > 0 ? FontWeight.bold : FontWeight.normal,
+          color: chat.unread > 0 ? Colors.black : Colors.grey,
+        ),
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -54,19 +68,19 @@ class ChatView extends GetView<ChatController> {
             TimeFormatter.timeAgo(chat.time),
             style: const TextStyle(fontSize: 12),
           ),
-          const SizedBox(height: 5),
-          if (chat.unread > 0)
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                chat.unread.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
+          // const SizedBox(height: 5),
+          // if (chat.unread > 0)
+          //   Container(
+          //     padding: const EdgeInsets.all(6),
+          //     decoration: const BoxDecoration(
+          //       color: Colors.red,
+          //       shape: BoxShape.circle,
+          //     ),
+          //     child: Text(
+          //       chat.unread.toString(),
+          //       style: const TextStyle(color: Colors.white, fontSize: 12),
+          //     ),
+          //   ),
         ],
       ),
     );
@@ -77,6 +91,30 @@ class ChatView extends GetView<ChatController> {
     return Scaffold(
       appBar: const CommonAppBar(title: "Chats", showBack: false),
       body: Obx(() {
+        if (controller.isLoginRequired.value) {
+          return const Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.chat_bubble_outline, size: 70, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "Login Required",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Please sign in to access your chats and start messaging.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }

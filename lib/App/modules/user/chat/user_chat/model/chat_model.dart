@@ -26,8 +26,7 @@ class ChatModel {
       id: json['_id'] ?? '',
       userId: json['user']?['_id'] ?? '',
       name: json['user']?['name'] ?? 'Unknown',
-      image: json['user']?['image'] ??
-          'https://i.pravatar.cc/150?img=1',
+      image: json['user']?['image'] ?? '',
       lastMessage: lastMsg?['message']?['text'] ?? '',
       time: lastMsg?['createdAt'] ?? '',
       unread: json['unreadCount'] ?? 0,

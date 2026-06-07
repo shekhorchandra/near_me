@@ -186,8 +186,11 @@ class ServicerConversationController extends GetxController {
 
     messageController.clear();
 
+
+
     try {
       final token = storage.accessToken!;
+
 
       final msg = await apiService.sendMessage(
         token: token,
@@ -197,9 +200,10 @@ class ServicerConversationController extends GetxController {
 
       messages.insert(0, msg);
     } catch (e) {
-      print("SEND ERROR => $e");
+      print("SEND MESSAGE ERROR => $e");
     }
   }
+
 
   @override
   void onClose() {

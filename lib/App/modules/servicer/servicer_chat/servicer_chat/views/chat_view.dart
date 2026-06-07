@@ -24,7 +24,17 @@ class ServiceChatView extends GetView<ServiceChatController> {
       },
       leading: Stack(
         children: [
-          CircleAvatar(radius: 25, backgroundImage: NetworkImage(chat.image)),
+          CircleAvatar(
+            radius: 25,
+            backgroundImage:
+            chat.image.isNotEmpty
+                ? NetworkImage(chat.image)
+                : null,
+            child:
+            chat.image.isEmpty
+                ? const Icon(Icons.person)
+                : null,
+          ),
         ],
       ),
       title: Text(
@@ -35,6 +45,11 @@ class ServiceChatView extends GetView<ServiceChatController> {
         chat.lastMessage,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontWeight:
+          chat.unread > 0 ? FontWeight.bold : FontWeight.normal,
+          color: chat.unread > 0 ? Colors.black : Colors.grey,
+        ),
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -43,19 +58,19 @@ class ServiceChatView extends GetView<ServiceChatController> {
             ServiceTimeFormatter.timeAgo(chat.time),
             style: const TextStyle(fontSize: 12),
           ),
-          const SizedBox(height: 5),
-          if (chat.unread > 0)
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                chat.unread.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            ),
+          // const SizedBox(height: 5),
+          // if (chat.unread > 0)
+          //   Container(
+          //     padding: const EdgeInsets.all(6),
+          //     decoration: const BoxDecoration(
+          //       color: Colors.red,
+          //       shape: BoxShape.circle,
+          //     ),
+          //     child: Text(
+          //       chat.unread.toString(),
+          //       style: const TextStyle(color: Colors.white, fontSize: 12),
+          //     ),
+          //   ),
         ],
       ),
     );

@@ -1,6 +1,5 @@
 class ServiceModel {
   final String id; // ✅ ADD THIS
-
   final String title;
   final String image;
   final double rating;
@@ -31,7 +30,7 @@ class ServiceModel {
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
-      id: json['_id'] ?? '', // ✅ USE API _id
+      id: json['_id'] ?? '',
 
       title: json['service_name'] ?? '',
       image: json['company_logo'] ?? '',

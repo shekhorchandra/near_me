@@ -154,18 +154,6 @@ class ServicerConversationView extends GetView<ServicerConversationController> {
 
                 return Column(
                   children: [
-                    if (controller.isTyping.value)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          "Typing...",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-
                     Expanded(
                       child: ListView.builder(
                         reverse: true,

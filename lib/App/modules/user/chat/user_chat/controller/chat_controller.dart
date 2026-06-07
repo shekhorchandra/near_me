@@ -11,10 +11,15 @@ class ChatController extends GetxController {
 
   var isLoading = false.obs;
   final chats = <ChatModel>[].obs;
-  final socketService = Get.find<SocketService>();
+  // final socketService = Get.find<SocketService>();
+
+  SocketService? socketService;
+  final isLoginRequired = false.obs;
 
   bool isUserOnline(String userId) {
-    return socketService.onlineUsers.contains(userId);
+    if (socketService == null) return false;
+
+    return socketService!.onlineUsers.contains(userId);
   }
 
   final storage = StorageService();
@@ -22,6 +27,14 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    if (Get.isRegistered<SocketService>()) {
+      socketService = Get.find<SocketService>();
+      fetchChats();
+    } else {
+      isLoginRequired.value = true;
+    }
+
     fetchChats();
   }
 
@@ -40,14 +53,11 @@ class ChatController extends GetxController {
 
       final data = await apiService.getConversations(token);
 
-      chats.value =
-          data.map((e) => ChatModel.fromJson(e)).toList();
+      chats.value = data.map((e) => ChatModel.fromJson(e)).toList();
     } catch (e) {
       print("❌ Chat API error: $e");
     } finally {
       isLoading.value = false;
     }
   }
-
 }
-

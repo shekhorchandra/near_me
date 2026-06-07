@@ -152,19 +152,6 @@ class ConversationView extends GetView<ConversationController> {
               child: Obx(() {
                 return Column(
                   children: [
-                    /// Typing indicator
-                    if (controller.isTyping.value)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          "Typing...",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-
                     /// Messages
                     Expanded(
                       child: ListView.builder(

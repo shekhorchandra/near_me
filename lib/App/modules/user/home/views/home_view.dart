@@ -402,23 +402,54 @@ class HomeView extends GetView<HomeController> {
                         
                               const Spacer(),
                         
-                              SizedBox(
-                                width: double.infinity,
-                                child: GestureDetector(
-                                  onTap: () {
-                        
-                                  }, // prevents card tap conflict
-                                  child: AppButton(
-                                    text: "View Route",
-                                    height: 38,
-                                    onPressed: () {
-                                      controller.showRouteToService(
-                                        service.lat,
-                                        service.lng,
-                                      );
-                                    },
+                              // SizedBox(
+                              //   width: double.infinity,
+                              //   child: GestureDetector(
+                              //     onTap: () {
+                              //
+                              //     }, // prevents card tap conflict
+                              //     child: AppButton(
+                              //       text: "View Route",
+                              //       height: 38,
+                              //       onPressed: () {
+                              //         controller.showRouteToService(
+                              //           service.lat,
+                              //           service.lng,
+                              //         );
+                              //       },
+                              //     ),
+                              //   ),
+                              // ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AppButton(
+                                      text: "View Details",
+                                      height: 38,
+                                      onPressed: () {
+                                        Get.toNamed(
+                                          AppRoutes.SERVICE_DETAILS,
+                                          arguments: {"id": service.id},
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
+
+                                  const SizedBox(width: 10),
+
+                                  Expanded(
+                                    child: AppButton(
+                                      text: "View Route",
+                                      height: 38,
+                                      onPressed: () {
+                                        controller.showRouteToService(
+                                          service.lat,
+                                          service.lng,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
