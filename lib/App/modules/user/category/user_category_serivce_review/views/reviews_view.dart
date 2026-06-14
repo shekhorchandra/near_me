@@ -12,7 +12,10 @@ class ReviewsView extends GetView<ReviewsController> {
     return Scaffold(
       backgroundColor: Colors.grey[50], // Light background for contrast
       appBar: AppBar(
-        title: const Text("Reviews", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Reviews",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
@@ -33,7 +36,8 @@ class ReviewsView extends GetView<ReviewsController> {
       ),
 
       body: Obx(() {
-        if (controller.isLoading.value) return const Center(child: CircularProgressIndicator());
+        if (controller.isLoading.value)
+          return const Center(child: CircularProgressIndicator());
         if (controller.filteredReviews.isEmpty)
           return const Center(child: Text("No Reviews Found"));
 
@@ -47,7 +51,10 @@ class ReviewsView extends GetView<ReviewsController> {
                 children: [
                   Text(
                     "Reviews",
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     "View all (${controller.filteredReviews.length}) >",
@@ -76,14 +83,17 @@ class ReviewsView extends GetView<ReviewsController> {
   }
 }
 
-
-
 class ReviewCard extends StatefulWidget {
   final ReviewModel item;
   final String serviceId;
   final double left;
 
-  const ReviewCard({super.key, required this.item, required this.serviceId, this.left = 0});
+  const ReviewCard({
+    super.key,
+    required this.item,
+    required this.serviceId,
+    this.left = 0,
+  });
 
   @override
   State<ReviewCard> createState() => _ReviewCardState();
@@ -95,6 +105,12 @@ class _ReviewCardState extends State<ReviewCard> {
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
+    debugPrint("Review: ${item.comment}");
+    debugPrint("Replies count: ${item.replies.length}");
+
+    for (final r in item.replies) {
+      debugPrint("Reply: ${r.comment}");
+    }
 
     return Container(
       margin: EdgeInsets.only(left: widget.left, top: 12),
@@ -126,7 +142,10 @@ class _ReviewCardState extends State<ReviewCard> {
                       children: [
                         Text(
                           item.userName,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
                         ),
                         const Text(
                           "2 days ago", // Replace with item.createdAt if available
@@ -153,7 +172,10 @@ class _ReviewCardState extends State<ReviewCard> {
           const SizedBox(height: 12),
 
           /// COMMENT
-          Text(item.comment, style: TextStyle(color: Colors.grey[800], height: 1.4)),
+          Text(
+            item.comment,
+            style: TextStyle(color: Colors.grey[800], height: 1.4),
+          ),
 
           const SizedBox(height: 16),
 
@@ -162,18 +184,28 @@ class _ReviewCardState extends State<ReviewCard> {
             children: [
               const Icon(Icons.favorite_border, size: 20),
               const SizedBox(width: 4),
-              const Text("124", style: TextStyle(fontSize: 13)), // Hardcoded/placeholder
+              const Text(
+                "124",
+                style: TextStyle(fontSize: 13),
+              ), // Hardcoded/placeholder
               const SizedBox(width: 16),
 
               // Reply Icon/Button
               GestureDetector(
-                onTap: () =>
-                    Get.dialog(ReplyDialogView(parentId: item.id, serviceId: widget.serviceId)),
+                onTap: () => Get.dialog(
+                  ReplyDialogView(
+                    parentId: item.id,
+                    serviceId: widget.serviceId,
+                  ),
+                ),
                 child: Row(
-                  children: const [
-                    Icon(Icons.reply_outlined, size: 20),
-                    SizedBox(width: 4),
-                    Text("01", style: TextStyle(fontSize: 13)),
+                  children: [
+                    const Icon(Icons.reply_outlined, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      "${item.replies.length}",
+                      style: const TextStyle(fontSize: 13),
+                    ),
                   ],
                 ),
               ),
@@ -183,25 +215,22 @@ class _ReviewCardState extends State<ReviewCard> {
               /// DARK "VIEW REPLIES" BUTTON
               if (item.replies.isNotEmpty)
                 InkWell(
-                  onTap: () => setState(() => showReplies = !showReplies),
+                  onTap: () {
+                    setState(() {
+                      showReplies = !showReplies;
+                    });
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.grey[700],
+                      color: Colors.grey[800],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Row(
-                      children: [
-                        Text(
-                          showReplies ? "Hide replies" : "View replies",
-                          style: const TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                        Icon(
-                          showReplies ? Icons.keyboard_arrow_up : Icons.chevron_right,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
+                    child: Text(
+                      showReplies
+                          ? "Hide replies"
+                          : "View replies (${item.replies.length})",
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
@@ -209,13 +238,28 @@ class _ReviewCardState extends State<ReviewCard> {
           ),
 
           /// RECURSIVE REPLIES
+          /// SHOW REPLIES
           if (showReplies)
             Column(
               children: item.replies.map((reply) {
-                return ReviewCard(
-                  item: reply,
-                  serviceId: widget.serviceId,
-                  left: 20, // Indentation for nested replies
+                return Container(
+                  margin: const EdgeInsets.only(left: 20, top: 8),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        reply.userName,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(reply.comment),
+                    ],
+                  ),
                 );
               }).toList(),
             ),

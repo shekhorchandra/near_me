@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../services/contants/api_constants.dart';
 import '../../user_category_service_details/models/ReviewModel.dart';
-
 
 class ReviewsController extends GetxController {
   final Dio dio = Dio();
@@ -17,48 +17,45 @@ class ReviewsController extends GetxController {
 
   RxList<ReviewModel> reviews = <ReviewModel>[].obs;
 
-  final tabs = [
-    "All",
-    "★★★★★",
-    "★★★★",
-    "★★★",
-    "★★",
-    "★",
-  ];
+  final tabs = ["All", "★★★★★", "★★★★", "★★★", "★★", "★"];
 
   @override
   void onInit() {
     super.onInit();
 
-    final args = Get.arguments ?? {};
-    serviceId = args["serviceId"];
-    userId = args["userId"];
+    final args = Get.arguments;
+
+    serviceId = args?["serviceId"] ?? "";
+
+    if (serviceId.isEmpty) {
+      debugPrint("❌ serviceId is missing from navigation");
+      return;
+    }
 
     fetchReviews();
   }
 
+  /// get all reviews
   Future<void> fetchReviews() async {
     try {
       isLoading.value = true;
 
       final res = await dio.get(
         "${ApiConstants.baseUrl}/api/v1/review/service/$serviceId",
-        options: Options(
-          headers: {"accesstoken": storage.accessToken},
-        ),
+        options: Options(headers: {"Authorization": storage.accessToken}),
       );
 
       if (res.data["success"] == true) {
         final List data = res.data["data"];
 
-        reviews.value =
-            data.map((e) => ReviewModel.fromJson(e)).toList();
+        reviews.value = data.map((e) => ReviewModel.fromJson(e)).toList();
       }
     } finally {
       isLoading.value = false;
     }
   }
 
+  /// create review
   Future<void> createReview({
     required String comment,
     int? rating,
@@ -75,7 +72,11 @@ class ReviewsController extends GetxController {
           if (parentReview != null) "parentReview": parentReview,
         },
         options: Options(
-          headers: {"accesstoken": storage.accessToken},
+          headers: {
+            "Authorization": "Bearer ${storage.accessToken}",
+            // OR if your backend does not use Bearer:
+            // "Authorization": storage.accessToken,
+          },
         ),
       );
 
@@ -102,13 +103,7 @@ class ReviewsController extends GetxController {
   int get totalReviews => reviews.length;
 
   Map<int, int> get ratingCount {
-    Map<int, int> map = {
-      5: 0,
-      4: 0,
-      3: 0,
-      2: 0,
-      1: 0,
-    };
+    Map<int, int> map = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
 
     for (var item in reviews) {
       map[item.rating] = map[item.rating]! + 1;

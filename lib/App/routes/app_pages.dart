@@ -67,7 +67,8 @@ import '../modules/user/category/user_category_serivce_review/bindings/reviews_b
 import '../modules/user/category/user_category_serivce_review/views/reviews_view.dart';
 import '../modules/user/category/user_category_service_details/bindings/ServiceDetailsBinding.dart';
 import '../modules/user/category/user_category_service_details/views/ServiceDetailsView.dart';
-import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart' hide ServicerConversationBinding;
+import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart'
+    hide ServicerConversationBinding;
 import '../modules/user/chat/user_chat_conversation/views/conversation_view.dart';
 import '../modules/user/home/bindings/home_binding.dart';
 import '../modules/user/home/views/home_view.dart';
@@ -85,7 +86,11 @@ import 'app_routes.dart';
 class AppPages {
   static final pages = [
     /// Splash Screen
-    GetPage(name: AppRoutes.SPLASH, page: () => const SplashView(), binding: SplashBinding()),
+    GetPage(
+      name: AppRoutes.SPLASH,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
+    ),
 
     /// Onboarding all pages
     GetPage(
@@ -144,7 +149,11 @@ class AppPages {
     ),
 
     /// User Home page
-    GetPage(name: AppRoutes.HOME, page: () => HomeView(), binding: HomeBinding()),
+    GetPage(
+      name: AppRoutes.HOME,
+      page: () => HomeView(),
+      binding: HomeBinding(),
+    ),
 
     /// User Category Details page
     GetPage(
@@ -161,7 +170,11 @@ class AppPages {
     ),
 
     /// user category service review
-    GetPage(name: AppRoutes.REVIEWS, page: () => const ReviewsView(), binding: ReviewsBinding()),
+    GetPage(
+      name: AppRoutes.REVIEWS,
+      page: () => const ReviewsView(),
+      binding: ReviewsBinding(),
+    ),
 
     ///user chat conversion
     GetPage(
@@ -171,12 +184,22 @@ class AppPages {
     ),
 
     /// User menu page
-    GetPage(name: AppRoutes.USER_MENU, page: () => const MenuView(), binding: MenuBinding()),
+    GetPage(
+      name: AppRoutes.USER_MENU,
+      page: () => const MenuView(),
+      binding: MenuBinding(),
+    ),
     GetPage(name: AppRoutes.ABOUT, page: () => const AboutView()),
     GetPage(name: AppRoutes.CONTACT_US, page: () => const ContactUsView()),
     GetPage(name: AppRoutes.HELP_SUPPORT, page: () => const HelpSupportView()),
-    GetPage(name: AppRoutes.TERMS_CONDITION, page: () => const TermsConditionView()),
-    GetPage(name: AppRoutes.PRIVACY_POLICY, page: () => const PrivacyPolicyView()),
+    GetPage(
+      name: AppRoutes.TERMS_CONDITION,
+      page: () => const TermsConditionView(),
+    ),
+    GetPage(
+      name: AppRoutes.PRIVACY_POLICY,
+      page: () => const PrivacyPolicyView(),
+    ),
     GetPage(
       name: AppRoutes.CHANGE_PASSWORD,
       page: () => const ChangePasswordView(),
@@ -269,25 +292,42 @@ class AppPages {
       binding: ServicerChangePasswordBinding(),
     ),
 
-    GetPage(name: AppRoutes.SERVICER_ABOUT, page: () => const ServicerAboutView()),
-    GetPage(name: AppRoutes.SERVICER_CONTACT_US, page: () => const ServicerContactUsView()),
-    GetPage(name: AppRoutes.SERVICER_HELP_SUPPORT, page: () => const ServicerHelpSupportView()),
-    GetPage(name: AppRoutes.SERVICER_TERMS_CONDITION, page: () => const ServicerTermsConditionView()),
-    GetPage(name: AppRoutes.SERVICER_PRIVACY_POLICY, page: () => const ServicerPrivacyPolicyView()),
+    GetPage(
+      name: AppRoutes.SERVICER_ABOUT,
+      page: () => const ServicerAboutView(),
+    ),
+    GetPage(
+      name: AppRoutes.SERVICER_CONTACT_US,
+      page: () => const ServicerContactUsView(),
+    ),
+    GetPage(
+      name: AppRoutes.SERVICER_HELP_SUPPORT,
+      page: () => const ServicerHelpSupportView(),
+    ),
+    GetPage(
+      name: AppRoutes.SERVICER_TERMS_CONDITION,
+      page: () => const ServicerTermsConditionView(),
+    ),
+    GetPage(
+      name: AppRoutes.SERVICER_PRIVACY_POLICY,
+      page: () => const ServicerPrivacyPolicyView(),
+    ),
 
     /// paymernt method
     GetPage(
-          name: AppRoutes.ADD_PAYMENT_METHOD,
-          page: () => AddNewCardView(),
-          binding: PaymentMethodBinding(),
-        ),
+      name: AppRoutes.ADD_PAYMENT_METHOD,
+      page: () => AddNewCardView(),
+      binding: PaymentMethodBinding(),
+    ),
 
     GetPage(
       name: AppRoutes.PAYMENT_METHOD,
       page: () {
         final args = Get.arguments as Map<String, dynamic>? ?? {};
 
-        return PaymentMethodsView(isSelectable: args['isSelectable'] as bool? ?? false);
+        return PaymentMethodsView(
+          isSelectable: args['isSelectable'] as bool? ?? false,
+        );
       },
       binding: PaymentMethodBinding(),
     ),
@@ -326,6 +366,5 @@ class AppPages {
       page: () => const ServiceProviderEditView(),
       binding: ServiceProviderEditBinding(),
     ),
-
   ];
 }

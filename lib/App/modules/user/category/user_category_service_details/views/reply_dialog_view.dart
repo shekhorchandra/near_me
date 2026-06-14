@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../services/contants/api_constants.dart';
+import '../../user_category_serivce_review/controller/reviews_controller.dart';
 
 class ReplyDialogView extends StatefulWidget {
   final String? parentId;
@@ -40,7 +41,7 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
         "${ApiConstants.baseUrl}/api/v1/review/create",
         data: {
           "user": userId,
-          "service": widget.serviceId, // Use the dynamic ID here
+          "service": widget.serviceId,
           "comment": text.text,
           if (widget.isReview) "rating": rating,
           if (widget.parentId != null) "parentReview": widget.parentId,
@@ -53,20 +54,29 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
         ),
       );
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // ✅ FORCE REFRESH REVIEWS
+        if (Get.isRegistered<ReviewsController>()) {
+          await Get.find<ReviewsController>().fetchReviews();
+        }
+
         Get.back();
+
         Get.snackbar("Success", "Submitted successfully");
       }
     } catch (e) {
       if (e is DioException) {
-        // FIX: This will show "Upgrade to Pro..." instead of just "Failed"
-        String serverMessage = e.response?.data['message'] ?? "Failed to submit";
-        Get.snackbar("Action Denied", serverMessage,
-            backgroundColor: Colors.red, colorText: Colors.white);
+        String msg =
+            e.response?.data['message'] ?? "Failed to submit";
 
-        print("🔴 SERVER ERROR: $serverMessage");
+        Get.snackbar(
+          "Error",
+          msg,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       } else {
-        Get.snackbar("Error", "An unexpected error occurred");
+        Get.snackbar("Error", "Unexpected error");
       }
     }
   }

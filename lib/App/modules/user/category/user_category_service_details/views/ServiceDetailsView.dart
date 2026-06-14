@@ -9,12 +9,8 @@ import '../controller/ServiceDetailsController.dart';
 class ServiceDetailsView extends GetView<ServiceDetailsController> {
   const ServiceDetailsView({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
-
-
     return Obx(
       () => Scaffold(
         appBar: CommonAppBar(title: controller.title.value),
@@ -49,8 +45,13 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                     );
                   },
                   icon: const Icon(Icons.chat, color: Colors.white),
-                  label: const Text("Chat", style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  label: const Text(
+                    "Chat",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                  ),
                 ),
 
                 ElevatedButton.icon(
@@ -58,8 +59,13 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                     controller.callNumber(controller.phone.value);
                   },
                   icon: const Icon(Icons.call, color: Colors.white),
-                  label: const Text("Call", style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  label: const Text(
+                    "Call",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                  ),
                 ),
 
                 ElevatedButton.icon(
@@ -67,8 +73,13 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                     controller.openWebsite(controller.website.value);
                   },
                   icon: const Icon(Icons.public, color: Colors.white),
-                  label: const Text("Website", style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  label: const Text(
+                    "Website",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                  ),
                 ),
               ],
             ),
@@ -77,7 +88,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
         // ================= BODY =================
         body: controller.isLoading.value
-            ? const Center(child: CircularProgressIndicator(color: Colors.black))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              )
             : SingleChildScrollView(
                 child: Column(
                   children: [
@@ -111,7 +124,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                             bottom: 0,
                             child: Center(
                               child: IconButton(
-                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.white,
+                                ),
                                 onPressed: () {
                                   controller.pageController.previousPage(
                                     duration: const Duration(milliseconds: 300),
@@ -129,7 +145,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                             bottom: 0,
                             child: Center(
                               child: IconButton(
-                                icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                ),
                                 onPressed: () {
                                   controller.pageController.nextPage(
                                     duration: const Duration(milliseconds: 300),
@@ -164,13 +183,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               Row(
                                 children: [
                                   CircleAvatar(
-                                    backgroundImage: NetworkImage(controller.image.value),
+                                    backgroundImage: NetworkImage(
+                                      controller.image.value,
+                                    ),
                                   ),
                                   const SizedBox(width: 12),
 
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           controller.title.value,
@@ -181,16 +203,24 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                         ),
                                         Text(
                                           controller.category.value,
-                                          style: const TextStyle(color: Colors.grey),
+                                          style: const TextStyle(
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
                                             const Icon(Icons.star, size: 16),
                                             const SizedBox(width: 4),
-                                            Text(controller.rating.value.toString()),
+                                            Text(
+                                              controller.rating.value
+                                                  .toString(),
+                                            ),
                                             const SizedBox(width: 12),
-                                            const Icon(Icons.schedule, size: 16),
+                                            const Icon(
+                                              Icons.schedule,
+                                              size: 16,
+                                            ),
                                             const SizedBox(width: 4),
                                             Expanded(
                                               child: Text(
@@ -211,7 +241,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= ABOUT =================
                               const Text(
                                 "About",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 5),
                               Text(controller.about.value),
@@ -221,7 +254,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= SERVICES =================
                               const Text(
                                 "Services Offered",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 8),
 
@@ -237,7 +273,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.grey.shade200,
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                         ),
                                         child: Text(service),
                                       ),
@@ -250,7 +288,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= HIGHLIGHTS =================
                               const Text(
                                 "Service Highlights",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 8),
 
@@ -258,14 +299,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: controller.highlightServices.length,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 12,
-                                  childAspectRatio: 1.00, // taller card
-                                ),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                      childAspectRatio: 1.00, // taller card
+                                    ),
                                 itemBuilder: (context, index) {
-                                  final item = controller.highlightServices[index];
+                                  final item =
+                                      controller.highlightServices[index];
 
                                   return Card(
                                     elevation: 3,
@@ -274,7 +317,8 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     ),
                                     clipBehavior: Clip.antiAlias,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // ================= IMAGE =================
                                         Expanded(
@@ -282,10 +326,14 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             item["image"] ?? '',
                                             width: double.infinity,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Container(
-                                              color: Colors.grey.shade300,
-                                              child: const Icon(Icons.image, size: 40),
-                                            ),
+                                            errorBuilder: (_, __, ___) =>
+                                                Container(
+                                                  color: Colors.grey.shade300,
+                                                  child: const Icon(
+                                                    Icons.image,
+                                                    size: 40,
+                                                  ),
+                                                ),
                                           ),
                                         ),
 
@@ -293,7 +341,8 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                         Padding(
                                           padding: const EdgeInsets.all(8),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 item["title"] ?? '',
@@ -330,7 +379,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= LOCATION =================
                               const Text(
                                 "Location",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const SizedBox(height: 5),
 
@@ -338,18 +390,23 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                 width: double.infinity,
                                 height: 150,
                                 color: Colors.grey.shade300,
-                                child: Center(child: Text(controller.location.value)),
+                                child: Center(
+                                  child: Text(controller.location.value),
+                                ),
                               ),
 
                               const SizedBox(height: 15),
 
                               // ================= REVIEWS SECTION =================
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                ),
                                 child: Column(
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Reviews (${controller.reviews.length})",
@@ -360,27 +417,22 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                         ),
                                         TextButton(
                                           onPressed: () {
-                                            // View All Logic
+                                            Get.toNamed(
+                                              AppRoutes.REVIEWS,
+                                              arguments: {
+                                                "serviceId":
+                                                    controller.serviceId,
+                                              },
+                                            );
                                           },
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "View all (${controller.reviews.length})",
-                                                style: TextStyle(color: Colors.grey[600]),
-                                              ),
-                                              const Icon(
-                                                Icons.chevron_right,
-                                                size: 20,
-                                                color: Colors.grey,
-                                              ),
-                                            ],
-                                          ),
+                                          child: Text("View all"),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 10),
                                     ...controller.reviews.map(
-                                      (review) => buildReviewCard(context, review),
+                                      (review) =>
+                                          buildReviewCard(context, review),
                                     ),
                                   ],
                                 ),
@@ -400,130 +452,206 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
   }
 
   // --- Helper function to build the card ---
-  Widget buildReviewCard(BuildContext context, dynamic review) {
+  Widget buildReviewCard(BuildContext context, ReviewModel review) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Avatar, Name, Time, Stars
+          /// HEADER
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 24,
-                backgroundImage: NetworkImage(
-                  'https://via.placeholder.com/150',
-                ), // Replace with review.userImage
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: Colors.blue.shade100,
+                child: Text(
+                  review.userName.isNotEmpty
+                      ? review.userName[0].toUpperCase()
+                      : "U",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            text: review.userName,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                            children: const [
-                              TextSpan(
-                                text: " (You)",
-                                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Text(
-                          "2 days ago", // Replace with review.createdAt
-                          style: TextStyle(color: Colors.grey, fontSize: 12),
-                        ),
-                      ],
+                    Text(
+                      review.userName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          index < 5 ? Icons.star : Icons.star_border, // Use review.rating
-                          color: Colors.amber,
-                          size: 18,
-                        );
-                      }),
+                    const SizedBox(height: 2),
+                    Text(
+                      "2 days ago",
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// Rating badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.star, size: 14, color: Colors.green),
+                    const SizedBox(width: 3),
+                    Text(
+                      review.rating.toString(),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
 
-          // Review Text
+          const SizedBox(height: 10),
+
+          /// COMMENT
           Text(
             review.comment,
-            style: TextStyle(color: Colors.grey[800], fontSize: 14, height: 1.4),
+            style: TextStyle(
+              color: Colors.grey.shade800,
+              height: 1.4,
+              fontSize: 14,
+            ),
           ),
-          const SizedBox(height: 16),
 
-          // Footer: Like, Reply, View Replies
+          const SizedBox(height: 12),
+
+          /// ACTIONS ROW
           Row(
             children: [
-              // Like Icon
-              const Icon(Icons.favorite_border, size: 20, color: Colors.black87),
-              const SizedBox(width: 5),
-              const Text("124", style: TextStyle(fontSize: 13)), // Replace with review.likes
-              const SizedBox(width: 20),
+              const Icon(Icons.favorite_border, size: 18),
+              const SizedBox(width: 4),
+              const Text("124", style: TextStyle(fontSize: 12)),
 
-              // Reply Icon
-              const Icon(Icons.reply_outlined, size: 20, color: Colors.black87),
-              const SizedBox(width: 5),
-              const Text("01", style: TextStyle(fontSize: 13)), // Replace with review.repliesCount
+              const SizedBox(width: 16),
 
-              const Spacer(),
-
-              // View Replies Button
-              InkWell(
+              GestureDetector(
                 onTap: () {
-                  // Open replies or show dialog
-                  showDialog(
-                    context: context,
-                    builder: (_) => ReplyDialogView(
-                        serviceId: controller.serviceId, // Pass the real ID
-                        parentId: review.id,
-                        isReview: false
+                  Get.dialog(
+                    ReplyDialogView(
+                      serviceId: controller.serviceId,
+                      parentId: review.id,
+                      isReview: false,
                     ),
                   );
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[700],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    children: [
-                      Text("View replies", style: TextStyle(color: Colors.white, fontSize: 12)),
-                      SizedBox(width: 4),
-                      Icon(Icons.chevron_right, color: Colors.white, size: 14),
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.reply, size: 18),
+                    const SizedBox(width: 4),
+                    Text(
+                      "Reply (${review.replies.length})",
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
+
+              const Spacer(),
+
+              if (review.replies.isNotEmpty) _buildReplyToggle(review),
             ],
           ),
+
+          /// REPLIES SECTION
+          _buildReplies(review),
         ],
       ),
     );
+  }
+
+  Widget _buildReplyToggle(ReviewModel review) {
+    return Obx(() {
+      return InkWell(
+        onTap: () {
+          review.isExpanded.value = !review.isExpanded.value;
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade800,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            review.isExpanded.value
+                ? "Hide replies"
+                : "View replies (${review.replies.length})",
+            style: const TextStyle(color: Colors.white, fontSize: 11),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildReplies(ReviewModel review) {
+    return Obx(() {
+      if (!review.isExpanded.value) return const SizedBox();
+
+      return Column(
+        children: review.replies.map((reply) {
+          return Container(
+            margin: const EdgeInsets.only(top: 10, left: 30),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: Colors.orange.shade100,
+                      child: Text(
+                        reply.userName.isNotEmpty
+                            ? reply.userName[0].toUpperCase()
+                            : "U",
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      reply.userName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(reply.comment),
+              ],
+            ),
+          );
+        }).toList(),
+      );
+    });
   }
 }

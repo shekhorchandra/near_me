@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 class ReviewModel {
   final String id;
   final String userId;
@@ -6,6 +8,9 @@ class ReviewModel {
   final int rating;
   final String createdAt;
   final List<ReviewModel> replies;
+
+  /// ✅ reactive expand state
+  final RxBool isExpanded = false.obs;
 
   ReviewModel({
     required this.id,
