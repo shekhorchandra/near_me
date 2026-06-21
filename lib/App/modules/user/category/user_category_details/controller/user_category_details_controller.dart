@@ -26,6 +26,10 @@ class UserCategoryDetailsController extends GetxController {
   // ================= DATA =================
   var services = <ServiceModel>[].obs;
 
+  // ================= CATEGORY SELECTION =================
+  var selectedSubCategoryId = ''.obs;
+  var selectedChildCategoryId = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -107,6 +111,8 @@ class UserCategoryDetailsController extends GetxController {
         "${ApiConstants.baseUrl}/api/v1/service/by-category",
         data: {
           "categoryId": finalCategoryId,
+          "service_subCategory": selectedSubCategoryId.value,
+          "service_childCategory": selectedChildCategoryId.value,
           "lon": 90.4800,
           "lat": 23.8700,
           "searchTerm": searchText.value.trim(),
@@ -115,6 +121,10 @@ class UserCategoryDetailsController extends GetxController {
           "availability": availabilityValue,
         },
       );
+
+      print("Category: $finalCategoryId");
+      print("Sub Category: ${selectedSubCategoryId.value}");
+      print("Child Category: ${selectedChildCategoryId.value}");
 
       print("Service Response: ${response.data}");
 
@@ -125,7 +135,7 @@ class UserCategoryDetailsController extends GetxController {
         services.value = data
             .map(
               (item) => ServiceModel(
-            id: item["_id"] ?? "", // ✅ FIXED
+            id: item["_id"] ?? "",
 
             title: item["service_name"] ?? "",
 
@@ -162,6 +172,17 @@ class UserCategoryDetailsController extends GetxController {
     } finally {
       isLoadingServices.value = false;
     }
+  }
+
+
+  void selectSubCategory(String id) {
+    selectedSubCategoryId.value = id;
+    fetchServicesByCategory();
+  }
+
+  void selectChildCategory(String id) {
+    selectedChildCategoryId.value = id;
+    fetchServicesByCategory();
   }
 
   // ================= FILTER VALUE =================

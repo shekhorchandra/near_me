@@ -35,6 +35,38 @@ class ReviewsController extends GetxController {
     fetchReviews();
   }
 
+  /// delete review
+  Future<void> deleteReview(String reviewId) async {
+    try {
+      final storage = Get.find<StorageService>();
+      final token = storage.accessToken;
+
+      final dio = Dio();
+
+      await dio.delete(
+        "${ApiConstants.baseUrl}/api/v1/review/$reviewId",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      Get.snackbar(
+        "Success",
+        "Review deleted successfully",
+      );
+
+      await fetchReviews();
+    } on DioException catch (e) {
+      Get.snackbar(
+        "Error",
+        e.response?.data["message"] ??
+            "Failed to delete review",
+      );
+    }
+  }
+
   /// get all reviews
   Future<void> fetchReviews() async {
     try {

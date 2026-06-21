@@ -95,7 +95,8 @@ class HomeController extends GetxController {
       print(token);
 
       final response = await dio.post(
-        "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/service/nearest",
+        // "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/service/nearest",
+        "/api/v1/service/nearest",
         data: body,
         options: Options(
           headers: {"Authorization": token, "Content-Type": "application/json"},
@@ -191,7 +192,8 @@ class HomeController extends GetxController {
   Future<void> loadCategories() async {
     try {
       final res = await dio.get(
-        "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/category",
+        // "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/category",
+        "/api/v1/category",
       );
 
       // PRETTY JSON RESPONSE

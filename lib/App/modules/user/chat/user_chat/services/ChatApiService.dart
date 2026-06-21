@@ -6,8 +6,7 @@ class ChatApiService {
 
   ChatApiService(this.dio);
 
-  static const baseUrl =
-      "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1";
+  static const baseUrl = "https://nearme-q02y.onrender.com/api/v1";
 
   /// GET CONVERSATIONS
   Future<List<dynamic>> getConversations(String token) async {

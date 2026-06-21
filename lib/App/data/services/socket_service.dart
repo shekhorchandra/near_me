@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../../modules/services/contants/api_constants.dart';
+
 class SocketService extends GetxService {
   late IO.Socket socket;
 
@@ -11,7 +13,8 @@ class SocketService extends GetxService {
 
   Future<SocketService> connect(String userId) async {
     socket = IO.io(
-      "https://uncried-unpreventible-declan.ngrok-free.dev",
+      // "https://uncried-unpreventible-declan.ngrok-free.dev",
+      ApiConstants.baseUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

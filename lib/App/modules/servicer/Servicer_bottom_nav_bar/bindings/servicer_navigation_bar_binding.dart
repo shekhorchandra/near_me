@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
+import '../../../services/contants/api_constants.dart';
 import '../../../user/chat/user_chat/services/ChatApiService.dart';
 import '../../servicer_chat/servicer_chat/controller/chat_controller.dart';
 import '../../servicer_chat/servicer_chat/services/ChatApiService.dart';
@@ -24,7 +25,8 @@ class ServicerNavigationBinding implements Bindings {
     Get.lazyPut<Dio>(
       () => Dio(
         BaseOptions(
-          baseUrl: "https://uncried-unpreventible-declan.ngrok-free.dev",
+          // baseUrl: "https://uncried-unpreventible-declan.ngrok-free.dev",
+          baseUrl: ApiConstants.baseUrl,
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../../../../services/contants/api_constants.dart';
 import '../../../../user/chat/user_chat/services/ChatApiService.dart';
 import '../controller/chat_controller.dart';
 import 'package:dio/dio.dart';
@@ -10,7 +11,7 @@ class ServiceChatBinding extends Bindings {
   void dependencies() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: "https://uncried-unpreventible-declan.ngrok-free.dev",
+        baseUrl: ApiConstants.baseUrl,
       ),
     );
 

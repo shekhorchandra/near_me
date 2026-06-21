@@ -26,7 +26,7 @@ class CategoriesController extends GetxController {
       isLoading.value = true;
 
       final response = await dio.get(
-        'https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/category/search',
+        'https://nearme-q02y.onrender.com/api/v1/category/search',
         queryParameters: {
           "searchTerm": keyword,
           "level": 0,

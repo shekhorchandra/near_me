@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 
+import '../../../services/contants/api_constants.dart';
 import '../../category/user_category/controller/categories_controller.dart';
 import '../../chat/user_chat/controller/chat_controller.dart';
 import '../../chat/user_chat/services/ChatApiService.dart';
@@ -22,7 +23,7 @@ class UserNavigationBinding implements Bindings {
     Get.lazyPut<Dio>(
       () => Dio(
         BaseOptions(
-          baseUrl: "https://uncried-unpreventible-declan.ngrok-free.dev",
+          baseUrl: ApiConstants.baseUrl,
         ),
       ),
     );

@@ -552,26 +552,18 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
               const SizedBox(width: 16),
 
-              GestureDetector(
-                onTap: () {
+              TextButton.icon(
+                onPressed: () {
                   Get.dialog(
                     ReplyDialogView(
-                      serviceId: controller.serviceId,
-                      parentId: review.id,
+                      serviceId: controller.serviceId,// or controller.serviceId
+                      parentId: review.id,         // IMPORTANT
                       isReview: false,
                     ),
                   );
                 },
-                child: Row(
-                  children: [
-                    const Icon(Icons.reply, size: 18),
-                    const SizedBox(width: 4),
-                    Text(
-                      "Reply (${review.replies.length})",
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
+                icon: const Icon(Icons.reply),
+                label: const Text("Reply"),
               ),
 
               const Spacer(),

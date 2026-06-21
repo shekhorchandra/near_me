@@ -97,5 +97,7 @@ abstract class AppRoutes {
 
   /// servicer provider account
   static const SERVICE_PROVIDER_ACCOUNT_EDIT= '/service-provider-edit';
+/// review fro servicer
+  static const manageReviews = '/manage-reviews';
 
 }

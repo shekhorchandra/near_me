@@ -14,9 +14,12 @@ import '../../../Servicer_bottom_nav_bar/controllers/servicer_bottom_nav_control
 
 class ServicerMenuController extends GetxController {
   late final ServicerNavigationBarController navController;
+  final box = GetStorage();
 
   Rx<File?> profileImage = Rx<File?>(null);
   final ImagePicker _picker = ImagePicker();
+
+  String get serviceId => box.read("serviceId") ?? "";
 
   @override
   void onInit() {
@@ -36,7 +39,15 @@ class ServicerMenuController extends GetxController {
   }
 
   void review() {
-    Get.toNamed(AppRoutes.REVIEWS);
+    if (serviceId.isEmpty) {
+      AppSnackbar.error("Service ID not found");
+      return;
+    }
+
+    Get.toNamed(
+      AppRoutes.manageReviews,
+      arguments: serviceId,
+    );
   }
   void goToAbout() => Get.toNamed(AppRoutes.SERVICER_ABOUT);
   void onAdvertiseTap() => Get.toNamed(AppRoutes.SERVICER_LOGIN);

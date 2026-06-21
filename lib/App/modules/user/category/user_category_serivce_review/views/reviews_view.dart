@@ -28,7 +28,7 @@ class ReviewsView extends GetView<ReviewsController> {
         onPressed: () {
           Get.dialog(
             ReplyDialogView(
-              serviceId: controller.serviceId, // Pass actual ID from controller
+              serviceId: controller.serviceId,
               isReview: true,
             ),
           );
@@ -172,9 +172,51 @@ class _ReviewCardState extends State<ReviewCard> {
           const SizedBox(height: 12),
 
           /// COMMENT
-          Text(
-            item.comment,
-            style: TextStyle(color: Colors.grey[800], height: 1.4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  item.comment,
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    height: 1.4,
+                  ),
+                ),
+              ),
+
+              PopupMenuButton<String>(
+                onSelected: (value) async {
+                  if (value == "delete") {
+                    Get.defaultDialog(
+                      title: "Delete Review",
+                      middleText: "Are you sure you want to delete this review?",
+                      textCancel: "Cancel",
+                      textConfirm: "Delete",
+                      confirmTextColor: Colors.white,
+                      onConfirm: () async {
+                        Get.back();
+
+                        await Get.find<ReviewsController>()
+                            .deleteReview(item.id);
+                      },
+                    );
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: "delete",
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text("Delete"),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
@@ -182,36 +224,6 @@ class _ReviewCardState extends State<ReviewCard> {
           /// FOOTER: Likes | Reply | View Replies Button
           Row(
             children: [
-              const Icon(Icons.favorite_border, size: 20),
-              const SizedBox(width: 4),
-              const Text(
-                "124",
-                style: TextStyle(fontSize: 13),
-              ), // Hardcoded/placeholder
-              const SizedBox(width: 16),
-
-              // Reply Icon/Button
-              GestureDetector(
-                onTap: () => Get.dialog(
-                  ReplyDialogView(
-                    parentId: item.id,
-                    serviceId: widget.serviceId,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.reply_outlined, size: 20),
-                    const SizedBox(width: 4),
-                    Text(
-                      "${item.replies.length}",
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-
               /// DARK "VIEW REPLIES" BUTTON
               if (item.replies.isNotEmpty)
                 InkWell(
@@ -221,7 +233,10 @@ class _ReviewCardState extends State<ReviewCard> {
                     });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey[800],
                       borderRadius: BorderRadius.circular(8),
@@ -230,10 +245,70 @@ class _ReviewCardState extends State<ReviewCard> {
                       showReplies
                           ? "Hide replies"
                           : "View replies (${item.replies.length})",
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ),
+
+              const Spacer(),
+
+              /// REPLY BUTTON
+              InkWell(
+                onTap: () {
+                  Get.dialog(
+                    ReplyDialogView(
+                      parentId: item.id,
+                      serviceId: widget.serviceId,
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.reply_outlined, size: 20),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${item.replies.length}",
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              /// DELETE BUTTON
+              IconButton(
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  Get.defaultDialog(
+                    title: "Delete Review",
+                    middleText:
+                    "Are you sure you want to delete this review? This action cannot be undone.",
+                    textCancel: "Cancel",
+                    textConfirm: "Delete",
+                    confirmTextColor: Colors.white,
+                    buttonColor: Colors.red,
+                    onConfirm: () async {
+                      Get.back();
+
+                      await Get.find<ReviewsController>().deleteReview(item.id);
+                    },
+                  );
+                },
+              ),
             ],
           ),
 
@@ -249,15 +324,46 @@ class _ReviewCardState extends State<ReviewCard> {
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        reply.userName,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              reply.userName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(reply.comment),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(reply.comment),
+
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                        ),
+                        onPressed: () async {
+                          Get.defaultDialog(
+                            title: "Delete Reply",
+                            middleText: "Delete this reply?",
+                            textCancel: "Cancel",
+                            textConfirm: "Delete",
+                            confirmTextColor: Colors.white,
+                            onConfirm: () async {
+                              Get.back();
+
+                              await Get.find<ReviewsController>()
+                                  .deleteReview(reply.id);
+                            },
+                          );
+                        },
+                      ),
                     ],
                   ),
                 );

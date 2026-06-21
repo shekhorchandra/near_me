@@ -43,13 +43,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: controller.selectedRating.value,
-                      items: [
-                        'Rating',
-                        'All',
-                        '5',
-                        '4+',
-                        '3+',
-                      ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      items: ['Rating', 'All', '5', '4+', '3+']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
                       onChanged: (v) {
                         controller.selectedRating.value = v!;
                         controller.applyFilters();
@@ -61,13 +59,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: controller.selectedRadius.value,
-                      items: [
-                        'Radius',
-                        'All',
-                        '1 mile',
-                        '5 mile',
-                        '10 mile',
-                      ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      items: ['Radius', 'All', '1 mile', '5 mile', '10 mile']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
                       onChanged: (v) {
                         controller.selectedRadius.value = v!;
                         controller.applyFilters();
@@ -79,12 +75,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: controller.selectedAvailability.value,
-                      items: [
-                        'Availability',
-                        'All',
-                        'Available',
-                        'Busy',
-                      ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      items: ['Availability', 'All', 'Available', 'Busy']
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
                       onChanged: (v) {
                         controller.selectedAvailability.value = v!;
                         controller.applyFilters();
@@ -116,11 +111,15 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                               tree.isEmpty ||
                               tree['children'] == null ||
                               (tree['children'] as List).isEmpty) {
-                            return const Center(child: Text("No Categories Found"));
+                            return const Center(
+                              child: Text("No Categories Found"),
+                            );
                           }
 
                           ///  DATA
-                          return SingleChildScrollView(child: buildCategoryTree(tree));
+                          return SingleChildScrollView(
+                            child: buildCategoryTree(tree),
+                          );
                         }),
                       ),
                     ),
@@ -139,7 +138,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                               itemCount: 5,
                               itemBuilder: (context, index) {
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                  ),
                                   child: SkeletonLoader.card(height: 180),
                                 );
                               },
@@ -148,7 +149,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
 
                           /// ✅ EMPTY STATE
                           if (controller.services.isEmpty) {
-                            return const Center(child: Text("No Services Found"));
+                            return const Center(
+                              child: Text("No Services Found"),
+                            );
                           }
 
                           /// ✅ DATA
@@ -164,17 +167,19 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Image.network(
                                         service.image,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Image.asset(
-                                            "assets/images/placeholder2.jpg",
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return Image.asset(
+                                                "assets/images/placeholder2.jpg",
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                       ),
 
                                       const SizedBox(height: 8),
@@ -187,16 +192,25 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                                         ),
                                       ),
 
-                                      InfoRow(icon: Icons.star, text: service.rating.toString()),
+                                      InfoRow(
+                                        icon: Icons.star,
+                                        text: service.rating.toString(),
+                                      ),
 
                                       InfoRow(
                                         icon: Icons.location_on,
                                         text: "${service.distance} miles",
                                       ),
 
-                                      InfoRow(icon: Icons.schedule, text: service.schedule),
+                                      InfoRow(
+                                        icon: Icons.schedule,
+                                        text: service.schedule,
+                                      ),
 
-                                      InfoRow(icon: Icons.location_city, text: service.location),
+                                      InfoRow(
+                                        icon: Icons.location_city,
+                                        text: service.location,
+                                      ),
 
                                       const SizedBox(height: 10),
 
@@ -230,7 +244,11 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
     );
   }
 
-  Widget buildCategoryTree(Map<String, dynamic> node, {int level = 0}) {
+  Widget buildCategoryTree(
+    Map<String, dynamic> node, {
+    int level = 0,
+    String? parentId,
+  }) {
     final children = (node['children'] as List?) ?? [];
     final id = node['_id'] ?? '';
     final name = node['name'] ?? '';
@@ -238,7 +256,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
     /// Skip root level
     if (level == 0) {
       return Column(
-        children: children.map<Widget>((child) => buildCategoryTree(child, level: 1)).toList(),
+        children: children
+            .map<Widget>((child) => buildCategoryTree(child, level: 1))
+            .toList(),
       );
     }
 
@@ -253,21 +273,34 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
         title: Row(
           children: [
             if (isSelectable)
-              Checkbox(value: isSelected, onChanged: (_) => controller.toggleCategory(id))
+              Checkbox(
+                value: isSelected,
+                onChanged: (_) {
+                  controller.selectedSubCategoryId.value = parentId ?? "";
+                  controller.selectedChildCategoryId.value = id;
+
+                  controller.toggleCategory(id);
+
+                  print("SubCategory: ${controller.selectedSubCategoryId.value}");
+                  print("ChildCategory: ${controller.selectedChildCategoryId.value}");
+                },
+              )
             else
               const SizedBox(width: 24),
 
             Expanded(
               child: Text(
                 name,
-                style: TextStyle(fontWeight: level == 1 ? FontWeight.bold : FontWeight.normal),
+                style: TextStyle(
+                  fontWeight: level == 1 ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ],
         ),
-        children: children
-            .map<Widget>((child) => buildCategoryTree(child, level: level + 1))
-            .toList(),
+        children: children.map<Widget>((child) {
+          return buildCategoryTree(child, level: level + 1, parentId: id);
+        }).toList(),
       );
     }
 
@@ -277,12 +310,26 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
       child: Row(
         children: [
           if (isSelectable)
-            Checkbox(value: isSelected, onChanged: (_) => controller.toggleCategory(id))
+            Checkbox(
+              value: isSelected,
+              onChanged: (_) {
+                controller.selectedSubCategoryId.value = parentId ?? "";
+                controller.selectedChildCategoryId.value = id;
+
+                controller.toggleCategory(id);
+
+                print("SubCategory: ${controller.selectedSubCategoryId.value}");
+                print("ChildCategory: ${controller.selectedChildCategoryId.value}");
+              },
+            )
           else
             const SizedBox(width: 24),
 
           Expanded(
-            child: Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text(name)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(name),
+            ),
           ),
         ],
       ),
@@ -303,7 +350,11 @@ class InfoRow extends StatelessWidget {
         Icon(icon, size: 12),
         const SizedBox(width: 4),
         Expanded(
-          child: Text(text, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 12),
+          ),
         ),
       ],
     );

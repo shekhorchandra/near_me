@@ -134,60 +134,60 @@ class MultiSelectDropdownField extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       /// ✅ CUSTOM SERVICE ADD
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              controller:
-                              controller.customServiceController,
-                              hint: isChild
-                                  ? 'Add child service'
-                                  : 'Add service',
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          AppButton(
-                            width: 60,
-                            height: 40,
-                            onPressed: () {
-                              final value = controller
-                                  .customServiceController.text
-                                  .trim();
-
-                              if (value.isEmpty) return;
-
-                              // 🔥 LIMIT CHECK
-                              if (selectedIds.length >= 5) {
-                                Get.snackbar(
-                                    'Limit', 'Max 5 allowed');
-                                return;
-                              }
-
-                              final customId =
-                              DateTime.now().toString();
-
-                              final newCategory = Category(
-                                id: customId,
-                                name: value,
-                                children: [],
-                              );
-
-                              if (isChild) {
-                                controller.childServices.add(newCategory);
-                                controller.selectedChildServiceIds
-                                    .add(customId);
-                              } else {
-                                controller.services.add(newCategory);
-                                controller.selectedServiceIds
-                                    .add(customId);
-                              }
-
-                              controller.customServiceController.clear();
-                            },
-                            text: 'Add',
-                          ),
-                        ],
-                      ),
+                      // Row(
+                      //   children: [
+                      //     Expanded(
+                      //       child: CustomTextField(
+                      //         controller:
+                      //         controller.customServiceController,
+                      //         hint: isChild
+                      //             ? 'Add child service'
+                      //             : 'Add service',
+                      //       ),
+                      //     ),
+                      //     const SizedBox(width: 8),
+                      //     AppButton(
+                      //       width: 60,
+                      //       height: 40,
+                      //       onPressed: () {
+                      //         final value = controller
+                      //             .customServiceController.text
+                      //             .trim();
+                      //
+                      //         if (value.isEmpty) return;
+                      //
+                      //         // 🔥 LIMIT CHECK
+                      //         if (selectedIds.length >= 5) {
+                      //           Get.snackbar(
+                      //               'Limit', 'Max 5 allowed');
+                      //           return;
+                      //         }
+                      //
+                      //         final customId =
+                      //         DateTime.now().toString();
+                      //
+                      //         final newCategory = Category(
+                      //           id: customId,
+                      //           name: value,
+                      //           children: [],
+                      //         );
+                      //
+                      //         if (isChild) {
+                      //           controller.childServices.add(newCategory);
+                      //           controller.selectedChildServiceIds
+                      //               .add(customId);
+                      //         } else {
+                      //           controller.services.add(newCategory);
+                      //           controller.selectedServiceIds
+                      //               .add(customId);
+                      //         }
+                      //
+                      //         controller.customServiceController.clear();
+                      //       },
+                      //       text: 'Add',
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   );
                 }),

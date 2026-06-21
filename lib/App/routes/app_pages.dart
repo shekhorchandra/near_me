@@ -58,6 +58,8 @@ import '../modules/servicer/servicer_menu/servicer_help_support/help_support_vie
 import '../modules/servicer/servicer_menu/servicer_menu_bar/bindings/servicer_menu_binding.dart';
 import '../modules/servicer/servicer_menu/servicer_menu_bar/views/servicer_menu_view.dart';
 import '../modules/servicer/servicer_menu/servicer_privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
+import '../modules/servicer/servicer_menu/servicer_review/binding/servicer_review_binding.dart';
+import '../modules/servicer/servicer_menu/servicer_review/views/ServicerReviewView.dart';
 import '../modules/servicer/servicer_menu/servicer_terms_condition/terms_condition_view/Terms_Condition_View.dart';
 import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
@@ -365,6 +367,12 @@ class AppPages {
       name: AppRoutes.SERVICE_PROVIDER_ACCOUNT_EDIT,
       page: () => const ServiceProviderEditView(),
       binding: ServiceProviderEditBinding(),
+    ),
+/// servicer review
+    GetPage(
+      name: AppRoutes.manageReviews,
+      page: () => ManageReviewsScreen(),
+      binding: ServicerReviewBinding(),
     ),
   ];
 }
