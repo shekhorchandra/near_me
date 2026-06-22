@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../services/contants/api_constants.dart';
 import '../../user_chat_conversation/model/MessageModel.dart';
 
 class ChatApiService {
@@ -6,7 +7,7 @@ class ChatApiService {
 
   ChatApiService(this.dio);
 
-  static const baseUrl = "https://nearme-q02y.onrender.com/api/v1";
+  static const baseUrl = "${ApiConstants.baseUrl}/api/v1";
 
   /// GET CONVERSATIONS
   Future<List<dynamic>> getConversations(String token) async {
