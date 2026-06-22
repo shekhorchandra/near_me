@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,6 +24,12 @@ class ServiceProviderController extends GetxController {
   final websiteController = TextEditingController();
   final customServiceController = TextEditingController();
 
+
+  final latitude = 23.8103.obs;
+  final longitude = 90.4125.obs;
+
+  GoogleMapController? mapController;
+
   var categories = <Category>[].obs;
   var selectedCategoryId = ''.obs;
 
@@ -34,6 +41,8 @@ class ServiceProviderController extends GetxController {
 
   RxString selectedSubCategoryId = "".obs;
   RxString selectedChildCategoryId = "".obs;
+
+  final isLoading = false.obs;
 
 
   var is24Hours = false.obs;
@@ -243,7 +252,10 @@ class ServiceProviderController extends GetxController {
         "allTimeAvailability": isOpen24_7.value,
         "location": {
           "type": "Point",
-          "coordinates": [90.4125, 23.8103],
+          "coordinates": [
+            longitude.value, // longitude first
+            latitude.value,  // latitude second
+          ],
           "address": addressController.text.trim(),
         },
       };

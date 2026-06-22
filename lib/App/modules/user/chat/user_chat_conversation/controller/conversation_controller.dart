@@ -39,11 +39,15 @@ class ConversationController extends GetxController {
     // 🔥 SOCKET EVENTS (CLEAN)
     // -----------------------------
 
+    socketService.offEvent("direct_message"); // IMPORTANT
+
     socketService.onEvent("direct_message", (data) {
       final msg = MessageModel.fromSocket(data);
 
-      // only add if message belongs to this chat
-      if (msg.senderId == userId || msg.receiverId == userId) {
+      final myId = storage.userId ?? "";
+
+      if ((msg.senderId == myId && msg.receiverId == userId) ||
+          (msg.senderId == userId && msg.receiverId == myId)) {
         messages.insert(0, msg);
       }
     });
@@ -93,13 +97,11 @@ class ConversationController extends GetxController {
     try {
       final token = storage.accessToken!;
 
-      final msg = await apiService.sendMessage(
+      await apiService.sendMessage(
         token: token,
         receiverId: userId,
         text: text,
       );
-
-      messages.insert(0, msg);
 
     } catch (e) {
       print("SEND ERROR => $e");

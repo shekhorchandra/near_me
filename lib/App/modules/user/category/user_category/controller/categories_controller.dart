@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
+import '../../../../services/contants/api_constants.dart';
+
 class CategoriesController extends GetxController {
   final Dio dio = Dio();
 
@@ -26,7 +28,7 @@ class CategoriesController extends GetxController {
       isLoading.value = true;
 
       final response = await dio.get(
-        'https://nearme-q02y.onrender.com/api/v1/category/search',
+        '${ApiConstants.baseUrl}/api/v1/category/search',
         queryParameters: {
           "searchTerm": keyword,
           "level": 0,

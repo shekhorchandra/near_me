@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 
@@ -45,6 +46,10 @@ class ServiceProviderEditController extends GetxController {
   RxString selectedChildCategoryId = "".obs;
 
   final logger = Logger();
+  final latitude = 23.8103.obs;
+  final longitude = 90.4125.obs;
+
+  GoogleMapController? mapController;
 
   @override
   void onInit() {
@@ -81,15 +86,6 @@ class ServiceProviderEditController extends GetxController {
       Get.snackbar("Error", e.toString());
     }
   }
-
-  // List<Category> get allOfferServices {
-  //   return categoryTree
-  //       .expand((cat) => cat.children)
-  //       .expand((child) => child.children.isNotEmpty
-  //       ? child.children
-  //       : [child])
-  //       .toList();
-  // }
 
   // ================= SELECT =================
   void selectCategory(String id) {
@@ -145,71 +141,6 @@ class ServiceProviderEditController extends GetxController {
     }
   }
 
-  // ================= FETCH SERVICE =================
-  // Future<void> fetchService() async {
-  //   try {
-  //     isLoading.value = true;
-  //
-  //     final res = await dio.get(
-  //       "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
-  //       options: Options(
-  //         headers: {
-  //           "Authorization": "Bearer ${storage.accessToken}",
-  //           "accesstoken": storage.accessToken,
-  //         },
-  //       ),
-  //     );
-  //
-  //     final data = res.data["data"];
-  //
-  //     nameCtrl.text = data["service_name"] ?? "";
-  //     addressCtrl.text = data["service_address"] ?? "";
-  //     aboutCtrl.text = data["about"] ?? "";
-  //     websiteCtrl.text = data["website_link"] ?? "";
-  //
-  //     contactCtrl.text = normalizeBdPhone(
-  //       data["phone"].toString().startsWith("8801")
-  //           ? "+${data["phone"]}"
-  //           : data["phone"].toString(),
-  //     );
-  //
-  //     openingCtrl.text = data["openingTime"] ?? "";
-  //     closingCtrl.text = data["closingTime"] ?? "";
-  //
-  //     selectedCategoryId.value = data["service_category"]?["_id"]?.toString() ?? "";
-  //
-  //     selectedOfferServices.assignAll(
-  //       (data["offer_services"] as List?)?.map((e) => e["_id"].toString()).toList() ?? [],
-  //     );
-  //
-  //     logoUrl.value = data["company_logo"] ?? "";
-  //
-  //     if (data["openingTime"] != null) {
-  //       final parts = data["openingTime"].split(":");
-  //       openingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-  //     }
-  //
-  //     if (data["closingTime"] != null) {
-  //       final parts = data["closingTime"].split(":");
-  //       closingTime.value = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-  //     }
-  //
-  //     logoUrl.value = data["company_logo"] ?? "";
-  //
-  //     mediaUrls.assignAll(
-  //       (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ?? [],
-  //     );
-  //
-  //     mediaFiles.clear();
-  //
-  //     update();
-  //   } catch (e) {
-  //     Get.snackbar("Error", e.toString());
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-
   // ================= PHONE =================
 
   Future<void> fetchService() async {
@@ -229,6 +160,15 @@ class ServiceProviderEditController extends GetxController {
       logger.i("FETCH SERVICE => ${res.data}");
 
       final data = res.data["data"];
+      if (data["location"] != null &&
+          data["location"]["coordinates"] != null) {
+
+        final coordinates = data["location"]["coordinates"];
+
+        longitude.value = (coordinates[0] as num).toDouble();
+        latitude.value = (coordinates[1] as num).toDouble();
+
+      }
 
       // ✅ SAVE SERVICE ID
       // IMPORTANT
@@ -372,8 +312,7 @@ class ServiceProviderEditController extends GetxController {
       }
 
       // ✅ remove duplicates
-      final cleanOfferServices =
-      selectedOfferServices.toSet().toList();
+      final cleanOfferServices = selectedOfferServices.toSet().toList();
 
       final body = {
         "service_name": nameCtrl.text.trim(),
@@ -385,13 +324,13 @@ class ServiceProviderEditController extends GetxController {
         "website_link": websiteCtrl.text.trim(),
         "location": {
           "type": "Point",
-          "coordinates": [90.4125, 23.8103],
+          "coordinates": [longitude.value, latitude.value],
         },
         "openingTime":
-        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+            "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
 
         "closingTime":
-        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+            "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
 
         "allTimeAvailability": false,
       };
@@ -400,18 +339,14 @@ class ServiceProviderEditController extends GetxController {
 
       final formData = FormData();
 
-      formData.fields.add(
-        MapEntry("data", jsonEncode(body)),
-      );
+      formData.fields.add(MapEntry("data", jsonEncode(body)));
 
       // ✅ logo
       if (logoFile.value != null) {
         formData.files.add(
           MapEntry(
             "company_logo",
-            await MultipartFile.fromFile(
-              logoFile.value!.path,
-            ),
+            await MultipartFile.fromFile(logoFile.value!.path),
           ),
         );
       }
@@ -421,9 +356,7 @@ class ServiceProviderEditController extends GetxController {
         try {
           final response = await dio.get(
             url,
-            options: Options(
-              responseType: ResponseType.bytes,
-            ),
+            options: Options(responseType: ResponseType.bytes),
           );
 
           formData.files.add(
@@ -431,8 +364,7 @@ class ServiceProviderEditController extends GetxController {
               "media",
               MultipartFile.fromBytes(
                 response.data,
-                filename:
-                "old_${DateTime.now().millisecondsSinceEpoch}.jpg",
+                filename: "old_${DateTime.now().millisecondsSinceEpoch}.jpg",
               ),
             ),
           );
@@ -444,10 +376,7 @@ class ServiceProviderEditController extends GetxController {
       // ✅ new images
       for (final file in mediaFiles) {
         formData.files.add(
-          MapEntry(
-            "media",
-            await MultipartFile.fromFile(file.path),
-          ),
+          MapEntry("media", await MultipartFile.fromFile(file.path)),
         );
       }
 
@@ -457,53 +386,32 @@ class ServiceProviderEditController extends GetxController {
         data: formData,
         options: Options(
           headers: {
-            "Authorization":
-            "Bearer ${storage.accessToken}",
+            "Authorization": "Bearer ${storage.accessToken}",
             "accesstoken": storage.accessToken,
           },
-          validateStatus: (status) =>
-          status != null && status < 500,
+          validateStatus: (status) => status != null && status < 500,
         ),
       );
 
-      final prettyJson =
-      const JsonEncoder.withIndent('    ')
-          .convert(res.data);
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(res.data);
 
       logger.i(prettyJson);
 
-      if (res.statusCode == 200 &&
-          res.data["success"] == true) {
-
-        Get.snackbar(
-          "Success",
-          "Updated Successfully",
-        );
+      if (res.statusCode == 200 && res.data["success"] == true) {
+        Get.snackbar("Success", "Updated Successfully");
 
         mediaFiles.clear();
         logoFile.value = null;
 
         await fetchService();
-
       } else {
-
-        Get.snackbar(
-          "Error",
-          res.data["message"] ?? "Update failed",
-        );
+        Get.snackbar("Error", res.data["message"] ?? "Update failed");
       }
-
     } catch (e) {
-
       logger.e("UPDATE ERROR => $e");
 
-      Get.snackbar(
-        "Error",
-        "Something went wrong",
-      );
-
+      Get.snackbar("Error", "Something went wrong");
     } finally {
-
       isUpdating.value = false;
     }
   }

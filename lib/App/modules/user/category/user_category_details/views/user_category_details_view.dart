@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
-import '../../../../../core/widgets/skeleton_loader.dart'; // ✅ ADD
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../../../../../routes/app_routes.dart';
-import '../../user_category_service_details/models/ReviewModel.dart';
 import '../controller/user_category_details_controller.dart';
 
 class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {

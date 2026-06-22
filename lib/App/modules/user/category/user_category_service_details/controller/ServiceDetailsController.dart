@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../data/services/storage_service.dart';
@@ -29,6 +33,11 @@ class ServiceDetailsController extends GetxController {
 
   var media = <String>[].obs;
 
+  final latitude = 23.8103.obs;
+  final longitude = 90.4125.obs;
+
+  GoogleMapController? mapController;
+  final logger = Logger();
   RxList<String> servicesOffered = <String>[].obs;
   var highlightServices = <Map<String, dynamic>>[].obs;
   RxList<ReviewModel> reviews = <ReviewModel>[].obs;
@@ -69,6 +78,34 @@ class ServiceDetailsController extends GetxController {
 
       print("STATUS = ${response.statusCode}");
       print("DATA = ${response.data}");
+
+      final data = response.data["data"];
+
+      if (data["location"] != null &&
+          data["location"]["coordinates"] != null) {
+
+        final coordinates = data["location"]["coordinates"];
+
+        longitude.value = (coordinates[0] as num).toDouble();
+        latitude.value = (coordinates[1] as num).toDouble();
+
+        print("LAT = ${latitude.value}");
+        print("LNG = ${longitude.value}");
+
+        mapController?.animateCamera(
+          CameraUpdate.newLatLng(
+            LatLng(latitude.value, longitude.value),
+          ),
+        );
+      }
+
+      // PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent(
+        '    ',
+      ).convert(data);
+
+      // LOGGER PRINT
+      logger.i(prettyJson);
 
       if (response.statusCode == 200 && response.data["success"] == true) {
         final data = response.data["data"];

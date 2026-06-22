@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
@@ -76,10 +79,17 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                           ? null
                           : controller.selectedCategoryId.value,
                       items: controller.categories
-                          .map((e) => DropdownMenuItem(value: e.id, child: Text(e.name)))
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.id,
+                              child: Text(e.name),
+                            ),
+                          )
                           .toList(),
                       onChanged: (val) {
-                        final selected = controller.categories.firstWhere((e) => e.id == val);
+                        final selected = controller.categories.firstWhere(
+                          (e) => e.id == val,
+                        );
                         controller.selectCategory(selected);
                       },
                       icon: Icons.category,
@@ -207,13 +217,66 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              const Text("Location", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const Text(
+                "Location",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+
               const SizedBox(height: 6),
-              Container(
-                height: 150,
-                width: double.infinity,
-                color: Colors.grey.shade300,
-                child: const Center(child: Text("Map Placeholder")),
+
+
+              /// location
+              SizedBox(
+                height: 200,
+                child: Obx(
+                  () => GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(
+                        controller.latitude.value,
+                        controller.longitude.value,
+                      ),
+                      zoom: 15,
+                    ),
+
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+
+                    scrollGesturesEnabled: true,
+                    zoomGesturesEnabled: true,
+                    rotateGesturesEnabled: true,
+                    tiltGesturesEnabled: true,
+
+                    gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                      Factory<OneSequenceGestureRecognizer>(
+                        () => EagerGestureRecognizer(),
+                      ),
+                    },
+
+                    onMapCreated: (GoogleMapController mapController) {
+                      controller.mapController = mapController;
+                    },
+
+                    onTap: (LatLng position) {
+                      controller.latitude.value = position.latitude;
+                      controller.longitude.value = position.longitude;
+                    },
+
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId("service_location"),
+                        position: LatLng(
+                          controller.latitude.value,
+                          controller.longitude.value,
+                        ),
+                        draggable: true,
+                        onDragEnd: (LatLng value) {
+                          controller.latitude.value = value.latitude;
+                          controller.longitude.value = value.longitude;
+                        },
+                      ),
+                    },
+                  ),
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -323,7 +386,10 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              const Text("Logo for your service", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Logo for your service",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 6),
 
               Obx(
@@ -344,7 +410,10 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                           child: controller.logo.value.isNotEmpty
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.file(File(controller.logo.value), fit: BoxFit.cover),
+                                  child: Image.file(
+                                    File(controller.logo.value),
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                               : Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -355,12 +424,18 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                                         color: Colors.grey.shade200,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(Icons.add, color: Colors.grey),
+                                      child: const Icon(
+                                        Icons.add,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                     const SizedBox(height: 8),
                                     const Text(
                                       "Upload Logo",
-                                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -384,7 +459,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                             height: 40,
                             width: double.infinity,
                             child: AppButton(
-                              onPressed: () => controller.setLogo(), // your file picker
+                              onPressed: () =>
+                                  controller.setLogo(), // your file picker
                               text: 'Upload Logo',
                               icon: Icons.upload_file,
                             ),
@@ -418,16 +494,22 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                                 context: Get.context!,
                                 initialTime: controller.openingTime.value,
                               );
-                              if (picked != null) controller.setOpeningTime(picked);
+                              if (picked != null)
+                                controller.setOpeningTime(picked);
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 12,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade400),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                controller.openingTime.value.format(Get.context!),
+                                controller.openingTime.value.format(
+                                  Get.context!,
+                                ),
                                 style: const TextStyle(fontSize: 14),
                               ),
                             ),
@@ -444,16 +526,22 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                                 context: Get.context!,
                                 initialTime: controller.closingTime.value,
                               );
-                              if (picked != null) controller.setClosingTime(picked);
+                              if (picked != null)
+                                controller.setClosingTime(picked);
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 12,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade400),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                controller.closingTime.value.format(Get.context!),
+                                controller.closingTime.value.format(
+                                  Get.context!,
+                                ),
                                 style: const TextStyle(fontSize: 14),
                               ),
                             ),
@@ -470,7 +558,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                         Obx(
                           () => Checkbox(
                             value: controller.isOpen24_7.value,
-                            onChanged: (val) => controller.isOpen24_7.value = val ?? false,
+                            onChanged: (val) =>
+                                controller.isOpen24_7.value = val ?? false,
                           ),
                         ),
                         const Text("Mark if your service is available 24/7"),
@@ -513,12 +602,18 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                         children: [
                           Text(
                             controller.selectedPlan.value.subscriptionPlan,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             "£${controller.selectedPlan.value.subscriptionPrice.toStringAsFixed(2)}/month",
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -529,7 +624,11 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               ),
               const SizedBox(height: 20),
 
-              AppButton(onPressed: controller.submitService, text: 'Continue to Payment'),
+              AppButton(
+                onPressed: controller.submitService,
+                loading: controller.isLoading.value,
+                text: 'Continue to Payment',
+              ),
               SizedBox(height: 40),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/models/ReviewModel.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
@@ -379,20 +380,48 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= LOCATION =================
                               const Text(
                                 "Location",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 6),
+                              SizedBox(
+                                height: 200,
+                                child: Obx(() {
+                                  final lat = controller.latitude.value;
+                                  final lng = controller.longitude.value;
 
-                              Container(
-                                width: double.infinity,
-                                height: 150,
-                                color: Colors.grey.shade300,
-                                child: Center(
-                                  child: Text(controller.location.value),
-                                ),
+                                  return GoogleMap(
+                                    initialCameraPosition: CameraPosition(
+                                      target: LatLng(lat, lng),
+                                      zoom: 16,
+                                    ),
+
+                                    onMapCreated: (map) {
+                                      controller.mapController = map;
+
+                                      // move camera to existing location once
+                                      map.animateCamera(
+                                        CameraUpdate.newLatLng(LatLng(lat, lng)),
+                                      );
+                                    },
+
+                                    onTap: (pos) {
+                                      controller.latitude.value = pos.latitude;
+                                      controller.longitude.value = pos.longitude;
+                                    },
+
+                                    markers: {
+                                      Marker(
+                                        markerId: const MarkerId("service_location"),
+                                        position: LatLng(lat, lng),
+                                        draggable: true,
+                                        onDragEnd: (pos) {
+                                          controller.latitude.value = pos.latitude;
+                                          controller.longitude.value = pos.longitude;
+                                        },
+                                      ),
+                                    },
+                                  );
+                                }),
                               ),
 
                               const SizedBox(height: 15),

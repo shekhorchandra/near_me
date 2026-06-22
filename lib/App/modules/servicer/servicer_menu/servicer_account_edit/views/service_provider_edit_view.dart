@@ -1,6 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../servicer_preview/service_provider_preview_view.dart';
 import '../controller/service_provider_edit_controller.dart';
 import '../../../../../core/widgets/App_button.dart';
@@ -247,14 +248,45 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(child: Text("Map Placeholder")),
+                SizedBox(
+                  height: 200,
+                  child: Obx(() {
+                    final lat = controller.latitude.value;
+                    final lng = controller.longitude.value;
+
+                    return GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(lat, lng),
+                        zoom: 16,
+                      ),
+
+                      onMapCreated: (map) {
+                        controller.mapController = map;
+
+                        // move camera to existing location once
+                        map.animateCamera(
+                          CameraUpdate.newLatLng(LatLng(lat, lng)),
+                        );
+                      },
+
+                      onTap: (pos) {
+                        controller.latitude.value = pos.latitude;
+                        controller.longitude.value = pos.longitude;
+                      },
+
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId("service_location"),
+                          position: LatLng(lat, lng),
+                          draggable: true,
+                          onDragEnd: (pos) {
+                            controller.latitude.value = pos.latitude;
+                            controller.longitude.value = pos.longitude;
+                          },
+                        ),
+                      },
+                    );
+                  }),
                 ),
 
                 const SizedBox(height: 12),
