@@ -25,37 +25,39 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
             shrinkWrap: true,
             children: [
               const SizedBox(height: 40),
-        
+
               // Title
               Text(
                 "Login as a Service Provider",
                 textAlign: TextAlign.center,
                 style: AppText.h1.bold.copyWith(color: AppColor.primary),
               ),
-        
+
               const SizedBox(height: 6),
-        
+
               // Subtitle
               Text(
                 "Sign in to manage your services and requests.",
                 textAlign: TextAlign.center,
-                style: AppText.body1.regular.copyWith(color: AppColor.neutral.s700),
+                style: AppText.body1.regular.copyWith(
+                  color: AppColor.neutral.s700,
+                ),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Email TextField
               CustomTextField(
                 hint: "Email Address",
                 icon: Icons.email_outlined,
                 controller: controller.emailController,
               ),
-        
+
               const SizedBox(height: 12),
-        
+
               // Password TextField with Obscure toggle
               Obx(
-                    () => CustomTextField(
+                () => CustomTextField(
                   hint: "Password",
                   icon: Icons.lock_outline,
                   controller: controller.passwordController,
@@ -70,9 +72,9 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 8),
-        
+
               // Forgot Password
               Align(
                 alignment: Alignment.centerRight,
@@ -80,20 +82,21 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   onPressed: () {
                     // Navigate to Forgot Password page
                     Get.toNamed(AppRoutes.SERVICER_FORGOT_PASSWORD);
-        
                   },
                   child: Text(
                     "Forgot Password?",
-                    style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+                    style: AppText.body2.semiBold.copyWith(
+                      color: AppColor.primary,
+                    ),
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 10),
-        
+
               // Login Button
               Obx(
-                    () => AppButton(
+                () => AppButton(
                   text: "Log in",
                   loading: controller.isLoading.value,
                   onPressed: () async {
@@ -101,18 +104,22 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   },
                 ),
               ),
-        
+
               const SizedBox(height: 20),
               // Sign Up RichText
               Center(
                 child: RichText(
                   text: TextSpan(
                     text: "Don't have an account? ",
-                    style: AppText.body2.regular.copyWith(color: AppColor.neutral.s700),
+                    style: AppText.body2.regular.copyWith(
+                      color: AppColor.neutral.s700,
+                    ),
                     children: [
                       TextSpan(
                         text: "Register",
-                        style: AppText.body2.semiBold.copyWith(color: AppColor.primary),
+                        style: AppText.body2.semiBold.copyWith(
+                          color: AppColor.primary,
+                        ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             Get.toNamed(AppRoutes.SERVICER_SIGNUP);
@@ -122,9 +129,9 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   ),
                 ),
               ),
-        
+
               const SizedBox(height: 20),
-        
+
               // Divider with text
               Row(
                 children: [
@@ -133,36 +140,49 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
                       "Or continue with",
-                      style: AppText.body2.regular.copyWith(color: AppColor.neutral.s600),
+                      style: AppText.body2.regular.copyWith(
+                        color: AppColor.neutral.s600,
+                      ),
                     ),
                   ),
                   const Expanded(child: Divider()),
                 ],
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Social Buttons
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0), // reduce horizontal padding
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                ), // reduce horizontal padding
                 child: Row(
                   children: [
                     Flexible(
-                      child: SocialButton(text: "Google", iconPath: AppAssets.google,
-                          // onPressed: () => Get.find<ServicerLoginController>().loginWithGoogleProviderDeepLink(),
-                        onPressed: () => controller.loginWithGoogle(role: "PROVIDER"),
+                      child: SocialButton(
+                        text: "Google",
+                        iconPath: AppAssets.google,
+                        // onPressed: () => Get.find<ServicerLoginController>().loginWithGoogleProviderDeepLink(),
+                        onPressed: () {
+                          Get.find<ServicerLoginController>()
+                              .loginWithGoogleProvider();
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: SocialButton(text: "Apple", iconPath: AppAssets.apple, onPressed: () {  },),
+                      child: SocialButton(
+                        text: "Apple",
+                        iconPath: AppAssets.apple,
+                        onPressed: () {},
+                      ),
                     ),
                   ],
                 ),
               ),
-        
+
               const SizedBox(height: 24),
-        
+
               // Login as a Service button (if needed, e.g., vendor or admin)
               AppButton(
                 text: "Login as a User",
@@ -173,7 +193,7 @@ class ServicerLoginView extends GetView<ServicerLoginController> {
                   Get.toNamed(AppRoutes.USER_LOGIN);
                 },
               ),
-        
+
               const SizedBox(height: 40),
             ],
           ),

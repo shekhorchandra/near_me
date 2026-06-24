@@ -84,7 +84,17 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.isReview ? "Write Review" : "Write Reply"),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      title: Text(
+        widget.isReview ? "Write Review" : "Write Reply",
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -99,26 +109,69 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
                   },
                   icon: Icon(
                     i < rating ? Icons.star : Icons.star_border,
+                    color: Colors.black,
                   ),
                 ),
               ),
             ),
 
+          const SizedBox(height: 12),
+
           TextField(
             controller: text,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              hintText: "Write here",
+            maxLines: 4,
+            style: const TextStyle(
+              color: Colors.black,
+            ),
+            decoration: InputDecoration(
+              hintText: "Write here...",
+              hintStyle: const TextStyle(
+                color: Colors.black54,
+              ),
+              filled: true,
+              fillColor: Colors.grey.shade100,
+              contentPadding: const EdgeInsets.all(16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade300,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Colors.black,
+                  width: 1.5,
+                ),
+              ),
             ),
           ),
         ],
       ),
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
         TextButton(
           onPressed: () => Get.back(),
-          child: const Text("Cancel"),
+          child: const Text(
+            "Cancel",
+            style: TextStyle(
+              color: Colors.black54,
+            ),
+          ),
         ),
+
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
           onPressed: submit,
           child: const Text("Send"),
         ),

@@ -18,9 +18,25 @@ class UserSignupController extends GetxController {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  final hasMinLength = false.obs;
+  final hasUppercase = false.obs;
+  final hasLowercase = false.obs;
+  final hasNumber = false.obs;
+  final hasSpecialChar = false.obs;
+  final isPasswordValid = false.obs;
+
   var isLoading = false.obs;
 
   final logger = Logger();
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    passwordController.addListener(() {
+      validatePassword(passwordController.text);
+    });
+  }
 
   void togglePassword() {
     obscurePassword.value = !obscurePassword.value;
@@ -32,6 +48,15 @@ class UserSignupController extends GetxController {
 
   /// user register api call
   Future<void> registerUser() async {
+    if (!isPasswordValid.value) {
+      AppSnackbar.error("Please enter a strong password.");
+      return;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      AppSnackbar.error("Passwords do not match.");
+      return;
+    }
     try {
       isLoading.value = true;
 
@@ -76,6 +101,22 @@ class UserSignupController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void validatePassword(String password) {
+    hasMinLength.value = password.length >= 8;
+    hasUppercase.value = RegExp(r'[A-Z]').hasMatch(password);
+    hasLowercase.value = RegExp(r'[a-z]').hasMatch(password);
+    hasNumber.value = RegExp(r'[0-9]').hasMatch(password);
+    hasSpecialChar.value =
+        RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-+=~`/\\[\]]').hasMatch(password);
+
+    isPasswordValid.value =
+        hasMinLength.value &&
+            hasUppercase.value &&
+            hasLowercase.value &&
+            hasNumber.value &&
+            hasSpecialChar.value;
   }
 
   @override

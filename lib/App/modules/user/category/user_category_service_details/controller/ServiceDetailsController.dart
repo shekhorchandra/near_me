@@ -30,6 +30,8 @@ class ServiceDetailsController extends GetxController {
   RxString phone = ''.obs;
   RxString providerId = ''.obs;
   RxString providerName = ''.obs;
+  RxInt selectedTab = 0.obs;
+
 
   var media = <String>[].obs;
 
@@ -57,6 +59,14 @@ class ServiceDetailsController extends GetxController {
 
     fetchServiceDetails();
     fetchReviews();
+  }
+
+  List<ReviewModel> get filteredReviews {
+    if (selectedTab.value == 0) return reviews;
+
+    int rating = 6 - selectedTab.value;
+
+    return reviews.where((e) => e.rating == rating).toList();
   }
 
   Future<void> fetchServiceDetails() async {
@@ -146,12 +156,21 @@ class ServiceDetailsController extends GetxController {
   }
 
   Future<void> callNumber(String phone) async {
-    final cleanPhone = phone.startsWith('+') ? phone : '+$phone';
+    String cleanPhone = phone.trim().replaceAll(RegExp(r'\s+|-'), '');
 
-    final Uri uri = Uri.parse("tel:$cleanPhone");
+    // Bangladesh local number: 017xxxxxxx -> +88017xxxxxxx
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = '+880${cleanPhone.substring(1)}';
+    } else if (!cleanPhone.startsWith('+')) {
+      cleanPhone = '+$cleanPhone';
+    }
 
-    if (await canLaunchUrl(uri)) {
+    final Uri uri = Uri(scheme: 'tel', path: cleanPhone);
+
+    try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      Get.snackbar("Error", "Could not open dialer");
     }
   }
 

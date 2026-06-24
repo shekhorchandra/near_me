@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../data/services/GoogleAuthService.dart';
+import '../../../../../data/services/auth_api_service.dart';
 import '../../../../../data/services/socket_service.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
@@ -23,11 +25,15 @@ class ServicerLoginController extends GetxController {
 
   final obscureConfirmPassword = true.obs;
   RxBool loading = false.obs;
-
+  final AuthApiService _authApiService = Get.find<AuthApiService>();
   final StorageService _storageService = StorageService();
 
   final emailController = TextEditingController(text: "shekhorchandrasaha@gmail.com");
   final passwordController = TextEditingController(text: "Tonoy@#123");
+
+  // final emailController = TextEditingController();
+  // final passwordController = TextEditingController();
+
 
   final isLoading = false.obs;
 
@@ -47,11 +53,6 @@ class ServicerLoginController extends GetxController {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  void _handleException(dynamic e, StackTrace stackTrace) {
-    debugPrint("Login Error: $e");
-    debugPrint("StackTrace: $stackTrace");
-    Get.snackbar("Error", "Something went wrong. Please try again.");
-  }
 
   Future<void> loginProvider() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
@@ -183,136 +184,121 @@ class ServicerLoginController extends GetxController {
     }
   }
 
-  /// using url
-  // Future<void> loginWithGoogleProviderDeepLink() async {
-  //   loading.value = true;
-  //
-  //   final AppLinks appLinks = AppLinks();
-  //   StreamSubscription<Uri>? sub;
-  //
-  //   try {
-  //     // Step 1: Listen for deep link callback
-  //     sub = appLinks.uriLinkStream.listen((Uri uri) async {
-  //       if (uri.scheme == "Nearme" && uri.path == "/auth/google") {
-  //         final accessToken = uri.queryParameters['access'];
-  //         final refreshToken = uri.queryParameters['refresh'];
-  //         final role = uri.queryParameters['role'];
-  //
-  //         if (accessToken != null && refreshToken != null) {
-  //           if (role != "PROVIDER") {
-  //             AppSnackbar.error("Not a provider account");
-  //             return;
-  //           }
-  //           await _storageService.setAccessToken(accessToken);
-  //           await _storageService.setRefreshToken(refreshToken);
-  //
-  //           // _storeUserId();
-  //
-  //           // Register FCM and Device
-  //           //
-  //           // bool fcmRegistered = await _registerFCM();
-  //           //
-  //
-  //           // if (!fcmRegistered) {
-  //           //
-  //           //   Get.snackbar('Error', 'An error occurred while initializing notifications!');
-  //           //   return;
-  //           // }
-  //
-  //           //
-  //           // bool deviceRegistered = await _registerDevice(data);
-  //           //
-  //
-  //           // if (!deviceRegistered) {
-  //           //
-  //           //   Get.snackbar('Error', 'An error occurred while registering the device.');
-  //           //   return;
-  //           // }
-  //
-  //           _storageService.write('loggedIn', true);
-  //           Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
-  //
-  //           // isVerifiedOrIsShopCreated();
-  //
-  //           Get.snackbar("Login Successful", "");
-  //         } else {
-  //           Get.snackbar("Error", "Failed to get token from Google login");
-  //         }
-  //
-  //         await sub?.cancel();
-  //       }
-  //     });
-  //
-  //     // Step 2: Open browser with your API
-  //     final url = Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER');
-  //
-  //     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-  //       Get.snackbar("Error", "Could not launch login URL");
-  //       return;
-  //     }
-  //   } catch (e, st) {
-  //     _handleException(e, st);
-  //   } finally {
-  //     loading.value = false;
-  //   }
-  // }
+
 
   /// In app
+  Future<void> loginWithGoogleProvider() async {
+    isLoading.value = true;
 
-  Future<void> loginWithGoogle({required String role}) async {
     try {
-      isLoading.value = true;
+      final String? idToken =
+      await GoogleAuthService.instance.signInWithGoogle();
 
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        AppSnackbar.error("Login cancelled");
+      if (idToken == null || idToken.isEmpty) {
+        AppSnackbar.error("Google login cancelled or failed");
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final idToken = googleAuth.idToken;
-
-      // 🔥 Send token to backend
-      final response = await http.post(
-        // Uri.parse(ApiConstants.google_login),
-        Uri.parse('${ApiConstants.baseUrl}/auth/google?role=PROVIDER'),
-
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "idToken": idToken,
-          "role": role, // 🔥 IMPORTANT
-        }),
+      final response = await _authApiService.googleAuthentication(
+        idToken: idToken,
+        role: "provider",
       );
 
-      final data = jsonDecode(response.body);
+      if (response == null) {
+        AppSnackbar.error("No response from server");
+        return;
+      }
 
-      if (response.statusCode == 200 && data["success"]) {
-        final accessToken = data["data"]["accessToken"];
-        final refreshToken = data["data"]["refreshToken"];
-        final userRole = data["data"]["user"]["role"];
+      print("=========== PROVIDER GOOGLE LOGIN RESPONSE ===========");
+      print(response.data);
+      print("=====================================================");
 
-        // await box.write("accessToken", accessToken);
-        // await box.write("refreshToken", refreshToken);
-        // await box.write("role", userRole);
+      final responseData = response.data;
 
-        // 🔥 ROLE BASE NAVIGATION
-        if (userRole == "USER") {
-          Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
-        } else if (userRole == "PROVIDER") {
-          Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (responseData["success"] != true) {
+          AppSnackbar.error(responseData["message"] ?? "Google login failed");
+          return;
+        }
+
+        final data = responseData["data"];
+
+        final accessToken =
+            data?["accessToken"] ?? data?["token"]?["accessToken"];
+
+        final refreshToken =
+            data?["refreshToken"] ?? data?["token"]?["refreshToken"];
+
+        final user = data?["user"];
+
+        final userId = user?["_id"]?.toString();
+        final userRole = user?["role"]?.toString();
+
+        final isVerified = user?["isVerified"] ?? false;
+        final hasService = user?["hasService"] ?? false;
+        final serviceId = user?["service"]?.toString();
+
+        if (accessToken == null || accessToken.toString().isEmpty) {
+          AppSnackbar.error("Access token not found");
+          return;
+        }
+
+        if (userRole != "PROVIDER") {
+          AppSnackbar.error("Not a provider account");
+          return;
+        }
+
+        await _storageService.clear();
+
+        await _storageService.setAccessToken(accessToken.toString());
+        await _storageService.setRefreshToken(refreshToken?.toString() ?? "");
+        await _storageService.setUserId(userId ?? "");
+        await _storageService.setServiceId(serviceId ?? "");
+        await _storageService.write("loggedIn", true);
+
+        if (userId != null && userId.isNotEmpty) {
+          if (!Get.isRegistered<SocketService>()) {
+            await Get.putAsync(
+                  () => SocketService().connect(userId),
+              permanent: true,
+            );
+          }
+        }
+
+        AppSnackbar.success(responseData["message"] ?? "Login successful");
+
+        if (isVerified == true) {
+          if (hasService == true) {
+            Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
+          } else {
+            Get.offAllNamed(
+              AppRoutes.SERVICE_CHOOSE_PLAN,
+              arguments: {
+                "email": user?["email"] ?? emailController.text.trim(),
+              },
+            );
+          }
         } else {
-          AppSnackbar.error("Unknown role");
+          Get.offAllNamed(
+            AppRoutes.SERVICER_VERIFY_ACCOUNT,
+            arguments: {
+              "email": user?["email"] ?? emailController.text.trim(),
+            },
+          );
         }
       } else {
-        AppSnackbar.error(data["message"]);
+        final message =
+            responseData?["message"] ??
+                responseData?["error"] ??
+                "Google login failed";
+
+        AppSnackbar.error(message.toString());
       }
-    } catch (e) {
-      AppSnackbar.error("Google login failed");
+    } catch (e, st) {
+      print("PROVIDER GOOGLE LOGIN ERROR = $e");
+      print(st);
+
+      AppSnackbar.error("Something went wrong during Google login");
     } finally {
       isLoading.value = false;
     }

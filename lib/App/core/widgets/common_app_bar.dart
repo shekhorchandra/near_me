@@ -12,6 +12,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color? backgroundColor;
   final Color? iconColor;
   final Color? titleColor;
+  final Widget? leading;
 
   const CommonAppBar({
     super.key,
@@ -22,6 +23,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
     this.iconColor,
     this.titleColor,
+    this.leading,
   });
 
   @override
@@ -33,18 +35,19 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: bgColor,
       elevation: 0,
       centerTitle: true,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: leading == null,
 
-      leading: showBack
-          ? IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: iconColor ?? fgColor,
-          size: 20,
-        ),
-        onPressed: onBack ?? () => Get.back(),
-      )
-          : null,
+      leading: leading ??
+          (showBack
+              ? IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: iconColor ?? fgColor,
+              size: 20,
+            ),
+            onPressed: onBack ?? () => Get.back(),
+          )
+              : null),
 
       title: Text(
         title,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/core/widgets/common_app_bar.dart';
 import '../../user_category_service_details/models/ReviewModel.dart';
 import '../../user_category_service_details/views/reply_dialog_view.dart';
 import '../controller/reviews_controller.dart';
@@ -11,26 +12,18 @@ class ReviewsView extends GetView<ReviewsController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50], // Light background for contrast
-      appBar: AppBar(
-        title: const Text(
-          "Reviews",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+      appBar: CommonAppBar(
+        title: 'Reviews',
       ),
 
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         label: const Text("Write Review"),
         icon: const Icon(Icons.rate_review),
         onPressed: () {
           Get.dialog(
-            ReplyDialogView(
-              serviceId: controller.serviceId,
-              isReview: true,
-            ),
+            ReplyDialogView(serviceId: controller.serviceId, isReview: true),
           );
         },
       ),
@@ -169,58 +162,6 @@ class _ReviewCardState extends State<ReviewCard> {
             ],
           ),
 
-          const SizedBox(height: 12),
-
-          /// COMMENT
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  item.comment,
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    height: 1.4,
-                  ),
-                ),
-              ),
-
-              PopupMenuButton<String>(
-                onSelected: (value) async {
-                  if (value == "delete") {
-                    Get.defaultDialog(
-                      title: "Delete Review",
-                      middleText: "Are you sure you want to delete this review?",
-                      textCancel: "Cancel",
-                      textConfirm: "Delete",
-                      confirmTextColor: Colors.white,
-                      onConfirm: () async {
-                        Get.back();
-
-                        await Get.find<ReviewsController>()
-                            .deleteReview(item.id);
-                      },
-                    );
-                  }
-                },
-                itemBuilder: (_) => const [
-                  PopupMenuItem(
-                    value: "delete",
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text("Delete"),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
           /// FOOTER: Likes | Reply | View Replies Button
           Row(
             children: [
@@ -245,10 +186,7 @@ class _ReviewCardState extends State<ReviewCard> {
                       showReplies
                           ? "Hide replies"
                           : "View replies (${item.replies.length})",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ),
                 ),
@@ -288,15 +226,12 @@ class _ReviewCardState extends State<ReviewCard> {
 
               /// DELETE BUTTON
               IconButton(
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                ),
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
                 onPressed: () {
                   Get.defaultDialog(
                     title: "Delete Review",
                     middleText:
-                    "Are you sure you want to delete this review? This action cannot be undone.",
+                        "Are you sure you want to delete this review? This action cannot be undone.",
                     textCancel: "Cancel",
                     textConfirm: "Delete",
                     confirmTextColor: Colors.white,
@@ -312,7 +247,7 @@ class _ReviewCardState extends State<ReviewCard> {
             ],
           ),
 
-          /// RECURSIVE REPLIES
+
           /// SHOW REPLIES
           if (showReplies)
             Column(
@@ -358,8 +293,9 @@ class _ReviewCardState extends State<ReviewCard> {
                             onConfirm: () async {
                               Get.back();
 
-                              await Get.find<ReviewsController>()
-                                  .deleteReview(reply.id);
+                              await Get.find<ReviewsController>().deleteReview(
+                                reply.id,
+                              );
                             },
                           );
                         },

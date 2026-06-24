@@ -11,9 +11,7 @@ import 'App/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: ".env");
   print(dotenv.env['GOOGLE_MAPS_API_KEY']);
   //  INIT STORAGE

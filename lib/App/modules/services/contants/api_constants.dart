@@ -47,4 +47,6 @@ class ApiConstants {
   static String highlightService(String id) => "$baseUrl/api/v1/highlight-service/$id";
 
   static String serviceById(String id) => "$baseUrl/api/v1/service/$id";
+
+  static const String googleAuthentication = "/api/v1/auth/google/authentication";
 }

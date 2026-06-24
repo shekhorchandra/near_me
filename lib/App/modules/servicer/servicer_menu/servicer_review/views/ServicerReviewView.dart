@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/core/widgets/common_app_bar.dart';
 
 import '../controller/ServicerReviewController.dart';
 import '../model/ServicerReviewModel.dart';
@@ -14,15 +15,8 @@ class ManageReviewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: const BackButton(color: Colors.black),
-        title: const Text(
-          "Manage Reviews",
-          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
-        ),
+      appBar: CommonAppBar(
+        title: 'Manage Reviews',
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -59,68 +53,140 @@ class ManageReviewsScreen extends StatelessWidget {
     Get.bottomSheet(
       Container(
         padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 16,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
         ),
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(24),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Reply to Review",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
 
-            TextField(
-              controller: replyController,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: "Write your reply...",
-                border: OutlineInputBorder(
+            /// Handle Bar
+            Center(
+              child: Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 20),
+
+            const Text(
+              "Reply to Review",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller: replyController,
+              maxLines: 4,
+              style: const TextStyle(
+                color: Colors.black,
+              ),
+              decoration: InputDecoration(
+                hintText: "Write your reply...",
+                hintStyle: const TextStyle(
+                  color: Colors.black54,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                contentPadding: const EdgeInsets.all(16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(
+                    color: Colors.black,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             Obx(() {
               return SizedBox(
                 width: double.infinity,
-                height: 45,
+                height: 50,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                   onPressed: controller.isReplyLoading.value
                       ? null
                       : () {
-                          final comment = replyController.text.trim();
+                    final comment = replyController.text.trim();
 
-                          if (comment.isEmpty) {
-                            Get.snackbar("Error", "Please write a reply");
-                            return;
-                          }
+                    if (comment.isEmpty) {
+                      Get.snackbar(
+                        "Error",
+                        "Please write a reply",
+                      );
+                      return;
+                    }
 
-                          controller.replyToReview(
-                            parentReviewId: review.id,
-                            comment: comment,
-                          );
-                        },
+                    controller.replyToReview(
+                      parentReviewId: review.id,
+                      comment: comment,
+                    );
+                  },
                   child: controller.isReplyLoading.value
-                      ? const CircularProgressIndicator()
-                      : const Text("Submit Reply"),
+                      ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : const Text(
+                    "Submit Reply",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               );
             }),
+
+            const SizedBox(height: 8),
           ],
         ),
       ),
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 

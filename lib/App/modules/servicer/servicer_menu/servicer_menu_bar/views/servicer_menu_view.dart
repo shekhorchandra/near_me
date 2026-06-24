@@ -31,43 +31,58 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
                     ],
                   ),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: AppColor.primary.withOpacity(0.1),
-                        child: Image.asset(
-                          AppAssets.usercat,
-                          height: 50,
-                          width: 50,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-        
+                      Obx(() {
+                        return CircleAvatar(
+                          radius: 30,
+                          backgroundColor: AppColor.primary.withOpacity(0.1),
+                          backgroundImage:
+                              controller.companyLogo.value.isNotEmpty
+                              ? NetworkImage(controller.companyLogo.value)
+                              : null,
+                          child: controller.companyLogo.value.isEmpty
+                              ? Image.asset(
+                                  AppAssets.usercat,
+                                  height: 60,
+                                  width: 60,
+                                  fit: BoxFit.contain,
+                                )
+                              : null,
+                        );
+                      }),
+
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
+                      Obx(() {
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  "Blissful Spa",
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            Text(
+                              controller.serviceName.value,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              "example123@gmail.com",
-                              style: TextStyle(fontSize: 13, color: Colors.grey),
+                            Text(
+                              controller.providerEmail.value,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
-                        ),
-                      ),
+                        );
+                      }),
+                      const Spacer(),
                       const Icon(Icons.arrow_forward_ios, size: 16),
                     ],
                   ),
@@ -86,7 +101,11 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      ),
                     ],
                   ),
                   child: Row(
@@ -100,34 +119,47 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                               children: [
                                 const Text(
                                   "★ Reviews",
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const Spacer(),
                                 Row(
                                   children: [
                                     CircleAvatar(
                                       radius: 10,
-                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=5"),
+                                      backgroundImage: NetworkImage(
+                                        "https://i.pravatar.cc/150?img=5",
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     CircleAvatar(
                                       radius: 10,
-                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=6"),
+                                      backgroundImage: NetworkImage(
+                                        "https://i.pravatar.cc/150?img=6",
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     CircleAvatar(
                                       radius: 10,
-                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=7"),
+                                      backgroundImage: NetworkImage(
+                                        "https://i.pravatar.cc/150?img=7",
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     CircleAvatar(
                                       radius: 10,
-                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=8"),
+                                      backgroundImage: NetworkImage(
+                                        "https://i.pravatar.cc/150?img=8",
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                     CircleAvatar(
                                       radius: 10,
-                                      backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=9"),
+                                      backgroundImage: NetworkImage(
+                                        "https://i.pravatar.cc/150?img=9",
+                                      ),
                                     ),
                                     const SizedBox(width: 4),
                                   ],
@@ -153,33 +185,60 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                   children: [
                     Text("Settings", style: AppText.textTheme.headlineSmall),
                     const SizedBox(height: 12),
-                    _menuItem(Icons.key, "Change Password", controller.changePassword),
+                    _menuItem(
+                      Icons.key,
+                      "Change Password",
+                      controller.changePassword,
+                    ),
                     KMenuItem(
                       title: 'Payment Methods',
                       icon: Icons.credit_card_rounded,
                       onTap: () => Get.toNamed(AppRoutes.PAYMENT_METHOD),
                     ),
-                    _menuItem(Icons.info_outline, "About Us", controller.goToAbout),
+                    _menuItem(
+                      Icons.info_outline,
+                      "About Us",
+                      controller.goToAbout,
+                    ),
                     _menuItem(
                       Icons.contact_support_outlined,
                       "Contact Us",
                       controller.onContactUsTap,
                     ),
-                    _menuItem(Icons.emergency, "Help & Support", controller.onHelpSupportTap),
+                    _menuItem(
+                      Icons.emergency,
+                      "Help & Support",
+                      controller.onHelpSupportTap,
+                    ),
                     const SizedBox(height: 24),
                     _menuItem(
                       Icons.privacy_tip_outlined,
                       "Privacy Policy",
                       controller.onPrivacyPolicyTap,
                     ),
-                    _menuItem(Icons.description_outlined, "Terms & Condition", controller.onTermsTap),
-                    _menuItem(Icons.star_rate_outlined, "Rate the App", controller.onRateAppTap),
-                    _menuItem(Icons.share_outlined, "Invite Friends", controller.onInviteFriendsTap),
+                    _menuItem(
+                      Icons.description_outlined,
+                      "Terms & Condition",
+                      controller.onTermsTap,
+                    ),
+                    _menuItem(
+                      Icons.star_rate_outlined,
+                      "Rate the App",
+                      controller.onRateAppTap,
+                    ),
+                    _menuItem(
+                      Icons.share_outlined,
+                      "Invite Friends",
+                      controller.onInviteFriendsTap,
+                    ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       height: 52,
-                      child: AppButton(text: 'Logout', onPressed: controller.serviceronLogoutTap),
+                      child: AppButton(
+                        text: 'Logout',
+                        onPressed: controller.serviceronLogoutTap,
+                      ),
                     ),
                     const SizedBox(height: 16),
                   ],

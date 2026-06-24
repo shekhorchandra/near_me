@@ -149,8 +149,11 @@ class UserLoginView extends GetView<UserLoginController> {
                 child: Row(
                   children: [
                     Flexible(
-                      child: SocialButton(text: "Google", iconPath: AppAssets.google,
-                        onPressed: () => Get.find<UserLoginController>().loginWithGoogleUserDeepLink(),),
+                      child: SocialButton(
+                        text: "Google",
+                        iconPath: AppAssets.google,
+                        onPressed: () => Get.find<UserLoginController>().loginWithGoogleUser(),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Flexible(

@@ -23,7 +23,7 @@ class CategoriesView extends GetView<CategoriesController> {
 
             /// SEARCH
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: CustomTextField(
                 hint: 'Search categories...',
                 icon: Icons.search,

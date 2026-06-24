@@ -16,6 +16,11 @@ class ServicerMenuController extends GetxController {
   late final ServicerNavigationBarController navController;
   final box = GetStorage();
 
+  final serviceName = ''.obs;
+  final providerEmail = ''.obs;
+  final isLoading = false.obs;
+  final companyLogo = ''.obs;
+
   Rx<File?> profileImage = Rx<File?>(null);
   final ImagePicker _picker = ImagePicker();
 
@@ -26,6 +31,8 @@ class ServicerMenuController extends GetxController {
     super.onInit();
     // Safely find nav controller after it's been registered
     navController = Get.find<ServicerNavigationBarController>();
+
+    fetchServiceProfile();
   }
 
   // ===== Navigation Functions =====
@@ -61,6 +68,40 @@ class ServicerMenuController extends GetxController {
   //   Get.deleteAll();
   //   Get.offAllNamed(AppRoutes.SERVICER_LOGIN);
   // }
+
+  Future<void> fetchServiceProfile() async {
+    try {
+      isLoading.value = true;
+
+      final serviceId = box.read("serviceId");
+      final token = box.read("accessToken");
+      final response = await http.get(
+        Uri.parse("${ApiConstants.baseUrl}/api/v1/service/$serviceId"),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data["success"] == true) {
+        final result = data["data"];
+
+        companyLogo.value = result["company_logo"] ?? "";
+
+        serviceName.value = result["service_name"] ?? "";
+        providerEmail.value = result["provider"]?["email"] ?? "";
+      } else {
+        AppSnackbar.error(data["message"] ?? "Failed to load service");
+      }
+    }catch (e, stackTrace) {
+      print("ERROR: $e");
+      print(stackTrace);
+      AppSnackbar.error(e.toString());
+    }finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> serviceronLogoutTap() async {
     try {

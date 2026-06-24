@@ -5,6 +5,8 @@ import 'package:near_me/App/modules/user/category/user_category_service_details/
 import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../../../servicer/servicer_chat/servicer_chat/helper/TimeFormatter.dart';
+import '../../FullImageView.dart';
 import '../controller/ServiceDetailsController.dart';
 
 class ServiceDetailsView extends GetView<ServiceDetailsController> {
@@ -107,12 +109,17 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                             itemBuilder: (context, index) {
                               final img = controller.media[index];
 
-                              return Image.network(
-                                img,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: Colors.grey.shade300,
-                                  child: const Icon(Icons.image, size: 50),
+                              return GestureDetector(
+                                onTap: () {
+                                  Get.to(() => FullImageView(imageUrl: img));
+                                },
+                                child: Image.network(
+                                  img,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: Colors.grey.shade300,
+                                    child: const Icon(Icons.image, size: 50),
+                                  ),
                                 ),
                               );
                             },
@@ -183,9 +190,27 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                               // ================= PROFILE =================
                               Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      controller.image.value,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.to(
+                                        () => FullImageView(
+                                          imageUrl: controller.image.value,
+                                        ),
+                                      );
+                                    },
+                                    child: ClipOval(
+                                      child: Image.network(
+                                        controller.image.value,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          width: 60,
+                                          height: 60,
+                                          color: Colors.grey.shade300,
+                                          child: const Icon(Icons.person),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -323,18 +348,27 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       children: [
                                         // ================= IMAGE =================
                                         Expanded(
-                                          child: Image.network(
-                                            item["image"] ?? '',
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) =>
-                                                Container(
-                                                  color: Colors.grey.shade300,
-                                                  child: const Icon(
-                                                    Icons.image,
-                                                    size: 40,
-                                                  ),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Get.to(
+                                                () => FullImageView(
+                                                  imageUrl: item["image"] ?? '',
                                                 ),
+                                              );
+                                            },
+                                            child: Image.network(
+                                              item["image"] ?? '',
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Container(
+                                                    color: Colors.grey.shade300,
+                                                    child: const Icon(
+                                                      Icons.image,
+                                                      size: 40,
+                                                    ),
+                                                  ),
+                                            ),
                                           ),
                                         ),
 
@@ -400,23 +434,30 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
                                       // move camera to existing location once
                                       map.animateCamera(
-                                        CameraUpdate.newLatLng(LatLng(lat, lng)),
+                                        CameraUpdate.newLatLng(
+                                          LatLng(lat, lng),
+                                        ),
                                       );
                                     },
 
                                     onTap: (pos) {
                                       controller.latitude.value = pos.latitude;
-                                      controller.longitude.value = pos.longitude;
+                                      controller.longitude.value =
+                                          pos.longitude;
                                     },
 
                                     markers: {
                                       Marker(
-                                        markerId: const MarkerId("service_location"),
+                                        markerId: const MarkerId(
+                                          "service_location",
+                                        ),
                                         position: LatLng(lat, lng),
                                         draggable: true,
                                         onDragEnd: (pos) {
-                                          controller.latitude.value = pos.latitude;
-                                          controller.longitude.value = pos.longitude;
+                                          controller.latitude.value =
+                                              pos.latitude;
+                                          controller.longitude.value =
+                                              pos.longitude;
                                         },
                                       ),
                                     },
@@ -434,8 +475,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                 child: Column(
                                   children: [
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Reviews (${controller.reviews.length})",
@@ -449,12 +489,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             Get.toNamed(
                                               AppRoutes.REVIEWS,
                                               arguments: {
-                                                "serviceId":
-                                                    controller.serviceId,
+                                                "serviceId": controller.serviceId,
                                               },
                                             );
                                           },
-                                          child: Text("View all"),
+                                          child: Text(
+                                            "View all (${controller.filteredReviews.length}) >",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -527,7 +571,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "2 days ago",
+                      ServiceTimeFormatter.timeAgo(review.createdAt),
                       style: TextStyle(
                         color: Colors.grey.shade500,
                         fontSize: 12,
@@ -558,8 +602,6 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
             ],
           ),
 
-          const SizedBox(height: 10),
-
           /// COMMENT
           Text(
             review.comment,
@@ -570,34 +612,29 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
             ),
           ),
 
-          const SizedBox(height: 12),
 
           /// ACTIONS ROW
           Row(
             children: [
-              const Icon(Icons.favorite_border, size: 18),
-              const SizedBox(width: 4),
-              const Text("124", style: TextStyle(fontSize: 12)),
 
-              const SizedBox(width: 16),
+
+              if (review.replies.isNotEmpty) _buildReplyToggle(review),
+
+              const Spacer(),
 
               TextButton.icon(
                 onPressed: () {
                   Get.dialog(
                     ReplyDialogView(
-                      serviceId: controller.serviceId,// or controller.serviceId
-                      parentId: review.id,         // IMPORTANT
+                      serviceId: controller.serviceId,
+                      parentId: review.id,
                       isReview: false,
                     ),
                   );
                 },
-                icon: const Icon(Icons.reply),
-                label: const Text("Reply"),
+                icon: const Icon(Icons.reply, color: Colors.black,),
+                label: const Text("Reply", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
               ),
-
-              const Spacer(),
-
-              if (review.replies.isNotEmpty) _buildReplyToggle(review),
             ],
           ),
 

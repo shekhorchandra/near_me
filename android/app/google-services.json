@@ -12,7 +12,20 @@
           "package_name": "com.app.near_me"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "282164809089-r32512upfu95ms60m40bbl31rkc40vob.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.near_me",
+            "certificate_hash": "0bf4f566935f5c6b6c7feeed9c439b80fdfb1b8b"
+          }
+        },
+        {
+          "client_id": "282164809089-pkov4jeere5n5o7btn0e1f6vsf40ufuq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAYSVu_3ITPPfAz4iRpmRecXqduu2_tX08"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "282164809089-8oif97g44iumr0pmuri99blmd0a1m997.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "282164809089-lqsaimnbjbjqnhqr7l86f51kmij7r8nf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.nearMe"
+              }
+            }
+          ]
         }
       }
     }

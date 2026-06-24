@@ -46,9 +46,14 @@ class ConversationController extends GetxController {
 
       final myId = storage.userId ?? "";
 
-      if ((msg.senderId == myId && msg.receiverId == userId) ||
-          (msg.senderId == userId && msg.receiverId == myId)) {
-        messages.insert(0, msg);
+      final isRelevant =
+          (msg.senderId == myId && msg.receiverId == userId) ||
+              (msg.senderId == userId && msg.receiverId == myId);
+
+      if (isRelevant) {
+        if (!messages.any((m) => m.id == msg.id)) {
+          messages.insert(0, msg);
+        }
       }
     });
 
