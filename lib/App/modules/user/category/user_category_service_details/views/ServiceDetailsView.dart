@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/models/ReviewModel.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
+import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../servicer/servicer_chat/servicer_chat/helper/TimeFormatter.dart';
 import '../../FullImageView.dart';
@@ -27,6 +30,17 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () {
+                    final token = Get.find<StorageService>().accessToken;
+
+                    if (token == null || token.isEmpty) {
+                      Get.snackbar(
+                        "Login Required",
+                        "Please login first to start chatting",
+                        snackPosition: SnackPosition.TOP,
+                      );
+                      return;
+                    }
+
                     print("providerId = ${controller.providerId.value}");
                     print("providerName = ${controller.providerName.value}");
 
@@ -59,6 +73,17 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
                 ElevatedButton.icon(
                   onPressed: () {
+                    final token = Get.find<StorageService>().accessToken;
+
+                    if (token == null || token.isEmpty) {
+                      Get.snackbar(
+                        "Login Required",
+                        "Please login first to make a call",
+                        snackPosition: SnackPosition.TOP,
+                      );
+                      return;
+                    }
+
                     controller.callNumber(controller.phone.value);
                   },
                   icon: const Icon(Icons.call, color: Colors.white),
@@ -127,42 +152,76 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
                           // LEFT BUTTON
                           Positioned(
-                            left: 5,
+                            left: 10,
                             top: 0,
                             bottom: 0,
                             child: Center(
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_back_ios,
-                                  color: Colors.white,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.25),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 8,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
                                 ),
-                                onPressed: () {
-                                  controller.pageController.previousPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    controller.pageController.previousPage(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
 
                           // RIGHT BUTTON
                           Positioned(
-                            right: 5,
+                            right: 10,
                             top: 0,
                             bottom: 0,
                             child: Center(
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white,
+                              child: ClipOval(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.25),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    onPressed: () {
+                                      controller.pageController.nextPage(
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  controller.pageController.nextPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
                               ),
                             ),
                           ),
@@ -239,8 +298,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             const Icon(Icons.star, size: 16),
                                             const SizedBox(width: 4),
                                             Text(
-                                              controller.rating.value
-                                                  .toString(),
+                                              controller.averageRating.value.toStringAsFixed(1),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                             const SizedBox(width: 12),
                                             const Icon(
@@ -475,7 +536,8 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                 child: Column(
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "Reviews (${controller.reviews.length})",
@@ -485,7 +547,18 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                           ),
                                         ),
                                         TextButton(
-                                          onPressed: () {
+                                          onPressed: () async {
+                                            final isLoggedIn = await controller.checkLogin();
+
+                                            if (!isLoggedIn) {
+                                              Get.snackbar(
+                                                "Login Required",
+                                                "Please login first to view reviews",
+                                                snackPosition: SnackPosition.TOP,
+                                              );
+                                              return;
+                                            }
+
                                             Get.toNamed(
                                               AppRoutes.REVIEWS,
                                               arguments: {
@@ -495,11 +568,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                           },
                                           child: Text(
                                             "View all (${controller.filteredReviews.length}) >",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            ),
+                                            style: const TextStyle(color: Colors.black),
                                           ),
-                                        ),
+                                        )
                                       ],
                                     ),
                                     const SizedBox(height: 10),
@@ -590,7 +661,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.star, size: 14, color: Colors.green),
+                    const Icon(Icons.star, size: 14, color: Colors.amber),
                     const SizedBox(width: 3),
                     Text(
                       review.rating.toString(),
@@ -601,6 +672,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
               ),
             ],
           ),
+          const SizedBox(height: 12),
 
           /// COMMENT
           Text(
@@ -612,31 +684,34 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
             ),
           ),
 
-
           /// ACTIONS ROW
-          Row(
-            children: [
-
-
-              if (review.replies.isNotEmpty) _buildReplyToggle(review),
-
-              const Spacer(),
-
-              TextButton.icon(
-                onPressed: () {
-                  Get.dialog(
-                    ReplyDialogView(
-                      serviceId: controller.serviceId,
-                      parentId: review.id,
-                      isReview: false,
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.reply, color: Colors.black,),
-                label: const Text("Reply", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     if (review.replies.isNotEmpty) _buildReplyToggle(review),
+          //
+          //     const Spacer(),
+          //
+          //     TextButton.icon(
+          //       onPressed: () {
+          //         Get.dialog(
+          //           ReplyDialogView(
+          //             serviceId: controller.serviceId,
+          //             parentId: review.id,
+          //             isReview: false,
+          //           ),
+          //         );
+          //       },
+          //       icon: const Icon(Icons.reply, color: Colors.black),
+          //       label: const Text(
+          //         "Reply",
+          //         style: TextStyle(
+          //           color: Colors.black,
+          //           fontWeight: FontWeight.bold,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
 
           /// REPLIES SECTION
           _buildReplies(review),
