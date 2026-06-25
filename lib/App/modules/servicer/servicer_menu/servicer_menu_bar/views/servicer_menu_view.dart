@@ -221,16 +221,16 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                       "Terms & Condition",
                       controller.onTermsTap,
                     ),
-                    _menuItem(
-                      Icons.star_rate_outlined,
-                      "Rate the App",
-                      controller.onRateAppTap,
-                    ),
-                    _menuItem(
-                      Icons.share_outlined,
-                      "Invite Friends",
-                      controller.onInviteFriendsTap,
-                    ),
+                    // _menuItem(
+                    //   Icons.star_rate_outlined,
+                    //   "Rate the App",
+                    //   controller.onRateAppTap,
+                    // ),
+                    // _menuItem(
+                    //   Icons.share_outlined,
+                    //   "Invite Friends",
+                    //   controller.onInviteFriendsTap,
+                    // ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,

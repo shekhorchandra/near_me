@@ -7,6 +7,8 @@ import '../../../../../core/values/app_color.dart';
 import '../../../../../core/values/app_text.dart';
 import '../../../../../core/widgets/App_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
+import '../../../../../data/services/storage_service.dart';
+import '../../../../../routes/app_routes.dart';
 import '../controller/menu_controller.dart';
 
 class MenuView extends GetView<UserMenuController> {
@@ -14,6 +16,8 @@ class MenuView extends GetView<UserMenuController> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn =
+        Get.find<StorageService>().accessToken?.isNotEmpty == true;
     return Scaffold(
       appBar: const CommonAppBar(title: "Menu", showBack: false),
       body: SafeArea(
@@ -58,24 +62,50 @@ class MenuView extends GetView<UserMenuController> {
                   children: [
                     Text("Settings", style: AppText.textTheme.headlineSmall),
                     const SizedBox(height: 12),
-                    _menuItem(Icons.key, "Change Password", controller.changePassword),
+                    _menuItem(
+                      Icons.key,
+                      "Change Password",
+                          () {
+                        final token = Get.find<StorageService>().accessToken;
+
+                        if (token == null || token.isEmpty) {
+                          Get.snackbar(
+                            "Login Required",
+                            "Please login first to change your password",
+                            snackPosition: SnackPosition.TOP,
+                          );
+                          return;
+                        }
+
+                        controller.changePassword();
+                      },
+                    ),
                     _menuItem(Icons.info_outline, "About Us", controller.goToAbout),
                     _menuItem(Icons.contact_support_outlined, "Contact Us", controller.onContactUsTap),
                     _menuItem(Icons.emergency, "Help & Support", controller.onHelpSupportTap),
                     const SizedBox(height: 24),
                     _menuItem(Icons.privacy_tip_outlined, "Privacy Policy", controller.onPrivacyPolicyTap),
                     _menuItem(Icons.description_outlined, "Terms & Condition", controller.onTermsTap),
-                    _menuItem(Icons.star_rate_outlined, "Rate the App", controller.onRateAppTap),
-                    _menuItem(Icons.share_outlined, "Invite Friends", controller.onInviteFriendsTap),
+                    // _menuItem(Icons.star_rate_outlined, "Rate the App", controller.onRateAppTap),
+                    // _menuItem(Icons.share_outlined, "Invite Friends", controller.onInviteFriendsTap),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       height: 52,
-                      child: AppButton(
-                        text: 'Logout',
-                        onPressed: () async {
-                          await controller.onLogoutTap();
-                        },
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: AppButton(
+                          text: isLoggedIn ? 'Logout' : 'Login',
+                          onPressed: () async {
+                            if (!isLoggedIn) {
+                              Get.toNamed(AppRoutes.USER_LOGIN);
+                              return;
+                            }
+
+                            await controller.onLogoutTap();
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
