@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 import '../../../../../core/values/app_assets.dart';
 import '../../../../../core/values/app_color.dart';
 import '../../../../../core/values/app_text.dart';
+import '../../../../../core/widgets/PasswordRule.dart';
 import '../../../../../core/widgets/app_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/social_button.dart';
 import '../../../../../routes/app_routes.dart';
 import '../controllers/servicer_signup_controller.dart';
+
 
 class ServicerSignupView extends GetView<ServicerSignupController> {
   const ServicerSignupView({super.key});
@@ -97,6 +99,38 @@ class ServicerSignupView extends GetView<ServicerSignupController> {
                   ),
                 ),
               ),
+
+              const SizedBox(height: 10),
+
+              Obx(
+                    () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PasswordRule(
+                      title: "At least 8 characters",
+                      valid: controller.hasMinLength.value,
+                    ),
+                    PasswordRule(
+                      title: "Contains an uppercase letter",
+                      valid: controller.hasUppercase.value,
+                    ),
+                    PasswordRule(
+                      title: "Contains a lowercase letter",
+                      valid: controller.hasLowercase.value,
+                    ),
+                    PasswordRule(
+                      title: "Contains a number",
+                      valid: controller.hasNumber.value,
+                    ),
+                    PasswordRule(
+                      title: "Contains a special character",
+                      valid: controller.hasSpecialChar.value,
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
 
               const SizedBox(height: 20),
 
