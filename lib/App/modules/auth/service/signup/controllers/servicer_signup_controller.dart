@@ -20,8 +20,41 @@ class ServicerSignupController extends GetxController {
   final servicerpasswordController = TextEditingController();
   final servicerconfirmPasswordController = TextEditingController();
 
+  final hasMinLength = false.obs;
+  final hasUppercase = false.obs;
+  final hasLowercase = false.obs;
+  final hasNumber = false.obs;
+  final hasSpecialChar = false.obs;
+  final isPasswordValid = false.obs;
+
   void togglePassword() => obscurePassword.value = !obscurePassword.value;
   void toggleConfirmPassword() => obscureConfirmPassword.value = !obscureConfirmPassword.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    servicerpasswordController.addListener(() {
+      validatePassword(servicerpasswordController.text);
+    });
+  }
+
+  void validatePassword(String password) {
+    hasMinLength.value = password.length >= 8;
+    hasUppercase.value = RegExp(r'[A-Z]').hasMatch(password);
+    hasLowercase.value = RegExp(r'[a-z]').hasMatch(password);
+    hasNumber.value = RegExp(r'[0-9]').hasMatch(password);
+    hasSpecialChar.value =
+        RegExp(r'[!@#\$%^&*(),.?":{}|<>_\-+=~`/\\[\]]')
+            .hasMatch(password);
+
+    isPasswordValid.value =
+        hasMinLength.value &&
+            hasUppercase.value &&
+            hasLowercase.value &&
+            hasNumber.value &&
+            hasSpecialChar.value;
+  }
 
   /// user register api call
   Future<void> registerProvider() async {
@@ -34,6 +67,10 @@ class ServicerSignupController extends GetxController {
     // ✅ Validate fields before sending
     if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       return AppSnackbar.error("All fields are required");
+    }
+    if (!isPasswordValid.value) {
+      AppSnackbar.error("Please enter a strong password.");
+      return;
     }
     if (password != confirmPassword) {
       return AppSnackbar.error("Passwords do not match");
