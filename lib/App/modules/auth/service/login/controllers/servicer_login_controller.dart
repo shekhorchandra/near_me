@@ -29,7 +29,7 @@ class ServicerLoginController extends GetxController {
   final StorageService _storageService = StorageService();
 
   final emailController = TextEditingController(text: "shekhorchandrasaha@gmail.com");
-  final passwordController = TextEditingController(text: "Tonoy@#123");
+  final passwordController = TextEditingController(text: "Test1234@");
 
   // final emailController = TextEditingController();
   // final passwordController = TextEditingController();
