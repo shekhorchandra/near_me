@@ -99,8 +99,6 @@ class UserMenuController extends GetxController {
 
       await storage.clear();
 
-      Get.deleteAll();
-
       AppSnackbar.success("Logged out successfully");
 
       Get.offAllNamed(AppRoutes.USER_LOGIN);
