@@ -31,7 +31,7 @@ class ServiceDetailsController extends GetxController {
   RxString providerId = ''.obs;
   RxString providerName = ''.obs;
   RxInt selectedTab = 0.obs;
-
+  final averageRating = 0.0.obs;
 
   var media = <String>[].obs;
 
@@ -69,6 +69,27 @@ class ServiceDetailsController extends GetxController {
     return reviews.where((e) => e.rating == rating).toList();
   }
 
+  ///  whether login or not
+  Future<bool> checkLogin() async {
+    try {
+      final token = storage.accessToken;
+
+      if (token == null || token.isEmpty) {
+        return false;
+      }
+
+      final response = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/user/me",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+
+      return response.data["success"] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// fetch details
   Future<void> fetchServiceDetails() async {
     try {
       isLoading.value = true;
@@ -91,9 +112,7 @@ class ServiceDetailsController extends GetxController {
 
       final data = response.data["data"];
 
-      if (data["location"] != null &&
-          data["location"]["coordinates"] != null) {
-
+      if (data["location"] != null && data["location"]["coordinates"] != null) {
         final coordinates = data["location"]["coordinates"];
 
         longitude.value = (coordinates[0] as num).toDouble();
@@ -103,22 +122,21 @@ class ServiceDetailsController extends GetxController {
         print("LNG = ${longitude.value}");
 
         mapController?.animateCamera(
-          CameraUpdate.newLatLng(
-            LatLng(latitude.value, longitude.value),
-          ),
+          CameraUpdate.newLatLng(LatLng(latitude.value, longitude.value)),
         );
       }
 
-      // PRETTY JSON RESPONSE
-      final prettyJson = const JsonEncoder.withIndent(
-        '    ',
-      ).convert(data);
+      /// PRETTY JSON RESPONSE
+      final prettyJson = const JsonEncoder.withIndent('    ').convert(data);
 
       // LOGGER PRINT
       logger.i(prettyJson);
 
       if (response.statusCode == 200 && response.data["success"] == true) {
         final data = response.data["data"];
+
+        averageRating.value =
+            (data["averageRating"] as num?)?.toDouble() ?? 0.0;
 
         providerId.value = data["provider"]?["_id"] ?? '';
         providerName.value = data["provider"]?["name"] ?? '';
@@ -143,7 +161,9 @@ class ServiceDetailsController extends GetxController {
             .map((e) => e["name"].toString())
             .toList();
 
-        highlightServices.value = List<Map<String, dynamic>>.from(data["highlight_services"] ?? []);
+        highlightServices.value = List<Map<String, dynamic>>.from(
+          data["highlight_services"] ?? [],
+        );
 
         // Highlights = media
         media.value = List<String>.from(data["media"] ?? []);
