@@ -13,11 +13,16 @@ class ReviewsController extends GetxController {
   RxInt selectedTab = 0.obs;
 
   late String serviceId;
-  late String userId;
+  String userId = "";
 
   RxList<ReviewModel> reviews = <ReviewModel>[].obs;
 
+  bool get isLoggedIn => storage.accessToken?.isNotEmpty == true;
+
   final tabs = ["All", "★★★★★", "★★★★", "★★★", "★★", "★"];
+
+  RxBool isCheckingUser = false.obs;
+  RxMap<String, dynamic> currentUser = <String, dynamic>{}.obs;
 
   @override
   void onInit() {
@@ -31,8 +36,36 @@ class ReviewsController extends GetxController {
       debugPrint("❌ serviceId is missing from navigation");
       return;
     }
-
+    getCurrentUser();
     fetchReviews();
+  }
+
+  Future<void> getCurrentUser() async {
+    try {
+      final token = storage.accessToken;
+
+      if (token == null || token.isEmpty) {
+        userId = "";
+        return;
+      }
+
+      final response = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/user/me",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      if (response.data["success"] == true) {
+        currentUser.value = response.data["data"];
+        userId = response.data["data"]["_id"] ?? "";
+      }
+    } catch (e) {
+      userId = "";
+      debugPrint("Current user error: $e");
+    }
   }
 
   /// delete review
@@ -93,11 +126,23 @@ class ReviewsController extends GetxController {
     int? rating,
     String? parentReview,
   }) async {
+    final token = storage.accessToken;
+
+    if (token == null || token.isEmpty) {
+      Get.snackbar(
+        "Login Required",
+        "Please login first",
+      );
+      return;
+    }
+    print("Token: ${storage.accessToken}");
+    print("Is Empty: ${storage.accessToken?.isEmpty}");
+    print("Is Null: ${storage.accessToken == null}");
+
     try {
       await dio.post(
         "${ApiConstants.baseUrl}/api/v1/review/create",
         data: {
-          "user": userId,
           "service": serviceId,
           "comment": comment,
           if (rating != null) "rating": rating,
@@ -105,18 +150,19 @@ class ReviewsController extends GetxController {
         },
         options: Options(
           headers: {
-            "Authorization": "Bearer ${storage.accessToken}",
-            // OR if your backend does not use Bearer:
-            // "Authorization": storage.accessToken,
+            "Authorization": "Bearer $token",
           },
         ),
       );
 
-      fetchReviews();
+      await fetchReviews();
       Get.back();
-      Get.snackbar("Success", "Submitted");
-    } catch (e) {
-      Get.snackbar("Error", "Failed");
+      Get.snackbar("Success", "Review submitted");
+    } on DioException catch (e) {
+      Get.snackbar(
+        "Error",
+        e.response?.data["message"] ?? "Failed to submit review",
+      );
     }
   }
 

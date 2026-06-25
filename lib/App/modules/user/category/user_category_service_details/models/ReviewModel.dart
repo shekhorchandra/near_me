@@ -33,8 +33,8 @@ class ReviewModel {
       replies: json["replies"] == null
           ? []
           : (json["replies"] as List)
-          .map((e) => ReviewModel.fromJson(e))
-          .toList(),
+                .map((e) => ReviewModel.fromJson(e))
+                .toList(),
     );
   }
 }
