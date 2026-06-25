@@ -18,6 +18,9 @@ void main() async {
   final storageService = StorageService();
   await storageService.init();
 
+  // Clear login data every app launch
+  await storageService.clear();
+
   //  REGISTER IN GETX
   Get.put<StorageService>(storageService, permanent: true);
 
