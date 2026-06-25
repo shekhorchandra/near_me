@@ -108,27 +108,27 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                       ),
                     ),
 
-                    const SizedBox(width: 8),
-
-                    SizedBox(
-                      width: 140,
-                      child: DropdownButtonFormField<String>(
-                        value: controller.selectedAvailability.value,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        ),
-                        items: const ['Availability', 'All', 'Available', 'Busy']
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (v) {
-                          controller.selectedAvailability.value = v!;
-                          controller.applyFilters();
-                        },
-                      ),
-                    ),
+                    // const SizedBox(width: 8),
+                    //
+                    // SizedBox(
+                    //   width: 140,
+                    //   child: DropdownButtonFormField<String>(
+                    //     value: controller.selectedAvailability.value,
+                    //     isExpanded: true,
+                    //     decoration: const InputDecoration(
+                    //       isDense: true,
+                    //       border: OutlineInputBorder(),
+                    //       contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    //     ),
+                    //     items: const ['Availability', 'All', 'Available', 'Busy']
+                    //         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    //         .toList(),
+                    //     onChanged: (v) {
+                    //       controller.selectedAvailability.value = v!;
+                    //       controller.applyFilters();
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
