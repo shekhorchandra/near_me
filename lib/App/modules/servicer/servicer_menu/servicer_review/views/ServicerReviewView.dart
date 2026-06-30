@@ -23,21 +23,27 @@ class ManageReviewsScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _ratingSummary(controller),
-            const SizedBox(height: 16),
-            _ratingFilters(controller),
-            const SizedBox(height: 12),
-
-            if (controller.filteredReviews.isEmpty)
-              const Center(child: Text("No reviews found")),
-
-            ...controller.filteredReviews.map(
-                  (review) => _reviewCard(context, review, controller),
-            ),
-          ],
+        return RefreshIndicator(
+          color: Colors.black,
+          onRefresh: () async {
+            await controller.fetchServiceReviews(); // Your API method
+          },
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _ratingSummary(controller),
+              const SizedBox(height: 16),
+              _ratingFilters(controller),
+              const SizedBox(height: 12),
+          
+              if (controller.filteredReviews.isEmpty)
+                const Center(child: Text("No reviews found")),
+          
+              ...controller.filteredReviews.map(
+                    (review) => _reviewCard(context, review, controller),
+              ),
+            ],
+          ),
         );
       }),
     );

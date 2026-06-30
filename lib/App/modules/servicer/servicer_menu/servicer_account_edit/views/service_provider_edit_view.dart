@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -294,123 +296,121 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                 /// ================= MEDIA =================
                 const Text(
                   "Media (Max 3)",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
-                const SizedBox(height: 10),
-
-                Obx(() {
-                  final totalImages =
-                      controller.mediaUrls.length +
-                      controller.mediaFiles.length;
-
-                  return Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      /// ================= SERVER IMAGES =================
-                      ...controller.mediaUrls.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final url = entry.value;
-
-                        return Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                url,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-
-                            /// REMOVE OLD IMAGE
-                            Positioned(
-                              top: 5,
-                              right: 5,
-                              child: InkWell(
-                                onTap: () => controller.removeApiMedia(index),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-
-                      /// ================= NEW PICKED IMAGES =================
-                      ...controller.mediaFiles.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final file = entry.value;
-
-                        return Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
-                                file,
-                                height: 100,
-                                width: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-
-                            /// REMOVE NEW IMAGE
-                            Positioned(
-                              top: 5,
-                              right: 5,
-                              child: InkWell(
-                                onTap: () => controller.removeMedia(index),
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-
-                      /// ================= ADD BUTTON =================
-                      if (totalImages < 3)
-                        InkWell(
-                          onTap: controller.pickMedia,
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey.shade400),
-                            ),
-                            child: const Icon(Icons.add_a_photo),
-                          ),
-                        ),
-                    ],
-                  );
-                }),
                 const SizedBox(height: 12),
 
-                /// ================= LOGO
+                Obx(() {
+                  final images = [
+                    ...controller.mediaUrls.map((e) => {"type": "network", "data": e}),
+                    ...controller.mediaFiles.map((e) => {"type": "file", "data": e}),
+                  ];
+
+                  final showAdd = images.length < 3;
+
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: images.length + (showAdd ? 1 : 0),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      // Add button
+                      if (showAdd && index == images.length) {
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: controller.pickMedia,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.grey.shade400),
+                            ),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_photo_alternate_outlined,
+                                  size: 28,
+                                  color: Colors.black54,
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "Add",
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      final item = images[index];
+                      final isNetwork = item["type"] == "network";
+
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: isNetwork
+                                ? Image.network(
+                              item["data"] as String,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            )
+                                : Image.file(
+                              item["data"] as File,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (isNetwork) {
+                                  controller.removeApiMedia(index);
+                                } else {
+                                  controller.removeMedia(
+                                    index - controller.mediaUrls.length,
+                                  );
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }),
+
+                const SizedBox(height: 12),
+
+                /// ================= LOGO =================
                 const Text(
                   "Logo (JPEG or PNG max 10 MB)",
                   style: TextStyle(fontWeight: FontWeight.bold),

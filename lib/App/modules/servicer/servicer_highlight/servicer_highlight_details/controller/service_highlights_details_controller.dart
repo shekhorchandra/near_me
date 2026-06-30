@@ -41,7 +41,6 @@ class ServiceHightlightsDetailsController extends GetxController {
       isLoading.value = true;
 
       final token = storage.accessToken;
-
       final url = ApiConstants.highlightService(highlightId);
 
       logger.i("HIGHLIGHT URL => $url");
@@ -49,66 +48,43 @@ class ServiceHightlightsDetailsController extends GetxController {
       final response = await http.get(
         Uri.parse(url),
         headers: {
-          // ✅ FIX
           "Authorization": "Bearer $token",
           "accesstoken": token ?? "",
           "Content-Type": "application/json",
         },
       );
 
-      logger.i(
-        "STATUS CODE => ${response.statusCode}",
-      );
+      logger.i("STATUS CODE => ${response.statusCode}");
 
       final decoded = jsonDecode(response.body);
 
-      // ✅ PRETTY LOGGER
-      final prettyJson =
-      const JsonEncoder.withIndent('    ')
-          .convert(decoded);
+      logger.i(
+        const JsonEncoder.withIndent('    ').convert(decoded),
+      );
 
-      logger.i(prettyJson);
+      if (response.statusCode == 200 && decoded["success"] == true) {
+        final data = decoded["data"];
 
-      if (response.statusCode == 200 &&
-          decoded["success"] == true) {
-
-        final data = decoded['data'];
-
-        titleController.text =
-            data['title'] ?? '';
-
-        descController.text =
-            data['description'] ?? '';
-
-        imageUrl.value =
-            data['image'] ?? '';
-
+        titleController.text = data["title"] ?? "";
+        descController.text = data["description"] ?? "";
+        imageUrl.value = data["image"] ?? "";
       } else {
-
         Get.snackbar(
           "Error",
-          decoded["message"] ??
-              "Failed to load highlight",
+          decoded["message"] ?? "Failed to load highlight",
         );
       }
-
     } catch (e) {
-
-      logger.e(
-        "FETCH SINGLE HIGHLIGHT ERROR => $e",
-      );
+      logger.e("FETCH SINGLE HIGHLIGHT ERROR => $e");
 
       Get.snackbar(
         "Error",
         "Something went wrong",
       );
-
     } finally {
-
       isLoading.value = false;
     }
   }
-
   // ================= PICK IMAGE =================
   void pickImage() async {
     final picked = await picker.pickImage(source: ImageSource.gallery);

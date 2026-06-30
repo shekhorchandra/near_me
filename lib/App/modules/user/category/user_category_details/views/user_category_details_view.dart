@@ -77,7 +77,9 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                         ),
                         items: const ['Rating', 'All', '5', '4+', '3+']
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
                             .toList(),
                         onChanged: (v) {
                           controller.selectedRating.value = v!;
@@ -98,37 +100,27 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 10),
                         ),
-                        items: const ['Radius', 'All', '1 mile', '5 mile', '10 mile']
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
+                        items:
+                            const [
+                                  'Radius',
+                                  'All',
+                                  '1 mile',
+                                  '5 mile',
+                                  '10 mile',
+                                ]
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(e),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (v) {
                           controller.selectedRadius.value = v!;
                           controller.applyFilters();
                         },
                       ),
                     ),
-
-                    // const SizedBox(width: 8),
-                    //
-                    // SizedBox(
-                    //   width: 140,
-                    //   child: DropdownButtonFormField<String>(
-                    //     value: controller.selectedAvailability.value,
-                    //     isExpanded: true,
-                    //     decoration: const InputDecoration(
-                    //       isDense: true,
-                    //       border: OutlineInputBorder(),
-                    //       contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    //     ),
-                    //     items: const ['Availability', 'All', 'Available', 'Busy']
-                    //         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    //         .toList(),
-                    //     onChanged: (v) {
-                    //       controller.selectedAvailability.value = v!;
-                    //       controller.applyFilters();
-                    //     },
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -137,38 +129,6 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// LEFT TREE CARD
-                    // Expanded(
-                    //   flex: 35,
-                    //   child: Container(
-                    //     padding: const EdgeInsets.all(4),
-                    //     child: Obx(() {
-                    //       ///  FIRST SHOW LOADING
-                    //       if (controller.isLoadingTree.value) {
-                    //         return SkeletonLoader.list(itemCount: 6);
-                    //       }
-                    //
-                    //       final tree = controller.categoryTree.value;
-                    //
-                    //       ///  EMPTY STATE
-                    //       if (tree == null ||
-                    //           tree.isEmpty ||
-                    //           tree['children'] == null ||
-                    //           (tree['children'] as List).isEmpty) {
-                    //         return const Center(
-                    //           child: Text("No Categories Found"),
-                    //         );
-                    //       }
-                    //
-                    //       ///  DATA
-                    //       return SingleChildScrollView(
-                    //         child: buildCategoryTree(tree),
-                    //       );
-                    //     }),
-                    //   ),
-                    // ),
-                    const SizedBox(width: 2),
-
                     /// RIGHT SERVICES CARD
                     Expanded(
                       flex: 65,
@@ -196,265 +156,202 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
                               child: Text("No Services Found"),
                             );
                           }
-
-                          /// ✅ DATA
-                          // return ListView.builder(
-                          //   itemCount: controller.services.length,
-                          //   itemBuilder: (context, index) {
-                          //     final service = controller.services[index];
-                          //
-                          //     return Card(
-                          //       elevation: 2,
-                          //       color: Colors.white,
-                          //       margin: const EdgeInsets.symmetric(vertical: 4),
-                          //       child: Padding(
-                          //         padding: const EdgeInsets.all(12),
-                          //         child: Column(
-                          //           crossAxisAlignment:
-                          //               CrossAxisAlignment.start,
-                          //           children: [
-                          //             AspectRatio(
-                          //               aspectRatio: 16 / 9,
-                          //               child: ClipRRect(
-                          //                 borderRadius: const BorderRadius.only(
-                          //                   topLeft: Radius.circular(16),
-                          //                   topRight: Radius.circular(16),
-                          //                 ),
-                          //                 child: Image.network(
-                          //                   service.image,
-                          //                   width: double.infinity,
-                          //                   fit: BoxFit.cover,
-                          //                 ),
-                          //               ),
-                          //             ),
-                          //
-                          //             const SizedBox(height: 8),
-                          //
-                          //             Text(
-                          //               service.title,
-                          //               style: const TextStyle(
-                          //                 fontSize: 16,
-                          //                 fontWeight: FontWeight.bold,
-                          //               ),
-                          //             ),
-                          //
-                          //             InfoRow(
-                          //               icon: Icons.star,
-                          //               text: service.rating.toString(),
-                          //             ),
-                          //
-                          //             InfoRow(
-                          //               icon: Icons.location_on,
-                          //               text: "${service.distance} miles",
-                          //             ),
-                          //
-                          //             InfoRow(
-                          //               icon: Icons.schedule,
-                          //               text: service.schedule,
-                          //             ),
-                          //
-                          //             InfoRow(
-                          //               icon: Icons.location_city,
-                          //               text: service.location,
-                          //             ),
-                          //
-                          //             const SizedBox(height: 10),
-                          //
-                          //             AppButton(
-                          //               width: double.infinity,
-                          //               height: 32,
-                          //               text: "View Details",
-                          //               onPressed: () {
-                          //                 Get.toNamed(
-                          //                   AppRoutes.SERVICE_DETAILS,
-                          //                   arguments: {"id": service.id},
-                          //                 );
-                          //               },
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     );
-                          //   },
-                          // );
-
-                          return ListView.builder(
-                            itemCount: controller.services.length,
-                            itemBuilder: (context, index) {
-                              final service = controller.services[index];
-
-                              return Card(
-                                color: Colors.white,
-                                elevation: 4,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: ClipRRect(
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                          ),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              Get.to(() => FullImageView(imageUrl: service.image));
-                                            },
-                                            child: Image.network(
-                                              service.image,
-                                              fit: BoxFit.cover,
-                                              width: double.infinity,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return ClipRRect(
-                                                  borderRadius: const BorderRadius.only(
-                                                    topLeft: Radius.circular(16),
-                                                    topRight: Radius.circular(16),
-                                                  ),
-                                                  child: Image.asset(
-                                                    "assets/images/placeholder2.jpg",
-                                                    fit: BoxFit.cover,
+                          
+                          return RefreshIndicator(
+                            color: Colors.black,
+                            onRefresh: () async {
+                              await controller.fetchServicesByCategory();
+                            },
+                            child: ListView.builder(
+                              itemCount: controller.services.length,
+                              itemBuilder: (context, index) {
+                                final service = controller.services[index];
+                            
+                                return Card(
+                                  color: Colors.white,
+                                  elevation: 4,
+                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AspectRatio(
+                                          aspectRatio: 16 / 9,
+                                          child: ClipRRect(
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16),
+                                            ),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                Get.to(
+                                                  () => FullImageView(
+                                                    imageUrl: service.image,
                                                   ),
                                                 );
                                               },
+                                              child: Image.network(
+                                                service.image,
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                errorBuilder:
+                                                    (context, error, stackTrace) {
+                                                      return ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius.only(
+                                                              topLeft:
+                                                                  Radius.circular(
+                                                                    16,
+                                                                  ),
+                                                              topRight:
+                                                                  Radius.circular(
+                                                                    16,
+                                                                  ),
+                                                            ),
+                                                        child: Image.asset(
+                                                          "assets/images/placeholder2.jpg",
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      );
+                                                    },
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-
-                                      Padding(
-                                        padding: const EdgeInsets.all(14),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    service.title,
-                                                    style: const TextStyle(
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                            
+                                        Padding(
+                                          padding: const EdgeInsets.all(14),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      service.title,
+                                                      style: const TextStyle(
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20,
+                            
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
                                                         ),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            20,
+                                                          ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.star,
+                                                          color: Colors.black,
+                                                          size: 14,
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          service.rating
+                                                              .toString(),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color: Colors.black,
-                                                        size: 14,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        service.rating
-                                                            .toString(),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-
-                                            const SizedBox(height: 12),
-
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.location_on,
-                                                  color: Colors.red,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Expanded(
-                                                  child: Text(
-                                                    "${service.distance} miles away",
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-
-                                            const SizedBox(height: 8),
-
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.access_time,
-                                                  color: Colors.blue,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Expanded(
-                                                  child: Text(service.schedule),
-                                                ),
-                                              ],
-                                            ),
-
-                                            const SizedBox(height: 8),
-
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.location_city,
-                                                  color: Colors.green,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Expanded(
-                                                  child: Text(service.location),
-                                                ),
-                                              ],
-                                            ),
-
-                                            const SizedBox(height: 16),
-
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: AppButton(
-                                                height: 42,
-                                                text: "View Details",
-                                                onPressed: () {
-                                                  Get.toNamed(
-                                                    AppRoutes.SERVICE_DETAILS,
-                                                    arguments: {
-                                                      "id": service.id,
-                                                    },
-                                                  );
-                                                },
+                                                ],
                                               ),
-                                            ),
-                                          ],
+                            
+                                              const SizedBox(height: 12),
+                            
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on,
+                                                    color: Colors.red,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "${service.distance} miles away",
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                            
+                                              const SizedBox(height: 8),
+                            
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.access_time,
+                                                    color: Colors.blue,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(service.schedule),
+                                                  ),
+                                                ],
+                                              ),
+                            
+                                              const SizedBox(height: 8),
+                            
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_city,
+                                                    color: Colors.green,
+                                                    size: 18,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(service.location),
+                                                  ),
+                                                ],
+                                              ),
+                            
+                                              const SizedBox(height: 16),
+                            
+                                              SizedBox(
+                                                width: double.infinity,
+                                                child: AppButton(
+                                                  height: 42,
+                                                  text: "View Details",
+                                                  onPressed: () {
+                                                    Get.toNamed(
+                                                      AppRoutes.SERVICE_DETAILS,
+                                                      arguments: {
+                                                        "id": service.id,
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           );
                         }),
                       ),
@@ -464,59 +361,6 @@ class UserCategoryDetailsView extends GetView<UserCategoryDetailsController> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-
-  Widget _filterDropdown({
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      height: 45,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 22,
-          ),
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-          selectedItemBuilder: (context) {
-            return items.map((e) {
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  e,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList();
-          },
-          items: items.map((e) {
-            return DropdownMenuItem<String>(
-              value: e,
-              child: Text(
-                e,
-                style: const TextStyle(fontSize: 14),
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
         ),
       ),
     );

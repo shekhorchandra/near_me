@@ -56,45 +56,52 @@ class CategoriesView extends GetView<CategoriesController> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  itemCount: controller.categories.length,
-                  itemBuilder: (context, index) {
-                    final category = controller.categories[index];
-
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                      ),
-                      leading: SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: Image.asset(
-                          category["image"]!,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      title: Text(
-                        category["name"]!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                      ),
-                      onTap: () {
-                        Get.toNamed(
-                          AppRoutes.USER_CATEGORY_DETAILS,
-                          arguments: {
-                            "id": category["id"],
-                            "name": category["name"],
-                          },
-                        );
-                      },
+                return RefreshIndicator(
+                  color: Colors.black,
+                  onRefresh: () async {
+                    await controller.fetchCategories(
+                      keyword: controller.searchText.value,
                     );
                   },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: controller.categories.length,
+                    itemBuilder: (context, index) {
+                      final category = controller.categories[index];
+
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                        leading: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Image.asset(
+                            category["image"]!,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        title: Text(
+                          category["name"]!,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                        ),
+                        onTap: () {
+                          Get.toNamed(
+                            AppRoutes.USER_CATEGORY_DETAILS,
+                            arguments: {
+                              "id": category["id"],
+                              "name": category["name"],
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               }),
             ),

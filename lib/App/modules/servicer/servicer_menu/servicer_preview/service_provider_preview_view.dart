@@ -1,16 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../core/widgets/common_app_bar.dart';
 import '../servicer_account_edit/controller/service_provider_edit_controller.dart';
 
 class ServiceProviderPreviewView extends StatelessWidget {
   final ServiceProviderEditController controller;
 
-  const ServiceProviderPreviewView({
-    super.key,
-    required this.controller,
-  });
+  const ServiceProviderPreviewView({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +21,9 @@ class ServiceProviderPreviewView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _actionBtn(Icons.chat, "Chat"),
-              _actionBtn(Icons.call, "Call"),
-              _actionBtn(Icons.public, "Website"),
+              // _actionBtn(Icons.chat, "Chat"),
+              // _actionBtn(Icons.call, "Call"),
+              // _actionBtn(Icons.public, "Website"),
             ],
           ),
         ),
@@ -36,29 +34,44 @@ class ServiceProviderPreviewView extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ================= HEADER IMAGE SLIDER =================
+              SizedBox(
+                height: 220,
+                child: (controller.mediaUrls.isNotEmpty ||
+                    controller.mediaFiles.isNotEmpty)
+                    ? PageView(
+                  children: [
+                    // Server images
+                    ...controller.mediaUrls.map(
+                          (url) => ClipRRect(
+                        child: Image.network(
+                          url,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
 
-              // ================= HEADER IMAGE =================
-              if (controller.mediaUrls.isNotEmpty)
-                Image.network(
-                  controller.mediaUrls.first,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
+                    // Newly selected images
+                    ...controller.mediaFiles.map(
+                          (file) => ClipRRect(
+                        child: Image.file(
+                          file,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
                 )
-              else if (controller.mediaFiles.isNotEmpty)
-                Image.file(
-                  controller.mediaFiles.first,
+                    : Container(
                   width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                )
-              else
-                Container(
-                  width: double.infinity,
-                  height: 200,
                   color: Colors.grey.shade300,
-                  child: const Center(child: Text("No Image")),
+                  child: const Center(
+                    child: Text("No Image"),
+                  ),
                 ),
+              ),
 
               const SizedBox(height: 10),
 
@@ -67,17 +80,18 @@ class ServiceProviderPreviewView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   children: [
-
                     // LOGO
                     CircleAvatar(
                       radius: 30,
                       backgroundImage: controller.logoFile.value != null
                           ? FileImage(controller.logoFile.value!)
                           : (controller.logoUrl.value.isNotEmpty
-                          ? NetworkImage(controller.logoUrl.value)
-                          : null) as ImageProvider?,
-                      child: controller.logoFile.value == null &&
-                          controller.logoUrl.value.isEmpty
+                                    ? NetworkImage(controller.logoUrl.value)
+                                    : null)
+                                as ImageProvider?,
+                      child:
+                          controller.logoFile.value == null &&
+                              controller.logoUrl.value.isEmpty
                           ? const Icon(Icons.person)
                           : null,
                     ),
@@ -89,7 +103,6 @@ class ServiceProviderPreviewView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           Text(
                             controller.nameCtrl.text,
                             style: const TextStyle(
@@ -134,7 +147,6 @@ class ServiceProviderPreviewView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     const Text(
                       'About',
                       style: TextStyle(
@@ -149,73 +161,75 @@ class ServiceProviderPreviewView extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
-                    // ================= SERVICES (NAME FIX) =================
-                    const Text(
-                      'Services Offered',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: controller.selectedOfferServices.map((e) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            controller.getServiceNameById(e),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ================= MEDIA =================
+                    // ================= SERVICE HIGHLIGHTS =================
                     const Text(
                       'Service Highlights',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
                     if (controller.mediaUrls.isNotEmpty ||
                         controller.mediaFiles.isNotEmpty)
-                      SizedBox(
-                        height: 100,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-
-                            ...controller.mediaUrls.map((url) {
-                              return _imageBox(NetworkImage(url));
-                            }),
-
-                            ...controller.mediaFiles.map((file) {
-                              return _imageBox(FileImage(file));
-                            }),
-                          ],
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount:
+                        controller.mediaUrls.length + controller.mediaFiles.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 1.3,
                         ),
+                        itemBuilder: (context, index) {
+                          final isNetwork = index < controller.mediaUrls.length;
+
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: isNetwork
+                                  ? Image.network(
+                                controller.mediaUrls[index],
+                                fit: BoxFit.cover,
+                              )
+                                  : Image.file(
+                                controller.mediaFiles[
+                                index - controller.mediaUrls.length],
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
                       )
                     else
-                      const Text("No media available"),
+                      Container(
+                        height: 120,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: const Center(
+                          child: Text("No service highlights available"),
+                        ),
+                      ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // ================= LOCATION =================
                     const Text(
@@ -228,11 +242,38 @@ class ServiceProviderPreviewView extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
-                    Container(
-                      width: double.infinity,
-                      height: 150,
-                      color: Colors.grey.shade300,
-                      child: const Center(child: Text('Map Placeholder')),
+                    SizedBox(
+                      height: 200,
+                      child: Obx(() {
+                        final lat = controller.latitude.value;
+                        final lng = controller.longitude.value;
+
+                        return GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(lat, lng),
+                            zoom: 16,
+                          ),
+
+                          onMapCreated: (map) {
+                            controller.mapController = map;
+
+                            map.animateCamera(
+                              CameraUpdate.newLatLng(LatLng(lat, lng)),
+                            );
+                          },
+
+                          markers: {
+                            Marker(
+                              markerId: const MarkerId("preview_location"),
+                              position: LatLng(lat, lng),
+                            ),
+                          },
+
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
+                          mapToolbarEnabled: false,
+                        );
+                      }),
                     ),
 
                     const SizedBox(height: 80),
@@ -254,9 +295,7 @@ class ServiceProviderPreviewView extends StatelessWidget {
       label: Text(text, style: const TextStyle(color: Colors.white)),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

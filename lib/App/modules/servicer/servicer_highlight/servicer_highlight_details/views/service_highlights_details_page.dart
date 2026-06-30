@@ -15,27 +15,35 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
       appBar: CommonAppBar(title: 'Service Highlights Details'),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SkeletonLoader.card(),
-
-                const SizedBox(height: 20),
-
-                SkeletonLoader.listTile(),
-                const SizedBox(height: 16),
-                SkeletonLoader.listTile(),
-
-                const SizedBox(height: 20),
-                SkeletonLoader.grid(itemCount: 2),
-              ],
+          return RefreshIndicator(
+            color: Colors.black,
+            onRefresh: controller.fetchSingleHighlight,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SkeletonLoader.card(),
+            
+                  const SizedBox(height: 20),
+            
+                  SkeletonLoader.listTile(),
+                  const SizedBox(height: 16),
+                  SkeletonLoader.listTile(),
+            
+                  const SizedBox(height: 20),
+                  SkeletonLoader.grid(itemCount: 2),
+                ],
+              ),
             ),
           );
         }
 
-        return _buildContent(controller);
+        return RefreshIndicator(
+          color: Colors.black,
+          onRefresh: controller.fetchSingleHighlight,
+          child: _buildContent(controller),
+        );
       }),
     );
   }
@@ -44,9 +52,12 @@ class ServiceHighlightsDetailsView extends GetView<ServiceHightlightsDetailsCont
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
-          ).copyWith(bottom: MediaQuery.of(context).viewPadding.bottom + 16),
+          ).copyWith(
+            bottom: MediaQuery.of(context).viewPadding.bottom + 16,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

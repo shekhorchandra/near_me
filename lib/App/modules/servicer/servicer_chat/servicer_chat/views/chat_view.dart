@@ -93,13 +93,27 @@ class ServiceChatView extends GetView<ServiceChatController> {
             ),
 
             Expanded(
-              child: ListView.separated(
-                itemCount: controller.chats.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final chat = controller.chats[index];
-                  return chatItem(chat);
+              child: RefreshIndicator(
+                color: Colors.black,
+                onRefresh: () async {
+                  await controller.fetchChats();
                 },
+                child: controller.chats.isEmpty
+                    ? ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: const [
+                    SizedBox(height: 250),
+                    Center(child: Text("No Chats Found")),
+                  ],
+                )
+                    : ListView.separated(
+                  itemCount: controller.chats.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final chat = controller.chats[index];
+                    return chatItem(chat);
+                  },
+                ),
               ),
             ),
           ],

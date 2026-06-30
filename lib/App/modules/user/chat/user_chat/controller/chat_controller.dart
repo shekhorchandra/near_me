@@ -34,8 +34,6 @@ class ChatController extends GetxController {
     } else {
       isLoginRequired.value = true;
     }
-
-    fetchChats();
   }
 
   Future<void> fetchChats() async {
