@@ -69,6 +69,8 @@ import '../modules/user/category/user_category_serivce_review/bindings/reviews_b
 import '../modules/user/category/user_category_serivce_review/views/reviews_view.dart';
 import '../modules/user/category/user_category_service_details/bindings/ServiceDetailsBinding.dart';
 import '../modules/user/category/user_category_service_details/views/ServiceDetailsView.dart';
+import '../modules/user/chat/user_chat/bindings/chat_binding.dart';
+import '../modules/user/chat/user_chat/views/chat_view.dart';
 import '../modules/user/chat/user_chat_conversation/bindings/conversation_binding.dart'
     hide ServicerConversationBinding;
 import '../modules/user/chat/user_chat_conversation/views/conversation_view.dart';
@@ -176,6 +178,12 @@ class AppPages {
       name: AppRoutes.REVIEWS,
       page: () => const ReviewsView(),
       binding: ReviewsBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.CHAT,
+      page: () => const ChatView(),
+      binding: ChatBinding(),
     ),
 
     ///user chat conversion

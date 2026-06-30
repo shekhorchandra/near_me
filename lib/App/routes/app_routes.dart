@@ -31,7 +31,10 @@ abstract class AppRoutes {
   /// SERVICE REVIEW
   static const REVIEWS = '/reviews';
 
-  ///user servicer_chat conversion
+  ///user user_chat
+  static const CHAT = '/chat';
+
+  ///user user_chat conversion
   static const CONVERSATION = '/conversation';
 
   /// user servicer_menu nav bar

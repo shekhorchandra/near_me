@@ -14,21 +14,21 @@ class ChatView extends GetView<ChatController> {
       onTap: () {
         Get.toNamed(
           AppRoutes.CONVERSATION,
-          arguments: {"userId": chat.userId, "name": chat.name, "image": chat.image,},
+          arguments: {
+            "userId": chat.userId,
+            "name": chat.name,
+            "image": chat.image,
+          },
         );
       },
       leading: Stack(
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundImage:
-            chat.image.isNotEmpty
+            backgroundImage: chat.image.isNotEmpty
                 ? NetworkImage(chat.image)
                 : null,
-            child:
-            chat.image.isEmpty
-                ? const Icon(Icons.person)
-                : null,
+            child: chat.image.isEmpty ? const Icon(Icons.person) : null,
           ),
 
           // Online indicator

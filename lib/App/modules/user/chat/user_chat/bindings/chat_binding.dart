@@ -11,8 +11,6 @@ class ChatBinding extends Bindings {
 
     Get.lazyPut(() => ChatApiService(dio));
 
-    Get.lazyPut(
-          () => ChatController(apiService: Get.find()),
-    );
+    Get.lazyPut(() => ChatController(apiService: Get.find()));
   }
 }
