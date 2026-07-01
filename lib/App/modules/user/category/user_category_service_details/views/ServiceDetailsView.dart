@@ -262,7 +262,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     GestureDetector(
                                       onTap: () {
                                         Get.to(
-                                          () => FullImageView(
+                                              () => FullImageView(
                                             imageUrl: controller.image.value,
                                           ),
                                         );
@@ -288,7 +288,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             controller.title.value,
@@ -325,7 +325,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 child: Text(
                                                   controller.schedule.value,
                                                   overflow:
-                                                      TextOverflow.ellipsis,
+                                                  TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
@@ -367,19 +367,19 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                   children: controller.servicesOffered
                                       .map(
                                         (service) => Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          child: Text(service),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(
+                                          20,
                                         ),
-                                      )
+                                      ),
+                                      child: Text(service),
+                                    ),
+                                  )
                                       .toList(),
                                 ),
 
@@ -399,17 +399,17 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount:
-                                      controller.highlightServices.length,
+                                  controller.highlightServices.length,
                                   gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        crossAxisSpacing: 12,
-                                        mainAxisSpacing: 12,
-                                        childAspectRatio: 1.00, // taller card
-                                      ),
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 1.00, // taller card
+                                  ),
                                   itemBuilder: (context, index) {
                                     final item =
-                                        controller.highlightServices[index];
+                                    controller.highlightServices[index];
 
                                     return Card(
                                       elevation: 3,
@@ -419,16 +419,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       clipBehavior: Clip.antiAlias,
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           // ================= IMAGE =================
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () {
                                                 Get.to(
-                                                  () => FullImageView(
+                                                      () => FullImageView(
                                                     imageUrl:
-                                                        item["image"] ?? '',
+                                                    item["image"] ?? '',
                                                   ),
                                                 );
                                               },
@@ -439,7 +439,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 errorBuilder: (_, __, ___) =>
                                                     Container(
                                                       color:
-                                                          Colors.grey.shade300,
+                                                      Colors.grey.shade300,
                                                       child: const Icon(
                                                         Icons.image,
                                                         size: 40,
@@ -454,7 +454,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             padding: const EdgeInsets.all(8),
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   item["title"] ?? '',
@@ -464,7 +464,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                   ),
                                                   maxLines: 1,
                                                   overflow:
-                                                      TextOverflow.ellipsis,
+                                                  TextOverflow.ellipsis,
                                                 ),
 
                                                 // const SizedBox(height: 4),
@@ -555,7 +555,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     children: [
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             "Reviews (${controller.reviews.length})",
@@ -567,19 +567,19 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                           TextButton(
                                             onPressed: () async {
                                               final isLoggedIn =
-                                                  await controller.checkLogin();
+                                              await controller.checkLogin();
 
                                               if (!isLoggedIn) {
                                                 Get.snackbar(
                                                   "Login Required",
                                                   "Please login first to view reviews",
                                                   snackPosition:
-                                                      SnackPosition.TOP,
+                                                  SnackPosition.TOP,
                                                 );
 
                                                 Future.delayed(
                                                   const Duration(seconds: 2),
-                                                  () {
+                                                      () {
                                                     Get.toNamed(
                                                       AppRoutes.USER_LOGIN,
                                                     );
@@ -593,7 +593,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 AppRoutes.REVIEWS,
                                                 arguments: {
                                                   "serviceId":
-                                                      controller.serviceId,
+                                                  controller.serviceId,
                                                 },
                                               );
                                             },
@@ -608,7 +608,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       ),
                                       const SizedBox(height: 10),
                                       ...controller.reviews.map(
-                                        (review) =>
+                                            (review) =>
                                             buildReviewCard(context, review),
                                       ),
                                     ],
