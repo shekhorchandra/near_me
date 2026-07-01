@@ -27,6 +27,9 @@ class ApiConstants {
   ///user logout
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
 
+  /// nearest service
+  static const String nearestService = "$baseUrl/api/v1/service/nearest";
+
   /// PLANS
   static const String getPlans = "$baseUrl/api/v1/plans";
 
