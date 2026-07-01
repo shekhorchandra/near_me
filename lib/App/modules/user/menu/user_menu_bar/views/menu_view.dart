@@ -22,27 +22,28 @@ class MenuView extends GetView<UserMenuController> {
         child: Column(
           children: [
             // ===== Fixed avatar =====
-            const SizedBox(height: 16),
-            Center(
-              child: Obx(
-                () => Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundImage: controller.profileImage.value != null
-                          ? FileImage(controller.profileImage.value!)
-                          : const NetworkImage(
-                                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmWDpF64gI24qp2wTAPnj_oA0QJZp7WFYvSw&s",
-                                )
-                                as ImageProvider,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
+            Column(
+              children: [
+                /// Profile Image
+                Obx(
+                      () => Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundImage: controller.profileImage.value != null
+                            ? FileImage(controller.profileImage.value!)
+                            : controller.profileImageUrl.value.isNotEmpty
+                            ? NetworkImage(controller.profileImageUrl.value)
+                            : const NetworkImage(
+                          "https://img.favpng.com/20/11/12/computer-icons-user-profile-png-favpng-0UAKKCpRRsMj5NaiELzw1pV7L.jpg",
+                        ) as ImageProvider,
+                      ),
+
+                      InkWell(
                         onTap: controller.onEditProfileTap,
                         child: CircleAvatar(
-                          radius: 16,
+                          radius: 18,
                           backgroundColor: AppColor.primary,
                           child: const Icon(
                             Icons.camera_alt,
@@ -51,10 +52,72 @@ class MenuView extends GetView<UserMenuController> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+
+
+
+                /// Name + Edit + Save
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Obx(
+                              () => TextField(
+                            controller: controller.nameController,
+                            enabled: controller.isEditing.value,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Your Name",
+                            ),
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      /// Edit Icon
+                      Obx(
+                            () => IconButton(
+                          onPressed: () {
+                            controller.isEditing.toggle();
+                          },
+                          icon: Icon(
+                            controller.isEditing.value
+                                ? Icons.close
+                                : Icons.edit,
+                          ),
+                        ),
+                      ),
+
+                      /// Save Icon
+                      Obx(
+                            () => controller.isUpdating.value
+                            ? const SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            color: Colors.black,
+                          ),
+                        )
+                            : IconButton(
+                          onPressed: controller.updateProfile,
+                          icon: const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             // ===== Scrollable menu =====

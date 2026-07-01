@@ -20,11 +20,20 @@ class UserMenuController extends GetxController {
   Rx<File?> profileImage = Rx<File?>(null);
   final ImagePicker _picker = ImagePicker();
 
+  RxString userName = "".obs;
+  RxString profileImageUrl = "".obs;
+  RxBool isEditing = false.obs;
+  RxBool isUpdating = false.obs;
+
+
+  final TextEditingController nameController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
     // Safely find nav controller after it's been registered
     navController = Get.find<UserNavigationBarController>();
+    getUserProfile();
   }
 
   // ===== Profile Image Editing =====
@@ -64,6 +73,92 @@ class UserMenuController extends GetxController {
     );
   }
 
+  Future<void> getUserProfile() async {
+    try {
+      final token = Get.find<StorageService>().accessToken;
+
+      final response = await http.get(
+        Uri.parse(ApiConstants.user_me),
+        headers: {
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+
+        final data = body["data"];
+
+        userName.value = data["name"] ?? "";
+        profileImageUrl.value = data["picture"] ?? "";
+
+        nameController.text = userName.value;
+      } else {
+        // HttpStatusHandler.handle(response);
+      }
+    } catch (e) {
+      AppSnackbar.error(e.toString());
+    }
+  }
+
+  Future<void> updateProfile() async {
+    try {
+      final storage = Get.find<StorageService>();
+      final token = storage.accessToken;
+
+      // User is not logged in
+      if (token == null || token.isEmpty) {
+        AppSnackbar.error("Please log in to update your profile.");
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
+        return;
+      }
+
+      isUpdating.value = true;
+
+      final request = http.MultipartRequest(
+        "PATCH",
+        Uri.parse(ApiConstants.user_info),
+      );
+
+      request.headers["Authorization"] = "Bearer $token";
+      request.fields["name"] = nameController.text.trim();
+
+      if (profileImage.value != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            "picture",
+            profileImage.value!.path,
+          ),
+        );
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await getUserProfile();
+        profileImage.value = null;
+        isEditing.value = false;
+
+        AppSnackbar.success("Profile updated successfully");
+      } else if (response.statusCode == 401) {
+        await storage.clear();
+        AppSnackbar.error("Your session has expired. Please log in again.");
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
+      } else {
+        final body = jsonDecode(response.body);
+
+        AppSnackbar.error(
+          body["message"] ?? "Something went wrong.",
+        );
+      }
+    } catch (e) {
+      AppSnackbar.error("Something went wrong. Please try again.");
+    } finally {
+      isUpdating.value = false;
+    }
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? pickedFile =
@@ -84,6 +179,7 @@ class UserMenuController extends GetxController {
   void onTermsTap() => Get.toNamed(AppRoutes.TERMS_CONDITION);
   void onRateAppTap() {}
   void onInviteFriendsTap() {}
+
   Future<void> onLogoutTap() async {
     try {
       final storage = Get.find<StorageService>();
