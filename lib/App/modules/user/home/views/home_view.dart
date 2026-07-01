@@ -58,38 +58,44 @@ class HomeView extends GetView<HomeController> {
             Column(
               children: [
                 /// LOGIN / REGISTER
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: AppButton(
-                          height: 34,
-                          text: "Login / Create a user account",
-                          onPressed: () {
-                            box.write("selectedRole", "USER");
-                            Get.toNamed(AppRoutes.USER_LOGIN);
-                          },
+                Obx(() {
+                  if (controller.isLoggedIn.value) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AppButton(
+                            height: 34,
+                            text: "Login / Create a user account",
+                            onPressed: () {
+                              box.write("selectedRole", "USER");
+                              Get.toNamed(AppRoutes.USER_LOGIN);
+                            },
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: AppButton(
-                          height: 34,
-                          text: "Login / Register a Service",
-                          onPressed: () {
-                            box.write("selectedRole", "PROVIDER");
-                            Get.toNamed(AppRoutes.SERVICER_LOGIN);
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: AppButton(
+                            height: 34,
+                            text: "Login / Register a Service",
+                            onPressed: () {
+                              box.write("selectedRole", "PROVIDER");
+                              Get.toNamed(AppRoutes.SERVICER_LOGIN);
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                }),
 
                 /// SEARCH + FILTER
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   child: Row(
                     children: [
                       Expanded(

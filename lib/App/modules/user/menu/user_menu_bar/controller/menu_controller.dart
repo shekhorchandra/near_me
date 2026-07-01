@@ -11,6 +11,7 @@ import '../../../../services/contants/api_constants.dart';
 import '../../../../services/utils/helpers/HttpStatusHandler.dart';
 import '../../../../services/utils/helpers/app_snackbar.dart';
 import '../../../User_bottom_nav_bar/controllers/bottom_nav_controller.dart';
+import '../../../home/controller/home_controller.dart';
 
 
 class UserMenuController extends GetxController {
@@ -98,6 +99,7 @@ class UserMenuController extends GetxController {
       }
 
       await storage.clear();
+      Get.find<HomeController>().checkLoginStatus();
 
       AppSnackbar.success("Logged out successfully");
 

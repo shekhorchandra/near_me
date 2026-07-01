@@ -11,6 +11,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 import '../../../../data/services/storage_service.dart';
+import '../../../services/contants/api_constants.dart';
 import '../../../services/geolocator_helper/current_location_picker.dart';
 import '../controller/marker_generator.dart';
 import '../model/CategoryModel.dart';
@@ -24,6 +25,8 @@ class HomeController extends GetxController {
   RxList<HomeServiceModel> services = <HomeServiceModel>[].obs;
   RxList<HomeServiceModel> filteredServices = <HomeServiceModel>[].obs;
   RxSet<Marker> markers = <Marker>{}.obs;
+
+  final RxBool isLoggedIn = false.obs;
 
   RxSet<Polyline> polylines = <Polyline>{}.obs;
 
@@ -49,8 +52,16 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    isLoggedIn.value = storage.accessToken != null &&
+        storage.accessToken!.isNotEmpty;
     loadNearestServices();
     loadCategories();
+  }
+
+  void checkLoginStatus() {
+    final token = storage.accessToken;
+
+    isLoggedIn.value = token != null && token.isNotEmpty;
   }
 
   /// ==================================================
@@ -95,11 +106,13 @@ class HomeController extends GetxController {
       print(token);
 
       final response = await dio.post(
-        // "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/service/nearest",
-        "/api/v1/service/nearest",
+        ApiConstants.nearestService,
         data: body,
         options: Options(
-          headers: {"Authorization": token, "Content-Type": "application/json"},
+          headers: {
+            "Authorization": token,
+            "Content-Type": "application/json",
+          },
         ),
       );
 
@@ -248,7 +261,7 @@ class HomeController extends GetxController {
           polylineId: const PolylineId("route"),
           points: routePoints,
           width: 8,
-          color: Colors.red,
+          color: Colors.black,
         ),
       });
 

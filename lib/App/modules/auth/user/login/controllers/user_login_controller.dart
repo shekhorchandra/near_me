@@ -18,6 +18,7 @@ import '../../../../../routes/app_routes.dart';
 import '../../../../services/auth_service.dart';
 import '../../../../services/contants/api_constants.dart';
 import '../../../../services/utils/helpers/app_snackbar.dart';
+import '../../../../user/home/controller/home_controller.dart';
 
 class UserLoginController extends GetxController {
   final obscurePassword = true.obs;
@@ -59,11 +60,6 @@ class UserLoginController extends GetxController {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  void _handleException(dynamic e, StackTrace stackTrace) {
-    debugPrint("Login Error: $e");
-    debugPrint("StackTrace: $stackTrace");
-    Get.snackbar("Error", "Something went wrong. Please try again.");
-  }
 
   Future<void> loginWithGoogleUser() async {
     loading.value = true;
@@ -181,6 +177,11 @@ class UserLoginController extends GetxController {
           await storage.setAccessToken(accessToken);
           await storage.setRefreshToken(refreshToken);
           await storage.setUserId(userId);
+
+          /// Update HomeController login state
+          if (Get.isRegistered<HomeController>()) {
+            Get.find<HomeController>().checkLoginStatus();
+          }
 
           /// CONNECT SOCKET
           if (!Get.isRegistered<SocketService>()) {
