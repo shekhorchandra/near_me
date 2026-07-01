@@ -103,4 +103,6 @@ abstract class AppRoutes {
 /// review fro servicer
   static const manageReviews = '/manage-reviews';
 
+  static const servicePreview = '/service-preview';
+
 }

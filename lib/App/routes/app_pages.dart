@@ -57,6 +57,8 @@ import '../modules/servicer/servicer_menu/servicer_contact_us/contact_view/conta
 import '../modules/servicer/servicer_menu/servicer_help_support/help_support_view/Help_Support_View.dart';
 import '../modules/servicer/servicer_menu/servicer_menu_bar/bindings/servicer_menu_binding.dart';
 import '../modules/servicer/servicer_menu/servicer_menu_bar/views/servicer_menu_view.dart';
+import '../modules/servicer/servicer_menu/servicer_preview/binding/ServicePreviewBinding.dart';
+import '../modules/servicer/servicer_menu/servicer_preview/view/PreviewServicePreviewProvider.dart';
 import '../modules/servicer/servicer_menu/servicer_privacy_policy/privacy_policy_view/Privacy_Policy_View.dart';
 import '../modules/servicer/servicer_menu/servicer_review/binding/servicer_review_binding.dart';
 import '../modules/servicer/servicer_menu/servicer_review/views/ServicerReviewView.dart';
@@ -293,6 +295,12 @@ class AppPages {
       name: AppRoutes.SERVICER_MENU,
       page: () => const ServicerMenuView(),
       binding: ServicerMenuBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.servicePreview,
+      page: () => const ServicePreviewView(),
+      binding: ServicePreviewBinding(),
     ),
 
     /// service change password
