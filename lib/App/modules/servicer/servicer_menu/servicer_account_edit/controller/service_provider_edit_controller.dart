@@ -49,6 +49,8 @@ class ServiceProviderEditController extends GetxController {
   final latitude = 23.8103.obs;
   final longitude = 90.4125.obs;
 
+  final RxString serviceId = ''.obs;
+
   GoogleMapController? mapController;
 
   @override
@@ -173,6 +175,8 @@ class ServiceProviderEditController extends GetxController {
       // ✅ SAVE SERVICE ID
       // IMPORTANT
       await storage.setServiceId(data["_id"]);
+
+      serviceId.value = data["_id"] ?? "";
 
       nameCtrl.text = data["service_name"] ?? "";
       addressCtrl.text = data["service_address"] ?? "";

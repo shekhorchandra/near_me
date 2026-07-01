@@ -1,10 +1,12 @@
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../servicer_preview/service_provider_preview_view.dart';
+import '../../../../../routes/app_routes.dart';
+import '../../servicer_preview/binding/ServicePreviewBinding.dart';
+import '../../servicer_preview/view/PreviewServicePreviewProvider.dart';
+import '../../servicer_preview/view/ServicePreviewProvider.dart';
 import '../controller/service_provider_edit_controller.dart';
 import '../../../../../core/widgets/App_button.dart';
 import '../../../../../core/widgets/SectionLabelWithEdit.dart';
@@ -17,6 +19,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: CommonAppBar(
         title: 'Edit Service Provider Account',
@@ -40,9 +43,14 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                     text: "Preview as User",
                     icon: Icons.remove_red_eye,
                     onPressed: () {
-                      Get.to(
-                        () =>
-                            ServiceProviderPreviewView(controller: controller),
+                      if (controller.serviceId.value.isEmpty) {
+                        Get.snackbar("Error", "Service ID not found");
+                        return;
+                      }
+
+                      Get.toNamed(
+                        AppRoutes.servicePreview,
+                        arguments: controller.serviceId.value,
                       );
                     },
                   ),
@@ -296,18 +304,19 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                 /// ================= MEDIA =================
                 const Text(
                   "Media (Max 3)",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 12),
 
                 Obx(() {
                   final images = [
-                    ...controller.mediaUrls.map((e) => {"type": "network", "data": e}),
-                    ...controller.mediaFiles.map((e) => {"type": "file", "data": e}),
+                    ...controller.mediaUrls.map(
+                      (e) => {"type": "network", "data": e},
+                    ),
+                    ...controller.mediaFiles.map(
+                      (e) => {"type": "file", "data": e},
+                    ),
                   ];
 
                   final showAdd = images.length < 3;
@@ -316,12 +325,13 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: images.length + (showAdd ? 1 : 0),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 1,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1,
+                        ),
                     itemBuilder: (context, index) {
                       // Add button
                       if (showAdd && index == images.length) {
@@ -343,10 +353,7 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                                   color: Colors.black54,
                                 ),
                                 SizedBox(height: 6),
-                                Text(
-                                  "Add",
-                                  style: TextStyle(fontSize: 12),
-                                ),
+                                Text("Add", style: TextStyle(fontSize: 12)),
                               ],
                             ),
                           ),
@@ -362,17 +369,17 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                             borderRadius: BorderRadius.circular(14),
                             child: isNetwork
                                 ? Image.network(
-                              item["data"] as String,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            )
+                                    item["data"] as String,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
                                 : Image.file(
-                              item["data"] as File,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                                    item["data"] as File,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
 
                           Positioned(
