@@ -282,7 +282,7 @@ class HomeView extends GetView<HomeController> {
               right: 0,
               bottom: 10,
               child: SizedBox(
-                height: 220,
+                height: 200,
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator(color: Colors.black));
