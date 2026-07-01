@@ -4,7 +4,7 @@ class ApiConstants {
   // static const String baseUrl = "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev";
   // static const String baseUrl = "https://nearme-q02y.onrender.com";
 
-  // Define endpoints
+  /////////////////////////////// Define endpoints ////////////////////////////////////////////////////
 
   /// user register
   static const String user_register = "$baseUrl/api/v1/user/register";
@@ -12,7 +12,13 @@ class ApiConstants {
   ///user login
   static const String user_login = "$baseUrl/api/v1/auth/login";
 
-  ///user account verify
+  /// get me
+  static const String user_me = "$baseUrl/api/v1/user/me";
+
+  /// user profile update
+  static const String user_info = "$baseUrl/api/v1/user/info";
+
+  /// user account verify
   static const String user_account_verify = "$baseUrl/api/v1/user/verify";
 
   /// user forget password
@@ -24,7 +30,7 @@ class ApiConstants {
   /// user forget password reset
   static const String userforgetPasswordreset = "$baseUrl/api/v1/auth/reset-password";
 
-  ///user logout
+  /// user logout
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
 
   /// nearest service
