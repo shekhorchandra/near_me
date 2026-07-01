@@ -92,23 +92,57 @@ class ChatView extends GetView<ChatController> {
       appBar: const CommonAppBar(title: "Chats", showBack: false),
       body: Obx(() {
         if (controller.isLoginRequired.value) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.chat_bubble_outline, size: 70, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text(
-                    "Login Required",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  const Icon(
+                    Icons.chat_bubble_outline,
+                    size: 70,
+                    color: Colors.grey,
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 16),
+
+                  const Text(
+                    "Login Required",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
                     "Please sign in to access your chats and start messaging.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // box.write("selectedRole", "USER"); // if needed
+                        Get.toNamed(AppRoutes.USER_LOGIN);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text("Login"),
+                    ),
                   ),
                 ],
               ),

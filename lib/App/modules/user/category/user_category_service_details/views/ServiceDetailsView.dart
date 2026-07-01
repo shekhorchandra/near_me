@@ -35,7 +35,13 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                         "Login Required",
                         "Please login first to start chatting",
                         snackPosition: SnackPosition.TOP,
+                        duration: const Duration(seconds: 2),
                       );
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        Get.toNamed(AppRoutes.USER_LOGIN);
+                      });
+
                       return;
                     }
 
@@ -570,6 +576,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                   snackPosition:
                                                       SnackPosition.TOP,
                                                 );
+
+                                                Future.delayed(
+                                                  const Duration(seconds: 2),
+                                                  () {
+                                                    Get.toNamed(
+                                                      AppRoutes.USER_LOGIN,
+                                                    );
+                                                  },
+                                                );
+
                                                 return;
                                               }
 
