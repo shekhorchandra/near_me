@@ -20,6 +20,7 @@ class ReviewsController extends GetxController {
   bool get isLoggedIn => storage.accessToken?.isNotEmpty == true;
 
   final tabs = ["All", "★★★★★", "★★★★", "★★★", "★★", "★"];
+  final isPreview = false.obs;
 
   RxBool isCheckingUser = false.obs;
   RxMap<String, dynamic> currentUser = <String, dynamic>{}.obs;
@@ -31,6 +32,7 @@ class ReviewsController extends GetxController {
     final args = Get.arguments;
 
     serviceId = args?["serviceId"] ?? "";
+    isPreview.value = args?["preview"] ?? false;
 
     if (serviceId.isEmpty) {
       debugPrint("❌ serviceId is missing from navigation");

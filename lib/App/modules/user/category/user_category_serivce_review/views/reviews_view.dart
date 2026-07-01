@@ -16,17 +16,23 @@ class ReviewsView extends GetView<ReviewsController> {
       backgroundColor: Colors.grey[50], // Light background for contrast
       appBar: CommonAppBar(title: 'Reviews'),
 
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        label: const Text("Write Review"),
-        icon: const Icon(Icons.rate_review),
-        onPressed: () {
-          Get.dialog(
-            ReplyDialogView(serviceId: controller.serviceId, isReview: true),
-          );
-        },
-      ),
+      floatingActionButton: Obx(() {
+        if (controller.isPreview.value) {
+          return const SizedBox.shrink();
+        }
+
+        return FloatingActionButton.extended(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          label: const Text("Write Review"),
+          icon: const Icon(Icons.rate_review),
+          onPressed: () {
+            Get.dialog(
+              ReplyDialogView(serviceId: controller.serviceId, isReview: true),
+            );
+          },
+        );
+      }),
 
       body: Obx(() {
         if (controller.isLoading.value)
@@ -37,7 +43,6 @@ class ReviewsView extends GetView<ReviewsController> {
         return Column(
           children: [
             // View All Header Row (Matching the design)
-
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -45,7 +50,8 @@ class ReviewsView extends GetView<ReviewsController> {
                 itemBuilder: (_, i) {
                   return ReviewCard(
                     item: controller.filteredReviews[i],
-                    serviceId: controller.serviceId, // Pass down to card
+                    serviceId: controller.serviceId,
+                    preview: controller.isPreview.value,
                   );
                 },
               ),
@@ -61,12 +67,14 @@ class ReviewCard extends StatefulWidget {
   final ReviewModel item;
   final String serviceId;
   final double left;
+  final bool preview;
 
   const ReviewCard({
     super.key,
     required this.item,
     required this.serviceId,
     this.left = 0,
+    this.preview = false,
   });
 
   @override
@@ -161,87 +169,89 @@ class _ReviewCardState extends State<ReviewCard> {
           ),
 
           /// FOOTER: Likes | Reply | View Replies Button
-          Row(
-            children: [
-              /// DARK "VIEW REPLIES" BUTTON
-              if (item.replies.isNotEmpty)
+          /// FOOTER
+          if (!widget.preview)
+            Row(
+              children: [
+                /// VIEW REPLIES
+                if (item.replies.isNotEmpty)
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        showReplies = !showReplies;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        showReplies
+                            ? "Hide replies"
+                            : "View replies (${item.replies.length})",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                const Spacer(),
+
+                /// REPLY BUTTON
                 InkWell(
                   onTap: () {
-                    setState(() {
-                      showReplies = !showReplies;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      showReplies
-                          ? "Hide replies"
-                          : "View replies (${item.replies.length})",
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
-                    ),
-                  ),
-                ),
-
-              const Spacer(),
-
-              /// REPLY BUTTON
-              InkWell(
-                onTap: () {
-                  Get.dialog(
-                    ReplyDialogView(
-                      parentId: item.id,
-                      serviceId: widget.serviceId,
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.reply_outlined, size: 20),
-                      const SizedBox(width: 4),
-                      Text(
-                        "${item.replies.length}",
-                        style: const TextStyle(fontSize: 13),
+                    Get.dialog(
+                      ReplyDialogView(
+                        parentId: item.id,
+                        serviceId: widget.serviceId,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 8),
-
-              /// DELETE BUTTON
-              if (item.userId == controller.userId)
-                IconButton(
-                  icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () {
-                    Get.defaultDialog(
-                      title: "Delete Review",
-                      middleText: "Are you sure?",
-                      onConfirm: () async {
-                        Get.back();
-                        await controller.deleteReview(item.id);
-                      },
                     );
                   },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.reply_outlined, size: 20),
+                        const SizedBox(width: 4),
+                        Text("${item.replies.length}"),
+                      ],
+                    ),
+                  ),
                 ),
-            ],
-          ),
+
+                const SizedBox(width: 8),
+
+                /// DELETE BUTTON
+                if (item.userId == controller.userId)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () async {
+                      Get.defaultDialog(
+                        title: "Delete Review",
+                        middleText: "Are you sure?",
+                        onConfirm: () async {
+                          Get.back();
+                          await controller.deleteReview(item.id);
+                        },
+                      );
+                    },
+                  ),
+              ],
+            ),
 
           /// SHOW REPLIES
-          if (showReplies)
+          if (!widget.preview && showReplies)
             Column(
               children: item.replies.map((reply) {
                 return Container(
@@ -272,7 +282,10 @@ class _ReviewCardState extends State<ReviewCard> {
 
                       if (reply.userId == controller.userId)
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.red),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
                           onPressed: () async {
                             Get.defaultDialog(
                               title: "Delete Reply",
