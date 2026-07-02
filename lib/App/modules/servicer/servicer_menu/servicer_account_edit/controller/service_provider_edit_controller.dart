@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -39,8 +40,13 @@ class ServiceProviderEditController extends GetxController {
   final logoUrl = ''.obs;
   final mediaUrls = <String>[].obs;
 
+  final address = ''.obs;
+
   final logoFile = Rxn<File>();
   final mediaFiles = <File>[].obs;
+  RxString location = ''.obs;
+
+  final selectedAddress = ''.obs;
 
   RxString selectedSubCategoryId = "".obs;
   RxString selectedChildCategoryId = "".obs;
@@ -62,6 +68,20 @@ class ServiceProviderEditController extends GetxController {
   Future<void> loadAll() async {
     await fetchCategoryTree();
     await fetchService();
+  }
+
+  ///
+  Future<void> getAddressFromLatLng(double lat, double lng) async {
+    final placemarks = await placemarkFromCoordinates(lat, lng);
+
+    if (placemarks.isNotEmpty) {
+      final place = placemarks.first;
+
+      selectedAddress.value =
+          "${place.street}, ${place.locality}, ${place.country}";
+
+      addressCtrl.text = selectedAddress.value;
+    }
   }
 
   // ================= CATEGORY TREE =================
@@ -162,14 +182,11 @@ class ServiceProviderEditController extends GetxController {
       logger.i("FETCH SERVICE => ${res.data}");
 
       final data = res.data["data"];
-      if (data["location"] != null &&
-          data["location"]["coordinates"] != null) {
-
+      if (data["location"] != null && data["location"]["coordinates"] != null) {
         final coordinates = data["location"]["coordinates"];
 
         longitude.value = (coordinates[0] as num).toDouble();
         latitude.value = (coordinates[1] as num).toDouble();
-
       }
 
       // ✅ SAVE SERVICE ID
@@ -182,6 +199,9 @@ class ServiceProviderEditController extends GetxController {
       addressCtrl.text = data["service_address"] ?? "";
       aboutCtrl.text = data["about"] ?? "";
       websiteCtrl.text = data["website_link"] ?? "";
+
+      address.value = data["service_address"] ?? "";
+      addressCtrl.text = address.value;
 
       contactCtrl.text = normalizeBdPhone(
         data["phone"].toString().startsWith("8801")
@@ -329,6 +349,7 @@ class ServiceProviderEditController extends GetxController {
         "location": {
           "type": "Point",
           "coordinates": [longitude.value, latitude.value],
+          "address": addressCtrl.text.trim(),
         },
         "openingTime":
             "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +24,7 @@ class ServiceProviderController extends GetxController {
   final addressController = TextEditingController();
   final websiteController = TextEditingController();
   final customServiceController = TextEditingController();
+  final searchController = TextEditingController();
 
 
   final latitude = 23.8103.obs;
@@ -41,6 +43,7 @@ class ServiceProviderController extends GetxController {
 
   RxString selectedSubCategoryId = "".obs;
   RxString selectedChildCategoryId = "".obs;
+  final selectedAddress = ''.obs;
 
   final isLoading = false.obs;
 
@@ -66,6 +69,11 @@ class ServiceProviderController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    getAddressFromLatLng(
+      latitude.value,
+      longitude.value,
+    );
 
     fetchCategories();
 
@@ -108,6 +116,37 @@ class ServiceProviderController extends GetxController {
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to load categories");
+    }
+  }
+
+  /// dragable adress
+  Future<void> getAddressFromLatLng(
+      double latitude,
+      double longitude,
+      ) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+
+        final address =
+            "${place.street}, "
+            "${place.subLocality}, "
+            "${place.locality}, "
+            "${place.administrativeArea}, "
+            "${place.country}";
+
+        selectedAddress.value = address;
+
+        // Optional: update your text field
+        addressController.text = address;
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -395,6 +434,17 @@ class ServiceProviderController extends GetxController {
           p.subscriptionPrice = price;
         }
       });
+    }
+    @override
+    void onClose() {
+      searchController.dispose();
+      serviceNameController.dispose();
+      contactController.dispose();
+      aboutController.dispose();
+      addressController.dispose();
+      websiteController.dispose();
+      customServiceController.dispose();
+      super.onClose();
     }
   }
 }
