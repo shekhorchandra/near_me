@@ -57,6 +57,8 @@ dependencies:
   socket_io_client: ^3.1.4
   pretty_dio_logger: ^1.4.0
   carousel_slider: ^5.1.2
+  geocoding: ^4.0.0
+  google_places_flutter: ^2.1.1
 
 dev_dependencies:
   flutter_test:
