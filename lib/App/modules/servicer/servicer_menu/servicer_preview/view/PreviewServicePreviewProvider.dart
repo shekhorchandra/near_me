@@ -15,10 +15,9 @@ class ServicePreviewView extends GetView<ServicePreviewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F6F8),
       body: Obx(() {
         if (controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.black,));
         }
 
         final service = controller.service.value!;
