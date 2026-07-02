@@ -19,7 +19,6 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: CommonAppBar(
         title: 'Edit Service Provider Account',
@@ -279,9 +278,14 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                         );
                       },
 
-                      onTap: (pos) {
+                      onTap: (LatLng pos) async {
                         controller.latitude.value = pos.latitude;
                         controller.longitude.value = pos.longitude;
+
+                        await controller.getAddressFromLatLng(
+                          pos.latitude,
+                          pos.longitude,
+                        );
                       },
 
                       markers: {
@@ -289,14 +293,46 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
                           markerId: const MarkerId("service_location"),
                           position: LatLng(lat, lng),
                           draggable: true,
-                          onDragEnd: (pos) {
+                          onDragEnd: (LatLng pos) async {
                             controller.latitude.value = pos.latitude;
                             controller.longitude.value = pos.longitude;
+
+                            await controller.getAddressFromLatLng(
+                              pos.latitude,
+                              pos.longitude,
+                            );
                           },
                         ),
                       },
                     );
                   }),
+                ),
+
+                const SizedBox(height: 10),
+
+                GetBuilder<ServiceProviderEditController>(
+                  builder: (controller) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            controller.addressCtrl.text,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 12),
