@@ -1,3 +1,5 @@
+import 'LocationModel.dart';
+
 class ServiceProviderModel {
 
   String planId;
@@ -8,7 +10,7 @@ class ServiceProviderModel {
   String about;
   String address;
   String website;
-  String location;
+  LocationModel location;
   List<String> images;
   String logo;
   String openingTime;
@@ -27,7 +29,7 @@ class ServiceProviderModel {
     this.about = '',
     this.address = '',
     this.website = '',
-    this.location = '',
+    this.location = const LocationModel(),
     this.images = const [],
     this.logo = '',
     this.openingTime = '',
