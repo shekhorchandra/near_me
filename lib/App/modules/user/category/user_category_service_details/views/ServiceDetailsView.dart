@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/models/ReviewModel.dart';
-import 'package:near_me/App/modules/user/category/user_category_service_details/views/reply_dialog_view.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
@@ -76,6 +75,20 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                 ),
 
                 ElevatedButton.icon(
+                  // onPressed: () {
+                  //   final token = Get.find<StorageService>().accessToken;
+                  //
+                  //   if (token == null || token.isEmpty) {
+                  //     Get.snackbar(
+                  //       "Login Required",
+                  //       "Please login first to make a call",
+                  //       snackPosition: SnackPosition.TOP,
+                  //     );
+                  //     return;
+                  //   }
+                  //
+                  //   controller.callNumber(controller.phone.value);
+                  // },
                   onPressed: () {
                     final token = Get.find<StorageService>().accessToken;
 
@@ -84,10 +97,26 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                         "Login Required",
                         "Please login first to make a call",
                         snackPosition: SnackPosition.TOP,
+                        duration: const Duration(seconds: 2),
                       );
+
+                      Future.delayed(const Duration(seconds: 2), () {
+                        Get.toNamed(AppRoutes.USER_LOGIN);
+                      });
+
                       return;
                     }
 
+                    print("providerId = ${controller.providerId.value}");
+                    print("providerName = ${controller.providerName.value}");
+
+                    if (controller.providerId.value.isEmpty) {
+                      Get.snackbar(
+                        "Error",
+                        "Provider information is not loaded yet.",
+                      );
+                      return;
+                    }
                     controller.callNumber(controller.phone.value);
                   },
                   icon: const Icon(Icons.call, color: Colors.white),
@@ -262,7 +291,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     GestureDetector(
                                       onTap: () {
                                         Get.to(
-                                              () => FullImageView(
+                                          () => FullImageView(
                                             imageUrl: controller.image.value,
                                           ),
                                         );
@@ -288,7 +317,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             controller.title.value,
@@ -325,7 +354,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 child: Text(
                                                   controller.schedule.value,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
@@ -367,19 +396,19 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                   children: controller.servicesOffered
                                       .map(
                                         (service) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 6,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
-                                        borderRadius: BorderRadius.circular(
-                                          20,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: Text(service),
                                         ),
-                                      ),
-                                      child: Text(service),
-                                    ),
-                                  )
+                                      )
                                       .toList(),
                                 ),
 
@@ -399,17 +428,17 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount:
-                                  controller.highlightServices.length,
+                                      controller.highlightServices.length,
                                   gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12,
-                                    mainAxisSpacing: 12,
-                                    childAspectRatio: 1.00, // taller card
-                                  ),
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 12,
+                                        mainAxisSpacing: 12,
+                                        childAspectRatio: 1.00, // taller card
+                                      ),
                                   itemBuilder: (context, index) {
                                     final item =
-                                    controller.highlightServices[index];
+                                        controller.highlightServices[index];
 
                                     return Card(
                                       elevation: 3,
@@ -419,16 +448,16 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       clipBehavior: Clip.antiAlias,
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           // ================= IMAGE =================
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () {
                                                 Get.to(
-                                                      () => FullImageView(
+                                                  () => FullImageView(
                                                     imageUrl:
-                                                    item["image"] ?? '',
+                                                        item["image"] ?? '',
                                                   ),
                                                 );
                                               },
@@ -439,7 +468,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 errorBuilder: (_, __, ___) =>
                                                     Container(
                                                       color:
-                                                      Colors.grey.shade300,
+                                                          Colors.grey.shade300,
                                                       child: const Icon(
                                                         Icons.image,
                                                         size: 40,
@@ -454,7 +483,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             padding: const EdgeInsets.all(8),
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   item["title"] ?? '',
@@ -464,7 +493,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                   ),
                                                   maxLines: 1,
                                                   overflow:
-                                                  TextOverflow.ellipsis,
+                                                      TextOverflow.ellipsis,
                                                 ),
 
                                                 // const SizedBox(height: 4),
@@ -531,6 +560,10 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             "service_location",
                                           ),
                                           position: LatLng(lat, lng),
+                                          infoWindow: InfoWindow(
+                                            title: controller.title.value,
+                                            snippet: controller.location.value,
+                                          ),
                                           draggable: true,
                                           onDragEnd: (pos) {
                                             controller.latitude.value =
@@ -544,6 +577,32 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                   }),
                                 ),
 
+                                const SizedBox(height: 10),
+
+                                Obx(
+                                  () => Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.location_on,
+                                        color: Colors.red,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          controller.location.value,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
                                 const SizedBox(height: 15),
 
                                 // ================= REVIEWS SECTION =================
@@ -555,7 +614,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                     children: [
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             "Reviews (${controller.reviews.length})",
@@ -567,19 +626,19 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                           TextButton(
                                             onPressed: () async {
                                               final isLoggedIn =
-                                              await controller.checkLogin();
+                                                  await controller.checkLogin();
 
                                               if (!isLoggedIn) {
                                                 Get.snackbar(
                                                   "Login Required",
                                                   "Please login first to view reviews",
                                                   snackPosition:
-                                                  SnackPosition.TOP,
+                                                      SnackPosition.TOP,
                                                 );
 
                                                 Future.delayed(
                                                   const Duration(seconds: 2),
-                                                      () {
+                                                  () {
                                                     Get.toNamed(
                                                       AppRoutes.USER_LOGIN,
                                                     );
@@ -593,7 +652,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                                 AppRoutes.REVIEWS,
                                                 arguments: {
                                                   "serviceId":
-                                                  controller.serviceId,
+                                                      controller.serviceId,
                                                 },
                                               );
                                             },
@@ -608,7 +667,7 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                       ),
                                       const SizedBox(height: 10),
                                       ...controller.reviews.map(
-                                            (review) =>
+                                        (review) =>
                                             buildReviewCard(context, review),
                                       ),
                                     ],
