@@ -16,16 +16,24 @@ class HomeView extends GetView<HomeController> {
   LinearGradient getBadgeGradient(String type) {
     switch (type) {
       case "Elite":
-        return const LinearGradient(colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)]);
+        return const LinearGradient(
+          colors: [Color(0xFF9F8CE2), Color(0xFF7161AA)],
+        );
 
       case "Pro":
-        return const LinearGradient(colors: [Color(0xFFFFEA00), Color(0xFFFFA600)]);
+        return const LinearGradient(
+          colors: [Color(0xFFFFEA00), Color(0xFFFFA600)],
+        );
 
       case "Basic":
-        return const LinearGradient(colors: [Color(0xFF48F88C), Color(0xFF4B9868)]);
+        return const LinearGradient(
+          colors: [Color(0xFF48F88C), Color(0xFF4B9868)],
+        );
 
       default:
-        return const LinearGradient(colors: [Colors.transparent, Colors.transparent]);
+        return const LinearGradient(
+          colors: [Colors.transparent, Colors.transparent],
+        );
     }
   }
 
@@ -64,7 +72,10 @@ class HomeView extends GetView<HomeController> {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
@@ -95,15 +106,27 @@ class HomeView extends GetView<HomeController> {
 
                 /// SEARCH + FILTER
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
                         child: SizedBox(
                           height: 50,
                           child: CustomTextField(
+                            controller: controller.searchController,
                             hint: "Search near me",
                             icon: Icons.search,
+                            onChanged: (value) {
+                              controller.searchServices();
+                            },
+
+                            // onSubmitted: (_) {
+                            //   controller.searchServices();
+                            // },
+
                             suffix: InkWell(
                               onTap: controller.showFilterBottomSheet,
                               child: const Padding(
@@ -125,7 +148,10 @@ class HomeView extends GetView<HomeController> {
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.my_location, color: Colors.black),
+                          icon: const Icon(
+                            Icons.my_location,
+                            color: Colors.black,
+                          ),
                           onPressed: () {
                             controller.loadNearestServices();
                           },
@@ -141,7 +167,10 @@ class HomeView extends GetView<HomeController> {
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.notifications, color: Colors.black),
+                          icon: const Icon(
+                            Icons.notifications,
+                            color: Colors.black,
+                          ),
                           onPressed: () {},
                         ),
                       ),
@@ -155,7 +184,9 @@ class HomeView extends GetView<HomeController> {
                 SizedBox(
                   height: 120,
                   child: Obx(() {
-                    final list = controller.services.where((e) => e.rating >= 4.0).toList();
+                    final list = controller.services
+                        .where((e) => e.rating >= 4.0)
+                        .toList();
 
                     if (list.isEmpty) return const SizedBox();
 
@@ -178,7 +209,8 @@ class HomeView extends GetView<HomeController> {
                         }
 
                         return GestureDetector(
-                          onTap: () => controller.focusService(service, index: index),
+                          onTap: () =>
+                              controller.focusService(service, index: index),
                           child: Column(
                             children: [
                               Stack(
@@ -191,7 +223,9 @@ class HomeView extends GetView<HomeController> {
                                     ),
                                     child: CircleAvatar(
                                       radius: 28,
-                                      backgroundImage: NetworkImage(service.image),
+                                      backgroundImage: NetworkImage(
+                                        service.image,
+                                      ),
                                     ),
                                   ),
 
@@ -202,7 +236,9 @@ class HomeView extends GetView<HomeController> {
                                       radius: 10,
                                       backgroundColor: Colors.black,
                                       child: Icon(
-                                        type == "Elite" ? Iconsax.crown1 : Iconsax.star1,
+                                        type == "Elite"
+                                            ? Iconsax.crown1
+                                            : Iconsax.star1,
                                         size: 12,
                                         color: Colors.white,
                                       ),
@@ -248,7 +284,9 @@ class HomeView extends GetView<HomeController> {
                               SizedBox(
                                 width: 90,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6,),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(8),
@@ -261,11 +299,11 @@ class HomeView extends GetView<HomeController> {
                                     style: const TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.white
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         );
@@ -285,7 +323,9 @@ class HomeView extends GetView<HomeController> {
                 height: 200,
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.black));
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    );
                   }
 
                   final services = controller.filteredServices;
@@ -298,7 +338,11 @@ class HomeView extends GetView<HomeController> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.inbox_outlined, size: 80, color: Colors.black),
+                              const Icon(
+                                Icons.inbox_outlined,
+                                size: 80,
+                                color: Colors.black,
+                              ),
                               const SizedBox(height: 16),
 
                               Container(
@@ -321,7 +365,10 @@ class HomeView extends GetView<HomeController> {
                                     Text(
                                       "We couldn't find any services at the moment.\nTry again later or adjust your filters.",
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 14, color: Colors.black),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -354,7 +401,9 @@ class HomeView extends GetView<HomeController> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(18),
-                            boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black12)],
+                            boxShadow: const [
+                              BoxShadow(blurRadius: 10, color: Colors.black12),
+                            ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -363,33 +412,49 @@ class HomeView extends GetView<HomeController> {
                                 service.title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                        
+
                               const SizedBox(height: 10),
-                        
+
                               Row(
                                 children: [
-                                  const Icon(Icons.star, size: 16, color: Colors.orange),
+                                  const Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: Colors.orange,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(service.rating.toStringAsFixed(1)),
                                 ],
                               ),
-                        
+
                               const SizedBox(height: 8),
-                        
+
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on, size: 16, color: Colors.black),
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.black,
+                                  ),
                                   const SizedBox(width: 4),
-                                  Text("${service.distance.toStringAsFixed(1)} miles away"),
+                                  Text(
+                                    "${service.distance.toStringAsFixed(1)} miles away",
+                                  ),
                                 ],
                               ),
-                        
+
                               const SizedBox(height: 10),
-                        
+
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: service.available
                                       ? Colors.green.withOpacity(.1)
@@ -399,15 +464,17 @@ class HomeView extends GetView<HomeController> {
                                 child: Text(
                                   service.available ? "Open Now" : "Closed",
                                   style: TextStyle(
-                                    color: service.available ? Colors.green : Colors.red,
+                                    color: service.available
+                                        ? Colors.green
+                                        : Colors.red,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
-                        
+
                               const Spacer(),
-                        
+
                               // SizedBox(
                               //   width: double.infinity,
                               //   child: GestureDetector(

@@ -75,20 +75,6 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                 ),
 
                 ElevatedButton.icon(
-                  // onPressed: () {
-                  //   final token = Get.find<StorageService>().accessToken;
-                  //
-                  //   if (token == null || token.isEmpty) {
-                  //     Get.snackbar(
-                  //       "Login Required",
-                  //       "Please login first to make a call",
-                  //       snackPosition: SnackPosition.TOP,
-                  //     );
-                  //     return;
-                  //   }
-                  //
-                  //   controller.callNumber(controller.phone.value);
-                  // },
                   onPressed: () {
                     final token = Get.find<StorageService>().accessToken;
 

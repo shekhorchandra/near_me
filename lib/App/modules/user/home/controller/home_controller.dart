@@ -45,6 +45,14 @@ class HomeController extends GetxController {
   RxDouble selectedRadius = 10.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
 
+  final searchController = TextEditingController();
+
+  final RxList<HomeServiceModel> searchResults = <HomeServiceModel>[].obs;
+
+  final RxBool isSearching = false.obs;
+
+  final RxList<HomeServiceModel> searchSuggestions = <HomeServiceModel>[].obs;
+
   final logger = Logger();
 
   final Dio dio = Dio();
@@ -162,50 +170,76 @@ class HomeController extends GetxController {
     }
   }
 
-  // Future<void> loadNearestServices() async {
-  //   try {
-  //     isLoading.value = true;
-  //
-  //     final token = storage.accessToken;
-  //
-  //     final body = {
-  //       "lon": "90.4800",
-  //       "lat": "23.8700",
-  //       // "radius": 10,
-  //       // "minRating": 0,
-  //       // "categories": [],
-  //     };
-  //
-  //     print("BODY => $body");
-  //
-  //     final response = await dio.post(
-  //       "https://nonrudimentarily-holey-richard.ngrok-free.dev/api/v1/service/nearest",
-  //       data: body,
-  //       options: Options(headers: {"Authorization": token, "Content-Type": "application/json"}),
-  //     );
-  //
-  //     print("RESPONSE => ${response.data}");
-  //
-  //     final List list = response.data["data"];
-  //
-  //     print("TOTAL SERVICES => ${list.length}");
-  //
-  //     services.value = list.map((e) => HomeServiceModel.fromMap(e)).toList();
-  //
-  //     filteredServices.value = services;
-  //
-  //     await generateMarkers();
-  //   } catch (e) {
-  //     print("ERROR => $e");
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
+
+  Future<void> searchServices() async {
+    try {
+      final keyword = searchController.text.trim();
+
+      if (keyword.isEmpty) {
+        searchSuggestions.clear();
+        await loadNearestServices();
+        return;
+      }
+
+      isSearching.value = true;
+
+      final position = await getCurrentLocation();
+
+      if (position == null) {
+        Get.snackbar("Error", "Unable to get current location");
+        return;
+      }
+
+      final response = await dio.get(
+        "${ApiConstants.baseUrl}/api/v1/service/search",
+        queryParameters: {
+          "lon": position.longitude,
+          "lat": position.latitude,
+          "searchTerm": keyword,
+          "viewAll": true,
+        },
+        options: Options(
+          headers: {
+            "Authorization": storage.accessToken,
+            "accesstoken": storage.accessToken,
+          },
+        ),
+      );
+
+      logger.i(response.data);
+
+      if (response.statusCode == 200 &&
+          response.data["success"] == true) {
+        final List data = response.data["data"];
+
+        final results =
+        data.map((e) => HomeServiceModel.fromMap(e)).toList();
+
+        // Suggestions for dropdown
+        searchSuggestions.value = results;
+
+        // Update map & bottom cards
+        filteredServices.value = results;
+        services.value = results;
+
+        await generateMarkers();
+
+        if (results.isNotEmpty) {
+          fitMapToServices(results);
+        }
+      }
+    } catch (e) {
+      logger.e(e);
+      Get.snackbar("Error", "Search failed");
+    } finally {
+      isSearching.value = false;
+    }
+  }
+
 
   Future<void> loadCategories() async {
     try {
       final res = await dio.get(
-        // "https://uncried-unpreventible-declan.ngrok-free.dev/api/v1/category",
         "/api/v1/category",
       );
 
