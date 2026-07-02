@@ -3,8 +3,10 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
@@ -177,27 +179,6 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                 ],
               ),
 
-              const SizedBox(height: 6),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Address",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 6),
-
-                  CustomTextField(
-                    controller: controller.addressController,
-                    hint: 'Your Address',
-                    icon: Icons.book,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -224,59 +205,187 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 6),
 
-
               /// location
               SizedBox(
-                height: 200,
-                child: Obx(
-                  () => GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                        controller.latitude.value,
-                        controller.longitude.value,
-                      ),
-                      zoom: 15,
-                    ),
-
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
-
-                    scrollGesturesEnabled: true,
-                    zoomGesturesEnabled: true,
-                    rotateGesturesEnabled: true,
-                    tiltGesturesEnabled: true,
-
-                    gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                      Factory<OneSequenceGestureRecognizer>(
-                        () => EagerGestureRecognizer(),
-                      ),
-                    },
-
-                    onMapCreated: (GoogleMapController mapController) {
-                      controller.mapController = mapController;
-                    },
-
-                    onTap: (LatLng position) {
-                      controller.latitude.value = position.latitude;
-                      controller.longitude.value = position.longitude;
-                    },
-
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId("service_location"),
-                        position: LatLng(
-                          controller.latitude.value,
-                          controller.longitude.value,
+                height: 300,
+                child: Stack(
+                  children: [
+                    Obx(
+                      () => GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(
+                            controller.latitude.value,
+                            controller.longitude.value,
+                          ),
+                          zoom: 15,
                         ),
-                        draggable: true,
-                        onDragEnd: (LatLng value) {
-                          controller.latitude.value = value.latitude;
-                          controller.longitude.value = value.longitude;
+
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+
+                        scrollGesturesEnabled: true,
+                        zoomGesturesEnabled: true,
+                        rotateGesturesEnabled: true,
+                        tiltGesturesEnabled: true,
+
+                        gestureRecognizers:
+                            <Factory<OneSequenceGestureRecognizer>>{
+                              Factory<OneSequenceGestureRecognizer>(
+                                () => EagerGestureRecognizer(),
+                              ),
+                            },
+
+                        onMapCreated: (GoogleMapController mapController) {
+                          controller.mapController = mapController;
+                        },
+
+                        onTap: (LatLng position) async {
+                          controller.latitude.value = position.latitude;
+                          controller.longitude.value = position.longitude;
+
+                          await controller.getAddressFromLatLng(
+                            position.latitude,
+                            position.longitude,
+                          );
+
+                          controller.mapController?.animateCamera(
+                            CameraUpdate.newLatLng(position),
+                          );
+                        },
+
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("service_location"),
+                            position: LatLng(
+                              controller.latitude.value,
+                              controller.longitude.value,
+                            ),
+                            draggable: true,
+                            infoWindow: InfoWindow(
+                              title: controller.serviceNameController.text,
+                              snippet: controller.selectedAddress.value,
+                            ),
+                            onDragEnd: (LatLng value) async {
+                              controller.latitude.value = value.latitude;
+                              controller.longitude.value = value.longitude;
+
+                              await controller.getAddressFromLatLng(
+                                value.latitude,
+                                value.longitude,
+                              );
+
+                              controller.mapController?.animateCamera(
+                                CameraUpdate.newLatLng(value),
+                              );
+                            },
+                          ),
                         },
                       ),
-                    },
-                  ),
+                    ),
+
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      right: 60,
+                      child: GooglePlaceAutoCompleteTextField(
+                        textEditingController: controller.searchController,
+                        googleAPIKey: dotenv.env['GOOGLE_MAPS_API_KEY']!,
+
+                        inputDecoration: InputDecoration(
+                          hintText: "Search location",
+                          prefixIcon: const Icon(Icons.search),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+
+                        debounceTime: 600,
+                        isLatLngRequired: true,
+
+                        itemClick: (prediction) {
+                          controller.searchController.text =
+                              prediction.description!;
+                        },
+
+                        getPlaceDetailWithLatLng: (prediction) async {
+                          final lat = double.parse(prediction.lat!);
+                          final lng = double.parse(prediction.lng!);
+
+                          controller.latitude.value = lat;
+                          controller.longitude.value = lng;
+
+                          controller.selectedAddress.value =
+                              prediction.description!;
+                          controller.addressController.text =
+                              prediction.description!;
+
+                          controller.mapController?.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                target: LatLng(lat, lng),
+                                zoom: 16,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+
+              Obx(
+                () => Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Address: ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        controller.selectedAddress.value,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Address",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+
+                  CustomTextField(
+                    controller: controller.addressController,
+                    hint: 'Your Address',
+                    icon: Icons.book,
+                  ),
+                ],
               ),
 
               const SizedBox(height: 12),
