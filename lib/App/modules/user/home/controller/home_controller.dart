@@ -11,13 +11,16 @@ import 'package:iconsax/iconsax.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 import '../../../../data/services/storage_service.dart';
+import '../../../auth/internet/controller/internet_controller.dart';
+import '../../../servicer/notification/controllers/notification_controller.dart';
 import '../../../services/contants/api_constants.dart';
 import '../../../services/geolocator_helper/current_location_picker.dart';
 import '../controller/marker_generator.dart';
 import '../model/CategoryModel.dart';
 import '../model/HomeServiceModel.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController
+    with WidgetsBindingObserver {
   /// STORAGE
   final StorageService storage = StorageService();
 
@@ -45,6 +48,8 @@ class HomeController extends GetxController {
   RxDouble selectedRadius = 10.0.obs;
   RxList<String> selectedCategories = <String>[].obs;
 
+  late final NotificationController notificationController;
+
   final searchController = TextEditingController();
 
   final RxList<HomeServiceModel> searchResults = <HomeServiceModel>[].obs;
@@ -60,10 +65,39 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    isLoggedIn.value = storage.accessToken != null &&
-        storage.accessToken!.isNotEmpty;
+
+    WidgetsBinding.instance.addObserver(this);
+
+    isLoggedIn.value =
+        storage.accessToken != null &&
+            storage.accessToken!.isNotEmpty;
+
+    notificationController = Get.put(NotificationController());
+
     loadNearestServices();
     loadCategories();
+
+    if (isLoggedIn.value) {
+      notificationController.fetchNotifications();
+    }
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+
+    final token = Get.find<StorageService>().accessToken;
+
+    if (token == null || token.isEmpty) return;
+
+    loadNearestServices();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      notificationController.fetchNotifications();
+    }
   }
 
   void checkLoginStatus() {
@@ -77,6 +111,15 @@ class HomeController extends GetxController {
   /// ==================================================
 
   Future<void> loadNearestServices() async {
+    // final internet = Get.find<InternetController>();
+    //
+    // if (!internet.isConnected.value) {
+    //   Get.snackbar(
+    //     "No Internet",
+    //     "Please check your internet connection.",
+    //   );
+    //   return;
+    // }
     try {
       isLoading.value = true;
 
@@ -117,10 +160,7 @@ class HomeController extends GetxController {
         ApiConstants.nearestService,
         data: body,
         options: Options(
-          headers: {
-            "Authorization": token,
-            "Content-Type": "application/json",
-          },
+          headers: {"Authorization": token, "Content-Type": "application/json"},
         ),
       );
 
@@ -170,7 +210,6 @@ class HomeController extends GetxController {
     }
   }
 
-
   Future<void> searchServices() async {
     try {
       final keyword = searchController.text.trim();
@@ -208,12 +247,10 @@ class HomeController extends GetxController {
 
       logger.i(response.data);
 
-      if (response.statusCode == 200 &&
-          response.data["success"] == true) {
+      if (response.statusCode == 200 && response.data["success"] == true) {
         final List data = response.data["data"];
 
-        final results =
-        data.map((e) => HomeServiceModel.fromMap(e)).toList();
+        final results = data.map((e) => HomeServiceModel.fromMap(e)).toList();
 
         // Suggestions for dropdown
         searchSuggestions.value = results;
@@ -236,12 +273,9 @@ class HomeController extends GetxController {
     }
   }
 
-
   Future<void> loadCategories() async {
     try {
-      final res = await dio.get(
-        "/api/v1/category",
-      );
+      final res = await dio.get("/api/v1/category");
 
       // PRETTY JSON RESPONSE
       final prettyJson = const JsonEncoder.withIndent('    ').convert(res.data);

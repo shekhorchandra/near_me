@@ -54,6 +54,7 @@ abstract class AppRoutes {
   static const SERVICER_VERIFY_ACCOUNT = '/verify-servicer-account';
   // servicer forget password
   static const SERVICER_FORGOT_PASSWORD = '/servicer-forgot-password';
+
   /// servicer forget password otp
   static const SERVICER_OTP_VERIFICATION = '/servicer-otp-verification';
   static const SERVICER_RESET_PASSWORD = '/servicer-reset-password';
@@ -68,10 +69,10 @@ abstract class AppRoutes {
   static const SERVICER_DASHBOARD = '/service-dashboard';
 
   /// servicer CHAT
-  static const SERVICER_CHAT= '/service-chat';
+  static const SERVICER_CHAT = '/service-chat';
 
   /// servicer CHAT
-  static const SERVICER_MENU= '/service-menu';
+  static const SERVICER_MENU = '/service-menu';
 
   /// user servicer_menu nav bar
   static const SERVICER_CHANGE_PASSWORD = '/servicer-change-password';
@@ -96,13 +97,15 @@ abstract class AppRoutes {
   static const SERVICE_CHOOSE_PLAN = '/choose-plan';
 
   /// servicer provider account
-  static const SERVICE_PROVIDER_ACCOUNT= '/service-provider';
+  static const SERVICE_PROVIDER_ACCOUNT = '/service-provider';
 
   /// servicer provider account
-  static const SERVICE_PROVIDER_ACCOUNT_EDIT= '/service-provider-edit';
-/// review fro servicer
+  static const SERVICE_PROVIDER_ACCOUNT_EDIT = '/service-provider-edit';
+
+  /// review fro servicer
   static const manageReviews = '/manage-reviews';
 
   static const servicePreview = '/service-preview';
 
+  static const NOTIFICATIONS = '/notifications';
 }

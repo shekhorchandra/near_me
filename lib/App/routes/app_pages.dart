@@ -37,6 +37,8 @@ import '../modules/auth/user_forget/user_reset_password/bindings/user_reset_pass
 import '../modules/auth/user_forget/user_reset_password/views/user_reset_password_view.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/bindings/servicer_navigation_bar_binding.dart';
 import '../modules/servicer/Servicer_bottom_nav_bar/views/servicer_bottom_nav_view.dart';
+import '../modules/servicer/notification/bindings/notification_binding.dart';
+import '../modules/servicer/notification/views/notification_view.dart';
 import '../modules/servicer/servicer_chat/servicer_chat/bindings/chat_binding.dart';
 import '../modules/servicer/servicer_chat/servicer_chat/views/chat_view.dart';
 import '../modules/servicer/servicer_chat/servicer_chat_conversation/bindings/conversation_binding.dart';
@@ -185,7 +187,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.CHAT,
       page: () => const ChatView(),
-      binding: ChatBinding(),
+      // binding: ChatBinding(),
     ),
 
     ///user chat conversion
@@ -193,6 +195,13 @@ class AppPages {
       name: AppRoutes.CONVERSATION,
       page: () => const ConversationView(),
       binding: ConversationBinding(),
+    ),
+
+    ///Notifications
+    GetPage(
+      name: AppRoutes.NOTIFICATIONS,
+      page: () => NotificationView(),
+      binding: NotificationBinding(),
     ),
 
     /// User menu page

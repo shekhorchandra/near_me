@@ -10,7 +10,7 @@ class UserNavigationBarPage extends GetView<UserNavigationBarController> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(UserNavigationBarController());
+    // final controller = Get.put(UserNavigationBarController());
 
     return Scaffold(
       body: SafeArea(

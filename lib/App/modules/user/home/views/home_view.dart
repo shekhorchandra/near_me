@@ -5,7 +5,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../../core/widgets/App_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../data/services/storage_service.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../auth/internet/controller/internet_controller.dart';
 import '../controller/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -43,6 +45,29 @@ class HomeView extends GetView<HomeController> {
       body: SafeArea(
         child: Stack(
           children: [
+            // Obx(() {
+            //   final internet = Get.find<InternetController>();
+            //
+            //   if (internet.isConnected.value) {
+            //     return const SizedBox();
+            //   }
+            //
+            //   return Container(
+            //     width: double.infinity,
+            //     color: Colors.red,
+            //     padding: const EdgeInsets.all(10),
+            //     child: const SafeArea(
+            //       child: Text(
+            //         "No Internet Connection",
+            //         textAlign: TextAlign.center,
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       ),
+            //     ),
+            //   );
+            // }),
             /// GOOGLE MAP
             Obx(
               () => GoogleMap(
@@ -126,7 +151,6 @@ class HomeView extends GetView<HomeController> {
                             // onSubmitted: (_) {
                             //   controller.searchServices();
                             // },
-
                             suffix: InkWell(
                               onTap: controller.showFilterBottomSheet,
                               child: const Padding(
@@ -160,20 +184,68 @@ class HomeView extends GetView<HomeController> {
 
                       const SizedBox(width: 6),
                       // NOTIFICATION BUTTON
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {},
-                        ),
-                      ),
+                      Obx(() {
+                        final unread = controller.notificationController.unreadCount.value;
+
+                        return Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.notifications,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  final token = StorageService().accessToken;
+
+                                  if (token == null || token.isEmpty) {
+                                    Get.snackbar(
+                                      "Login Required",
+                                      "Please login first.",
+                                    );
+                                    return;
+                                  }
+
+                                  Get.toNamed(AppRoutes.NOTIFICATIONS);
+                                },
+                              ),
+                            ),
+
+                            if (unread > 0)
+                              Positioned(
+                                right: 5,
+                                top: 5,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  constraints: const BoxConstraints(
+                                    minHeight: 18,
+                                    minWidth: 18,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      unread > 99 ? "99+" : unread.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      }),
                     ],
                   ),
                 ),

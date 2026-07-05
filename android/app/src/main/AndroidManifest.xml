@@ -14,9 +14,9 @@
     </queries>
 
     <application
-        android:label="N e a r M e"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:label="N e a r M e"
+        android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"

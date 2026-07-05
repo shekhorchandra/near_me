@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -11,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../data/network/dio_client.dart';
 import '../../../../../data/services/GoogleAuthService.dart';
 import '../../../../../data/services/auth_api_service.dart';
 import '../../../../../data/services/socket_service.dart';
@@ -68,9 +70,8 @@ class ServicerLoginController extends GetxController {
         password: passwordController.text.trim(),
       );
 
-      print(
-        "FULL LOGIN RESPONSE:------------------------------------------ $result",
-      );
+      const encoder = JsonEncoder.withIndent('  ');
+      print(encoder.convert(result));
 
       final responseData = result["data"];
 
@@ -120,7 +121,26 @@ class ServicerLoginController extends GetxController {
         // await _storageService.setServiceId(serviceId ?? "");
         await _storageService.setUserId(data?["user"]?["_id"] ?? "");
 
+        // Wait a little so Dio reads the latest token from storage
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        if (fcmToken != null && fcmToken.isNotEmpty) {
+          await updateFcmToken(fcmToken);
+        }
+
+        print("========== FCM TOKEN ==========");
+        print(fcmToken);
+
+        if (fcmToken != null && fcmToken.isNotEmpty) {
+          await updateFcmToken(fcmToken);
+        }
+
         print("USER ID SAVED => ${_storageService.userId}");
+
+        print("✅ STORED TOKEN: ${StorageService().accessToken}");
+        print("FCM TOKEN => $fcmToken");
 
         // if (!Get.isRegistered<SocketService>()) {
         //   await Get.putAsync(
@@ -184,6 +204,26 @@ class ServicerLoginController extends GetxController {
     }
   }
 
+  Future<void> updateFcmToken(String token) async {
+    try {
+      print("========== UPDATE FCM ==========");
+      print("Access Token => ${StorageService().accessToken}");
+      print("FCM Token => $token");
+
+      final response = await DioClient().client.patch(
+        ApiConstants.update_fcm,
+        data: {
+          "fcmToken": token,
+        },
+      );
+
+      print("========== UPDATE SUCCESS ==========");
+      print(response.data);
+    } catch (e) {
+      print("========== UPDATE ERROR ==========");
+      print(e);
+    }
+  }
 
 
   /// In app

@@ -1,6 +1,7 @@
 class ApiConstants {
   // static const String baseUrl = "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev";
-  static const String baseUrl = "https://uncried-unpreventible-declan.ngrok-free.dev";
+  static const String baseUrl =
+      "https://uncried-unpreventible-declan.ngrok-free.dev";
   // static const String baseUrl = "https://gastrotomic-squirrelly-yuonne.ngrok-free.dev";
   // static const String baseUrl = "https://nearme-q02y.onrender.com";
 
@@ -12,6 +13,14 @@ class ApiConstants {
   ///user login
   static const String user_login = "$baseUrl/api/v1/auth/login";
 
+  /// provider Login
+  static const String providerLogin = "$baseUrl/api/v1/auth/login";
+
+  ///
+  static const String refreshToken = '/api/v1/auth/refresh-token';
+
+  static const String update_fcm = "/api/v1/user/fcm-token";
+
   /// get me
   static const String user_me = "$baseUrl/api/v1/user/me";
 
@@ -22,13 +31,16 @@ class ApiConstants {
   static const String user_account_verify = "$baseUrl/api/v1/user/verify";
 
   /// user forget password
-  static const String userforgetPassword = "$baseUrl/api/v1/auth/forget-password/";
+  static const String userforgetPassword =
+      "$baseUrl/api/v1/auth/forget-password/";
 
   /// user forget password verify
-  static const String userforgetPasswordverify = "$baseUrl/api/v1/auth/verify-otp";
+  static const String userforgetPasswordverify =
+      "$baseUrl/api/v1/auth/verify-otp";
 
   /// user forget password reset
-  static const String userforgetPasswordreset = "$baseUrl/api/v1/auth/reset-password";
+  static const String userforgetPasswordreset =
+      "$baseUrl/api/v1/auth/reset-password";
 
   /// user logout
   static const String user_logout = "$baseUrl/api/v1/auth/logout";
@@ -49,13 +61,26 @@ class ApiConstants {
   static const String userAccountVerify = "$baseUrl/api/v1/user/verify";
 
   /// Service create highlights
-  static const String highlightServiceBase = "$baseUrl/api/v1/highlight-service";
+  static const String highlightServiceBase =
+      "$baseUrl/api/v1/highlight-service";
 
-  static String serviceHighlight(String serviceId) => "$baseUrl/api/v1/highlight-service/service/$serviceId";
+  static String serviceHighlight(String serviceId) =>
+      "$baseUrl/api/v1/highlight-service/service/$serviceId";
 
-  static String highlightService(String id) => "$baseUrl/api/v1/highlight-service/$id";
+  static String highlightService(String id) =>
+      "$baseUrl/api/v1/highlight-service/$id";
 
   static String serviceById(String id) => "$baseUrl/api/v1/service/$id";
 
-  static const String googleAuthentication = "/api/v1/auth/google/authentication";
+  static const String googleAuthentication =
+      "/api/v1/auth/google/authentication";
+
+  /// Notification
+  static const String notifications = '/api/v1/notification/my_notifications';
+
+  /// PATCH
+  static String markSeen(String id) => '/api/v1/notification/$id/mark_seen';
+
+  /// DELETE
+  static String deleteNotification(String id) => '/api/v1/notification/$id';
 }

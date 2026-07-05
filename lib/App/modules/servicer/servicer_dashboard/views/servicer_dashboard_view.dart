@@ -2,9 +2,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:near_me/App/core/values/app_assets.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
+import '../../../../data/services/storage_service.dart';
+import '../../../../routes/app_routes.dart';
 import '../controller/servicer_dashboard_controller.dart';
 
 class ServiceDashboardView extends GetView<ServiceDashboardController> {
@@ -64,10 +67,14 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                   Stack(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.notifications, size: 30),
                         onPressed: () {
-                          // Handle notification click
+                          StorageService _storageService = StorageService();
+                          final userId = _storageService.userId;
+
+                          if (userId != null)
+                            Get.toNamed(AppRoutes.NOTIFICATIONS, parameters: {"userId": userId});
                         },
+                        icon: Icon(Icons.notifications),
                       ),
                       // Badge
                       Positioned(
