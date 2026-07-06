@@ -6,6 +6,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../../core/widgets/common_app_bar.dart';
 import '../../../../data/models/notification_model.dart';
+import '../../../../routes/app_routes.dart';
 import '../controllers/notification_controller.dart';
 
 class NotificationView extends GetView<NotificationController> {
@@ -148,9 +149,17 @@ class _NotificationTile extends StatelessWidget {
           await controller.markSeen(notification.sId!);
         }
 
-        /// Navigate if needed
-        /// Example:
-        /// Get.toNamed(AppRoutes.SERVICE_DETAILS);
+        if (notification.type == NotificationType.CHAT) {
+          Get.toNamed(
+            AppRoutes.CONVERSATION,
+            arguments: {
+              "userId": notification.data?.senderId,
+              "name": notification.data?.senderName,
+              "image": notification.data?.image,
+              "isOnline": false,
+            },
+          );
+        }
       },
       contentPadding:
       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

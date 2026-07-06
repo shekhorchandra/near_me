@@ -71,22 +71,34 @@ class NotificationModel {
 
 class NotificationData {
   String? senderId;
+  String? senderName;
+  String? receiverId;
   String? message;
+  String? image;
 
   NotificationData({
     this.senderId,
+    this.senderName,
+    this.receiverId,
     this.message,
+    this.image,
   });
 
   NotificationData.fromJson(Map<String, dynamic> json) {
     senderId = json["senderId"]?.toString();
+    senderName = json["senderName"]?.toString();
+    receiverId = json["receiverId"]?.toString();
     message = json["message"]?.toString();
+    image = json["image"]?.toString();
   }
 
   Map<String, dynamic> toJson() {
     return {
       "senderId": senderId,
+      "senderName": senderName,
+      "receiverId": receiverId,
       "message": message,
+      "image": image,
     };
   }
 }
