@@ -30,12 +30,13 @@ class ServicerLoginController extends GetxController {
   final AuthApiService _authApiService = Get.find<AuthApiService>();
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(text: "shekhorchandrasaha@gmail.com");
+  final emailController = TextEditingController(
+    text: "shekhorchandrasaha@gmail.com",
+  );
   final passwordController = TextEditingController(text: "Test1234@");
 
   // final emailController = TextEditingController();
   // final passwordController = TextEditingController();
-
 
   final isLoading = false.obs;
 
@@ -54,7 +55,6 @@ class ServicerLoginController extends GetxController {
   void togglePassword() {
     obscurePassword.value = !obscurePassword.value;
   }
-
 
   Future<void> loginProvider() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
@@ -133,10 +133,6 @@ class ServicerLoginController extends GetxController {
         print("========== FCM TOKEN ==========");
         print(fcmToken);
 
-        if (fcmToken != null && fcmToken.isNotEmpty) {
-          await updateFcmToken(fcmToken);
-        }
-
         print("USER ID SAVED => ${_storageService.userId}");
 
         print("✅ STORED TOKEN: ${StorageService().accessToken}");
@@ -156,7 +152,7 @@ class ServicerLoginController extends GetxController {
         await _storageService.setServiceId(serviceId ?? "");
 
         await Get.putAsync(
-              () => SocketService().connect(userId ?? ""),
+          () => SocketService().connect(userId ?? ""),
           permanent: true,
         );
 
@@ -212,9 +208,7 @@ class ServicerLoginController extends GetxController {
 
       final response = await DioClient().client.patch(
         ApiConstants.update_fcm,
-        data: {
-          "fcmToken": token,
-        },
+        data: {"fcmToken": token},
       );
 
       print("========== UPDATE SUCCESS ==========");
@@ -225,14 +219,13 @@ class ServicerLoginController extends GetxController {
     }
   }
 
-
   /// In app
   Future<void> loginWithGoogleProvider() async {
     isLoading.value = true;
 
     try {
-      final String? idToken =
-      await GoogleAuthService.instance.signInWithGoogle();
+      final String? idToken = await GoogleAuthService.instance
+          .signInWithGoogle();
 
       if (idToken == null || idToken.isEmpty) {
         AppSnackbar.error("Google login cancelled or failed");
@@ -299,7 +292,7 @@ class ServicerLoginController extends GetxController {
         if (userId != null && userId.isNotEmpty) {
           if (!Get.isRegistered<SocketService>()) {
             await Get.putAsync(
-                  () => SocketService().connect(userId),
+              () => SocketService().connect(userId),
               permanent: true,
             );
           }
@@ -321,16 +314,14 @@ class ServicerLoginController extends GetxController {
         } else {
           Get.offAllNamed(
             AppRoutes.SERVICER_VERIFY_ACCOUNT,
-            arguments: {
-              "email": user?["email"] ?? emailController.text.trim(),
-            },
+            arguments: {"email": user?["email"] ?? emailController.text.trim()},
           );
         }
       } else {
         final message =
             responseData?["message"] ??
-                responseData?["error"] ??
-                "Google login failed";
+            responseData?["error"] ??
+            "Google login failed";
 
         AppSnackbar.error(message.toString());
       }

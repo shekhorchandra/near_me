@@ -7,129 +7,317 @@ import '../../../../data/services/storage_service.dart';
 import '../../../services/contants/api_constants.dart';
 
 class NotificationController extends GetxController {
-  final DioClient _dioClient = DioClient();
 
-  final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
+  final DioClient _dioClient = DioClient();
+  final StorageService storage = Get.find<StorageService>();
+
+  final RxList<NotificationModel> notifications =
+      <NotificationModel>[].obs;
+
   final RxBool isLoading = false.obs;
+
   final RxInt page = 1.obs;
   final RxInt limit = 20.obs;
   final RxInt unreadCount = 0.obs;
 
-  final ScrollController scrollController = ScrollController();
+
+  final ScrollController scrollController =
+  ScrollController();
+
 
   @override
   void onInit() {
     super.onInit();
 
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
+
+      if(scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent){
+
         loadMoreNotifications();
+
       }
+
     });
   }
 
-  final storage = Get.find<StorageService>();
 
   @override
   void onReady() {
     super.onReady();
 
-    final token = storage.accessToken;
+    loadNotificationsAfterLogin();
 
-    if (token == null || token.isEmpty) {
-      print("No access token. Skip API.");
-      return;
-    }
-
-    fetchNotifications();
   }
 
-  @override
-  void onClose() {
-    scrollController.dispose();
-    super.onClose();
-  }
 
-  Future<void> fetchNotifications({bool isLoadMore = false}) async {
-    if (isLoading.value) return;
 
-    isLoading.value = true;
+  Future<void> loadNotificationsAfterLogin() async {
 
-    try {
-      final response = await _dioClient.client.get(
-        ApiConstants.notifications,
-        queryParameters: {
-          "page": page.value,
-          "limit": limit.value,
-        },
+
+    // wait until storage gets token
+    int retry = 0;
+
+
+    while(
+    (storage.accessToken == null ||
+        storage.accessToken!.isEmpty)
+        &&
+        retry < 10
+    ){
+
+      await Future.delayed(
+        const Duration(milliseconds: 300),
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> list = response.data["data"] ?? [];
+      retry++;
 
-        final newNotifications = list
-            .map((e) => NotificationModel.fromJson(e))
+    }
+
+
+
+    final token = storage.accessToken;
+
+
+    if(token == null || token.isEmpty){
+
+      print(
+          "Notification skipped: No access token"
+      );
+
+      return;
+
+    }
+
+
+    print(
+        "Notification Token Found"
+    );
+
+
+    await fetchNotifications();
+
+  }
+
+
+
+
+
+  Future<void> fetchNotifications({
+    bool isLoadMore = false,
+  }) async {
+
+
+    if(isLoading.value) return;
+
+
+    final token = storage.accessToken;
+
+
+    if(token == null || token.isEmpty){
+
+      print(
+          "Skip notification API: token missing"
+      );
+
+      return;
+
+    }
+
+
+
+    try {
+
+      isLoading.value = true;
+
+
+      final response =
+      await _dioClient.client.get(
+
+        ApiConstants.notifications,
+
+        queryParameters: {
+
+          "page": page.value,
+
+          "limit": limit.value,
+
+        },
+
+      );
+
+
+
+      if(response.statusCode == 200){
+
+        final List<dynamic> list =
+            response.data["data"] ?? [];
+
+
+
+        final newNotifications =
+        list
+            .map(
+              (e)=>NotificationModel.fromJson(e),
+        )
             .toList();
 
-        if (isLoadMore) {
-          notifications.addAll(newNotifications);
-        } else {
-          notifications.assignAll(newNotifications);
+
+
+        if(isLoadMore){
+
+          notifications.addAll(
+              newNotifications
+          );
+
+        }
+        else{
+
+          notifications.assignAll(
+              newNotifications
+          );
+
         }
 
+
+
         unreadCount.value =
-            notifications.where((e) => e.isRead == false).length;
+            notifications
+                .where(
+                    (e)=>e.isRead == false
+            )
+                .length;
+
+
       }
-    } catch (e) {
-      print(e);
-      Get.snackbar("Error", e.toString());
-    } finally {
-      isLoading.value = false;
+
+
+    }catch(e){
+
+      print(
+          "Notification Error => $e"
+      );
+
+
     }
+    finally{
+
+      isLoading.value=false;
+
+    }
+
   }
 
-  void loadMoreNotifications() {
+
+
+
+
+  void loadMoreNotifications(){
+
+    if(isLoading.value) return;
+
+
     page.value++;
-    fetchNotifications(isLoadMore: true);
+
+    fetchNotifications(
+        isLoadMore:true
+    );
+
   }
+
+
+
+
 
   Future<void> refreshNotifications() async {
-    page.value = 1;
+
+    page.value=1;
+
     await fetchNotifications();
+
   }
 
+
+
+
+
   Future<void> markSeen(String id) async {
-    try {
+
+    try{
+
+
       await _dioClient.client.patch(
         ApiConstants.markSeen(id),
       );
 
+
+
       final index =
-      notifications.indexWhere((e) => e.sId == id);
+      notifications.indexWhere(
+              (e)=>e.sId==id
+      );
 
-      if (index != -1) {
-        notifications[index].isRead = true;
+
+      if(index!=-1){
+
+        notifications[index].isRead=true;
+
         notifications.refresh();
+
       }
 
-      if (unreadCount.value > 0) {
+
+      if(unreadCount.value>0){
+
         unreadCount.value--;
+
       }
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
+
+
+
+    }catch(e){
+
+      print(e);
+
     }
+
   }
 
+
+
+
+
   Future<void> deleteNotification(String id) async {
-    try {
+
+    try{
+
       await _dioClient.client.delete(
         ApiConstants.deleteNotification(id),
       );
 
-      notifications.removeWhere((e) => e.sId == id);
-    } catch (e) {
-      Get.snackbar("Error", e.toString());
+
+      notifications.removeWhere(
+              (e)=>e.sId==id
+      );
+
+
+    }catch(e){
+
+      print(e);
+
     }
+
   }
+
+
+
+  @override
+  void onClose(){
+
+    scrollController.dispose();
+
+    super.onClose();
+
+  }
+
 }

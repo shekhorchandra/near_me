@@ -38,11 +38,11 @@ class FCMService {
     await _notificationService.initialize();
 
     // Notification settings
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      log('Title: ${message.notification!.title}');
-      log('Body: ${message.notification!.body}');
-      _notificationService.showNotification(message);
-    });
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   log('Title: ${message.notification!.title}');
+    //   log('Body: ${message.notification!.body}');
+    //   _notificationService.showNotification(message);
+    // });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
 
