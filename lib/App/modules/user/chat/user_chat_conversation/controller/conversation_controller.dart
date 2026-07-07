@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../data/services/socket_service.dart';
@@ -26,31 +25,31 @@ class ConversationController extends GetxController {
   void onInit() {
     super.onInit();
 
-    userId = Get.arguments["userId"];
-    userName = Get.arguments["name"];
-    userImage = Get.arguments["image"] ?? "";
-    isOnline = Get.arguments["isOnline"] ?? false;
+    final args = (Get.arguments ?? {}) as Map<String, dynamic>;
 
-    print(Get.arguments);
+    print("ARGS => $args");
 
-    print("Conversation userId = --------------------------------------$userId");
+    final myId = storage.userId ?? "";
 
-    // -----------------------------
-    // 🔥 SOCKET EVENTS (CLEAN)
-    // -----------------------------
+    userId = (args["userId"] ?? args["serviceId"] ?? args["senderId"] ?? "")
+        .toString();
 
-    socketService.offEvent("direct_message"); // IMPORTANT
+    userName = (args["name"] ?? args["title"] ?? "Chat").toString();
+
+    userImage = (args["image"] ?? "").toString();
+    //
+    isOnline = args["isOnline"] ?? false;
+
+    print("MY ID = $myId");
+    print("OTHER USER = $userId");
+
+    socketService.offEvent("direct_message");
 
     socketService.onEvent("direct_message", (data) {
       final msg = MessageModel.fromSocket(data);
 
-      final myId = storage.userId ?? "";
-
-      final isRelevant =
-          (msg.senderId == myId && msg.receiverId == userId) ||
-              (msg.senderId == userId && msg.receiverId == myId);
-
-      if (isRelevant) {
+      if ((msg.senderId == myId && msg.receiverId == userId) ||
+          (msg.senderId == userId && msg.receiverId == myId)) {
         if (!messages.any((m) => m.id == msg.id)) {
           messages.insert(0, msg);
         }
@@ -71,7 +70,6 @@ class ConversationController extends GetxController {
       print("SEEN => $data");
     });
 
-    // -----------------------------
     fetchMessages();
   }
 
@@ -80,10 +78,7 @@ class ConversationController extends GetxController {
       isLoading.value = true;
 
       final token = storage.accessToken!;
-      final result = await apiService.getMessages(
-        token: token,
-        userId: userId,
-      );
+      final result = await apiService.getMessages(token: token, userId: userId);
 
       messages.assignAll(result.reversed.toList());
     } catch (e) {
@@ -107,7 +102,6 @@ class ConversationController extends GetxController {
         receiverId: userId,
         text: text,
       );
-
     } catch (e) {
       print("SEND ERROR => $e");
     }

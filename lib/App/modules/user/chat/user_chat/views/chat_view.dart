@@ -91,74 +91,77 @@ class ChatView extends GetView<ChatController> {
     return Scaffold(
       appBar: const CommonAppBar(title: "Chats", showBack: false),
       body: Obx(() {
-        if (controller.isLoginRequired.value) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.chat_bubble_outline,
-                    size: 70,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-
-                  const Text(
-                    "Login Required",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  const Text(
-                    "Please sign in to access your chats and start messaging.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // box.write("selectedRole", "USER"); // if needed
-                        Get.toNamed(AppRoutes.USER_LOGIN);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text("Login"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+        // if (controller.isLoginRequired.value) {
+        //   return Center(
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(24),
+        //       child: Column(
+        //         mainAxisAlignment: MainAxisAlignment.center,
+        //         children: [
+        //           const Icon(
+        //             Icons.chat_bubble_outline,
+        //             size: 70,
+        //             color: Colors.grey,
+        //           ),
+        //           const SizedBox(height: 16),
+        //
+        //           const Text(
+        //             "Login Required",
+        //             style: TextStyle(
+        //               fontSize: 22,
+        //               fontWeight: FontWeight.bold,
+        //             ),
+        //           ),
+        //
+        //           const SizedBox(height: 8),
+        //
+        //           const Text(
+        //             "Please sign in to access your chats and start messaging.",
+        //             textAlign: TextAlign.center,
+        //             style: TextStyle(
+        //               fontSize: 16,
+        //               color: Colors.grey,
+        //             ),
+        //           ),
+        //
+        //           const SizedBox(height: 24),
+        //
+        //           SizedBox(
+        //             width: double.infinity,
+        //             child: ElevatedButton(
+        //               onPressed: () {
+        //                 // box.write("selectedRole", "USER"); // if needed
+        //                 Get.toNamed(AppRoutes.USER_LOGIN);
+        //               },
+        //               style: ElevatedButton.styleFrom(
+        //                 backgroundColor: Colors.black,
+        //                 foregroundColor: Colors.white,
+        //                 padding: const EdgeInsets.symmetric(vertical: 14),
+        //                 shape: RoundedRectangleBorder(
+        //                   borderRadius: BorderRadius.circular(10),
+        //                 ),
+        //               ),
+        //               child: const Text("Login"),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   );
+        // }
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
 
         return Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: CustomTextField(hint: 'Search Chats...'),
-            ),
+            if (controller.chats.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: CustomTextField(
+                  hint: "Search Chats...",
+                ),
+              ),
 
             Expanded(
               child: RefreshIndicator(
@@ -168,21 +171,73 @@ class ChatView extends GetView<ChatController> {
                 },
                 child: controller.chats.isEmpty
                     ? ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: const [
-                          SizedBox(height: 250),
-                          Center(child: Text("No Chats Found")),
-                        ],
-                      )
-                    : ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: controller.chats.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final chat = controller.chats[index];
-                          return chatItem(chat);
-                        },
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.chat_bubble_outline,
+                              size: 70,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+
+                            const Text(
+                              "Login Required",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            const Text(
+                              "Please sign in to access your chats and start messaging.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            SizedBox(
+                              width: 220,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Get.toNamed(AppRoutes.USER_LOGIN);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text("Login"),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                    ),
+                  ],
+                )
+                    : ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: controller.chats.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    return chatItem(controller.chats[index]);
+                  },
+                ),
               ),
             ),
           ],

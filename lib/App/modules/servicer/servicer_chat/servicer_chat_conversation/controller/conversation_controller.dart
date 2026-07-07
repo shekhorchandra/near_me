@@ -26,21 +26,25 @@ class ServicerConversationController extends GetxController {
   late String myId;
 
   @override
+  @override
   void onInit() {
     super.onInit();
 
+    final args = Get.arguments as Map<String, dynamic>;
+
     myId = storage.userId ?? "";
 
-    userId = Get.arguments["serviceId"];
-    userName = Get.arguments["name"];
-    userImage = Get.arguments["image"] ?? "";
-    isOnline = Get.arguments["isOnline"] ?? false;
+    // Works for both normal chat and notification
+    userId = (args["serviceId"] ?? args["senderId"] ?? "").toString();
+    userName = (args["name"] ?? "").toString();
+    userImage = (args["image"] ?? "").toString();
+    isOnline = args["isOnline"] ?? false;
 
     // -----------------------------
     // 🔥 SOCKET EVENTS (CLEAN)
     // -----------------------------
 
-    socketService.offEvent("direct_message"); // IMPORTANT
+    socketService.offEvent("direct_message");
 
     socketService.onEvent("direct_message", (data) {
       final msg = MessageModel.fromSocket(data);
