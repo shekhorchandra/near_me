@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:get/get.dart';
 
+import '../../notification/controllers/notification_controller.dart';
+
 class ServiceDashboardController extends GetxController {
   var title = "Dashboard".obs;
 
@@ -22,6 +24,9 @@ class ServiceDashboardController extends GetxController {
   final _random = Random();
 
   var selectedDate = DateTime.now().obs;
+
+  final NotificationController notificationController =
+      Get.find<NotificationController>();
 
   @override
   void onInit() {
@@ -56,15 +61,28 @@ class ServiceDashboardController extends GetxController {
 
   String _monthName(int month) {
     const months = [
-      "Jan","Feb","Mar","Apr","May","Jun",
-      "Jul","Aug","Sep","Oct","Nov","Dec"
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
     return months[month - 1];
   }
 
   /// Generate random demo data
   List<double> _generateData(int count) {
-    return List.generate(count, (index) => _random.nextInt(150).toDouble() + 20);
+    return List.generate(
+      count,
+      (index) => _random.nextInt(150).toDouble() + 20,
+    );
   }
 
   void goToPrevious(String filter) {

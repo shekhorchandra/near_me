@@ -73,10 +73,21 @@ class NotificationService {
   }
 
   void _handleMessage(RemoteMessage message) {
-    print("Notification Clicked");
-    print(message.data);
+    final data = message.data;
 
-    _navigate(message.data);
+    print("PAYLOAD => ${message.data}");
+
+    if (data["type"] == "CHAT") {
+      Get.toNamed(
+        AppRoutes.CONVERSATION,
+        arguments: {
+          "userId": data["senderId"],
+          "name": data["senderName"] ?? "Chat",
+          "image": data["image"] ?? "",
+          "isOnline": false,
+        },
+      );
+    }
   }
 
   void _listenForegroundMessages() {
@@ -148,42 +159,41 @@ class NotificationService {
 
 
   void _handlePayload(String payload) {
+    print("PAYLOAD => $payload");
+
     final Map<String, dynamic> data = jsonDecode(payload);
+
+    print("DATA => $data");
 
     _navigate(data);
   }
 
   void _navigate(Map<String, dynamic> data) {
-    final type = data["type"];
+    print("DATA => $data");
 
-    switch (type) {
-      case "CHAT":
-        Get.toNamed(
-          AppRoutes.CHAT,
-          arguments: data["senderId"],
-        );
-        break;
+    final type = data["type"]?.toString();
 
-      case "DEAL":
-        Get.toNamed(
-          AppRoutes.CHAT,
-          arguments: data["dealId"],
-        );
-        break;
+    if (type == "CHAT") {
+      final senderId = data["senderId"]?.toString();
 
-      case "BOOKING":
-        Get.toNamed(
-          AppRoutes.CHAT,
-          arguments: data["bookingId"],
-        );
-        break;
-
-      default:
+      if (senderId == null || senderId.isEmpty) {
         Get.toNamed(AppRoutes.NOTIFICATIONS);
+        return;
+      }
+
+      Get.toNamed(
+        AppRoutes.CONVERSATION,
+        arguments: {
+          "userId": data["senderId"],
+          "name": data["senderName"] ?? "Chat",
+          "image": data["image"] ?? "",
+          "isOnline": false,
+        },
+      );
+
+      return;
     }
+
+    Get.toNamed(AppRoutes.NOTIFICATIONS);
   }
-
-
-
-
 }

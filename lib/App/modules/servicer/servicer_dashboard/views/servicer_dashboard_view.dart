@@ -16,17 +16,13 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(
-        title: 'Service Dashboard',
-        showBack: false,
-      ),
+      appBar: CommonAppBar(title: 'Service Dashboard', showBack: false),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// Profile Header
               Row(
                 children: [
@@ -42,62 +38,89 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Obx(() => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${controller.greeting.value} ${controller.userName.value}",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          child: Obx(
+                            () => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${controller.greeting.value} ${controller.userName.value}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              const Text(
-                                "Welcome back!\nHere is your profile overview",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          )),
+                                const Text(
+                                  "Welcome back!\nHere is your profile overview",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
 
                   // Notification Icon with Badge
-                  Stack(
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          StorageService _storageService = StorageService();
-                          final userId = _storageService.userId;
+                  Obx(() {
+                    final unread = controller.notificationController.unreadCount.value;
 
-                          if (userId != null)
-                            Get.toNamed(AppRoutes.NOTIFICATIONS, parameters: {"userId": userId});
-                        },
-                        icon: Icon(Icons.notifications),
-                      ),
-                      // Badge
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Text(
-                            "3", // Replace with dynamic count if needed
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            final token = StorageService().accessToken;
+
+                            if (token == null || token.isEmpty) {
+                              Get.snackbar(
+                                "Login Required",
+                                "Please login first.",
+                              );
+                              return;
+                            }
+
+                            final userId = StorageService().userId;
+
+                            Get.toNamed(
+                              AppRoutes.NOTIFICATIONS,
+                              parameters: {
+                                "userId": userId ?? "",
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.notifications),
+                        ),
+
+                        if (unread > 0)
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  unread > 99 ? "99+" : unread.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  })
                 ],
               ),
 
@@ -110,43 +133,46 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.green.shade50,
                 ),
-                child: Obx(() => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    /// Row with Icon + Text
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SvgPicture.asset(
-                          AppAssets.crown,
-                          height: 40,
-                          width: 40,
-                        ),
-                        const SizedBox(width: 8),
-
-                        /// Wrap text with Expanded to avoid overflow
-                        Expanded(
-                          child: Text(
-                            "You are currently using the ${controller.planName.value} (${controller.planPrice.value}). "
-                                "Your plan renews on ${controller.renewDate.value}.",
-                            style: const TextStyle(fontWeight: FontWeight.w500),
+                child: Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// Row with Icon + Text
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SvgPicture.asset(
+                            AppAssets.crown,
+                            height: 40,
+                            width: 40,
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 8),
 
-                    const SizedBox(height: 12),
+                          /// Wrap text with Expanded to avoid overflow
+                          Expanded(
+                            child: Text(
+                              "You are currently using the ${controller.planName.value} (${controller.planPrice.value}). "
+                              "Your plan renews on ${controller.renewDate.value}.",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                    /// Upgrade Button
-                    AppButton(
-                      height: 30,
-                      backgroundColor: Colors.green,
-                      onPressed: () {},
-                      text: 'Upgrade Plan',
-                    )
-                  ],
-                )),
+                      const SizedBox(height: 12),
+
+                      /// Upgrade Button
+                      AppButton(
+                        height: 30,
+                        backgroundColor: Colors.green,
+                        onPressed: () {},
+                        text: 'Upgrade Plan',
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -182,8 +208,12 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 selected: controller.selectedImpressionFilter,
                 onChange: controller.changeImpressionFilter,
                 data: controller.impressionData,
-                onPrevious: () => controller.goToPrevious(controller.selectedImpressionFilter.value),
-                onNext: () => controller.goToNext(controller.selectedImpressionFilter.value),
+                onPrevious: () => controller.goToPrevious(
+                  controller.selectedImpressionFilter.value,
+                ),
+                onNext: () => controller.goToNext(
+                  controller.selectedImpressionFilter.value,
+                ),
               ),
 
               const SizedBox(height: 20),
@@ -193,8 +223,11 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 selected: controller.selectedViewsFilter,
                 onChange: controller.changeViewsFilter,
                 data: controller.viewsData,
-                onPrevious: () => controller.goToPrevious(controller.selectedViewsFilter.value),
-                onNext: () => controller.goToNext(controller.selectedViewsFilter.value),
+                onPrevious: () => controller.goToPrevious(
+                  controller.selectedViewsFilter.value,
+                ),
+                onNext: () =>
+                    controller.goToNext(controller.selectedViewsFilter.value),
               ),
             ],
           ),
@@ -224,8 +257,18 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
       return "${index + 1}";
     } else {
       const months = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
       ];
       return index < months.length ? months[index] : "";
     }
@@ -244,39 +287,37 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
         borderRadius: BorderRadius.circular(12),
         color: color,
       ),
-      child: Obx(() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top row (title + image icon)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(color: Colors.grey,fontSize: 14,),
-                  ),
-                  Text(
-                    value.value.toString(),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top row (title + image icon)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
-                  ),
-                ],
-              ),
-              Image.asset(
-                iconPath,
-                height: 22,
-                width: 22,
-              ),
-            ],
-          ),
-        ],
-      )),
+                    Text(
+                      value.value.toString(),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Image.asset(iconPath, height: 22, width: 22),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -292,33 +333,41 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
         const SizedBox(height: 10),
 
         ///  Filters
-        Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: ["Week", "Month", "Year"].map((e) {
-            final isSelected = selected.value == e;
-            return GestureDetector(
-              onTap: () => onChange(e),
-              child: Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  e,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+        Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ["Week", "Month", "Year"].map((e) {
+              final isSelected = selected.value == e;
+              return GestureDetector(
+                onTap: () => onChange(e),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? Colors.black : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    e,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        )),
+              );
+            }).toList(),
+          ),
+        ),
 
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
@@ -330,122 +379,124 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                 icon: const Icon(Icons.arrow_back_ios, size: 18),
               ),
 
-              Obx(() => Text(
-                controller.getDisplayRange(selected.value),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+              Obx(
+                () => Text(
+                  controller.getDisplayRange(selected.value),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
-              )),
-
-              IconButton(
-                onPressed: onNext,                icon: const Icon(Icons.arrow_forward_ios, size: 18),
               ),
 
+              IconButton(
+                onPressed: onNext,
+                icon: const Icon(Icons.arrow_forward_ios, size: 18),
+              ),
             ],
           ),
         ),
 
-
-
         const SizedBox(height: 12),
-
-
 
         /// Chart
         SizedBox(
           height: 220,
-          child: Obx(() => LineChart(
-            LineChartData(
-              gridData: FlGridData(
-                show: true,
-                drawVerticalLine: true,
-                drawHorizontalLine: true,
-                verticalInterval: _getInterval(selected.value),
-                horizontalInterval: 50,
-                getDrawingHorizontalLine: (value) => FlLine(
-                  color: Colors.grey.shade300,
-                  strokeWidth: 1,
+          child: Obx(
+            () => LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  drawHorizontalLine: true,
+                  verticalInterval: _getInterval(selected.value),
+                  horizontalInterval: 50,
+                  getDrawingHorizontalLine: (value) =>
+                      FlLine(color: Colors.grey.shade300, strokeWidth: 1),
+                  getDrawingVerticalLine: (value) =>
+                      FlLine(color: Colors.grey.shade300, strokeWidth: 1),
                 ),
-                getDrawingVerticalLine: (value) => FlLine(
-                  color: Colors.grey.shade300,
-                  strokeWidth: 1,
+                borderData: FlBorderData(
+                  show: true,
+                  border: const Border(
+                    left: BorderSide(color: Colors.black, width: 1),
+                    bottom: BorderSide(color: Colors.black, width: 1),
+                  ),
                 ),
-              ),
-              borderData: FlBorderData(
-                show: true,
-                border: const Border(
-                  left: BorderSide(color: Colors.black, width: 1),
-                  bottom: BorderSide(color: Colors.black, width: 1),
-                ),
-              ),
 
-              /// Axis Labels
-              titlesData: FlTitlesData(
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: _getInterval(selected.value),
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        _getBottomTitle(value.toInt(), selected.value),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                /// Axis Labels
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: _getInterval(selected.value),
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          _getBottomTitle(value.toInt(), selected.value),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 50, // adjust based on your data
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                 ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 50, // adjust based on your data
-                    reservedSize: 40,
-                    getTitlesWidget: (value, meta) {
-                      return Text(
-                        value.toInt().toString(),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
 
-              lineBarsData: [
-                LineChartBarData(
-                  spots: List.generate(
-                    data.length,
-                        (i) => FlSpot(i.toDouble(), data[i]),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: List.generate(
+                      data.length,
+                      (i) => FlSpot(i.toDouble(), data[i]),
+                    ),
+                    isCurved: true,
+                    barWidth: 3,
+                    color: Colors.black, // Line color
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) =>
+                          FlDotCirclePainter(
+                            radius: 3,
+                            color: Colors.grey, // Dot color
+                            strokeWidth: 1,
+                            strokeColor: Colors.black,
+                          ),
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: Colors.blue.shade100.withOpacity(
+                        0.3,
+                      ), // Gradient fill
+                    ),
                   ),
-                  isCurved: true,
-                  barWidth: 3,
-                  color: Colors.black, // Line color
-                  dotData: FlDotData(
-                    show: true,
-                    getDotPainter: (spot, percent, barData, index) =>
-                        FlDotCirclePainter(
-                          radius: 3,
-                          color: Colors.grey, // Dot color
-                          strokeWidth: 1,
-                          strokeColor: Colors.black,
-                        ),
-                  ),
-                  belowBarData: BarAreaData(
-                    show: true,
-                    color: Colors.blue.shade100.withOpacity(0.3), // Gradient fill
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          )),
+          ),
         ),
       ],
     );
