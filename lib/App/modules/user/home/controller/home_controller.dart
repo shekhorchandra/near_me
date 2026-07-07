@@ -676,43 +676,7 @@ class HomeController extends GetxController
                 ),
               ),
 
-              /// CATEGORY
-              // const Text("Category", style: TextStyle(fontWeight: FontWeight.w600)),
-              // const SizedBox(height: 10),
-              //
-              // Obx(
-              //       () => Wrap(
-              //     spacing: 10,
-              //     runSpacing: 10,
-              //     children: categories.map((category) {
-              //       final selected = selectedCategories.contains(category.id);
-              //
-              //       return GestureDetector(
-              //         onTap: () {
-              //           if (selected) {
-              //             selectedCategories.remove(category.id);
-              //           } else {
-              //             selectedCategories.add(category.id);
-              //           }
-              //         },
-              //         child: Container(
-              //           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              //           decoration: BoxDecoration(
-              //             color: selected ? Colors.black : Colors.grey.shade200,
-              //             borderRadius: BorderRadius.circular(20),
-              //           ),
-              //           child: Text(
-              //             category.name,
-              //             style: TextStyle(
-              //               color: selected ? Colors.white : Colors.black,
-              //               fontWeight: FontWeight.w500,
-              //             ),
-              //           ),
-              //         ),
-              //       );
-              //     }).toList(),
-              //   ),
-              // ),
+
               const SizedBox(height: 20),
 
               /// BUTTON

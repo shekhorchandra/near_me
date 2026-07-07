@@ -250,7 +250,6 @@ class HomeView extends GetView<HomeController> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
 
                 /// TOP RATED BADGE SERVICES
                 SizedBox(
@@ -334,7 +333,7 @@ class HomeView extends GetView<HomeController> {
                                           const Icon(
                                             Icons.star,
                                             size: 12,
-                                            color: Colors.amber,
+                                            color: Colors.white,
                                           ),
                                           const SizedBox(width: 2),
                                           Text(
