@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../../../../../routes/app_routes.dart';
 import '../controller/chat_controller.dart';
 import '../helper/TimeFormatter.dart';
@@ -81,8 +82,14 @@ class ServiceChatView extends GetView<ServiceChatController> {
     return Scaffold(
       appBar: const CommonAppBar(title: "Service Chats", showBack: false),
       body: Obx(() {
+        /// ✅ SKELETON LOADER
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SkeletonLoader.list(
+              itemCount: 8,
+            ),
+          );
         }
 
         return Column(

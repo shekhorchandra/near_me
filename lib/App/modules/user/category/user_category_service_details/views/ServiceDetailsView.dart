@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:near_me/App/modules/user/category/user_category_service_details/models/ReviewModel.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../servicer/servicer_chat/servicer_chat/helper/TimeFormatter.dart';
@@ -135,9 +136,12 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
 
         // ================= BODY =================
         body: controller.isLoading.value
-            ? const Center(
-                child: CircularProgressIndicator(color: Colors.black),
-              )
+            ? Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: SkeletonLoader.list(
+            itemCount: 8,
+          ),
+        )
             : RefreshIndicator(
                 color: Colors.black,
                 onRefresh: () async {

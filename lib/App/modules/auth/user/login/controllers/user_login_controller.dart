@@ -63,145 +63,138 @@ class UserLoginController extends GetxController {
     loading.value = true;
 
     try {
-
-      final idToken =
-      await GoogleAuthService.instance.signInWithGoogle();
+      final String? idToken = await GoogleAuthService.instance
+          .signInWithGoogle();
 
       if (idToken == null || idToken.isEmpty) {
-        AppSnackbar.error("Google login failed");
+        AppSnackbar.error("Google login cancelled or failed");
         return;
       }
 
-
-      final response =
-      await _authApiService.googleAuthentication(
+      final response = await _authApiService.googleAuthentication(
         idToken: idToken,
         role: "user",
       );
 
-
-      print("GOOGLE STATUS ===== ${response?.statusCode}");
-      print("GOOGLE BODY ===== ${response?.data}");
-
-
       if (response == null) {
-        AppSnackbar.error("No response");
+        AppSnackbar.error("No response from server");
         return;
       }
 
+      print("=========== GOOGLE USER RESPONSE ===========");
+      print(response.data);
+      print("============================================");
 
-      if (response.statusCode != 200 &&
-          response.statusCode != 201) {
+      final responseData = response.data;
 
-        AppSnackbar.error(
-          response.data["message"] ??
-              "Google login failed",
-        );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        AppSnackbar.error(responseData["message"] ?? "Google login failed");
 
         return;
       }
 
+      if (responseData["success"] != true) {
+        AppSnackbar.error(responseData["message"] ?? "Google login failed");
 
-      final loginData = response.data["data"];
+        return;
+      }
 
+      final data = responseData["data"];
 
       final accessToken =
-      loginData["accessToken"];
+          data?["accessToken"] ?? data?["token"]?["accessToken"];
 
       final refreshToken =
-      loginData["refreshToken"];
+          data?["refreshToken"] ?? data?["token"]?["refreshToken"];
 
-      final user =
-      loginData["user"];
+      final user = data?["user"];
 
+      final userId = user?["_id"]?.toString();
 
-      if(accessToken == null ||
-          refreshToken == null) {
+      final role = user?["role"]?.toString();
 
-        AppSnackbar.error(
-          "Token missing",
-        );
+      if (accessToken == null || accessToken.toString().isEmpty) {
+        AppSnackbar.error("Access token not found");
 
         return;
       }
 
+      if (role != "USER") {
+        AppSnackbar.error("Please login from user panel");
 
-      // SAVE FIRST
-      await _storageService.setAccessToken(
-        accessToken,
-      );
+        return;
+      }
 
-      await _storageService.setRefreshToken(
-        refreshToken,
-      );
+      // ==============================
+      // CLEAR OLD SESSION
+      // ==============================
 
+      await _storageService.clear();
 
-      if(user != null){
-        await _storageService.setUserId(
-          user["_id"],
+      // ==============================
+      // SAVE AUTH DATA
+      // ==============================
+
+      await _storageService.setAccessToken(accessToken.toString());
+
+      await _storageService.setRefreshToken(refreshToken?.toString() ?? "");
+
+      await _storageService.setUserId(userId ?? "");
+
+      await _storageService.write("loggedIn", true);
+
+      print("ACCESS TOKEN => ${_storageService.accessToken}");
+
+      print("USER ID => ${_storageService.userId}");
+
+      // ==============================
+      // UPDATE FCM TOKEN
+      // ==============================
+
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+
+      print("FCM TOKEN => $fcmToken");
+
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        await updateFcmToken(fcmToken);
+      }
+
+      // ==============================
+      // CONNECT SOCKET
+      // ==============================
+
+      if (userId != null && userId.isNotEmpty) {
+        if (Get.isRegistered<SocketService>()) {
+          await Get.delete<SocketService>();
+        }
+
+        await Get.putAsync(
+          () => SocketService().connect(userId),
+          permanent: true,
         );
       }
 
+      // ==============================
+      // UPDATE HOME STATE
+      // ==============================
 
-      // VERIFY STORAGE
-      print(
-          "SAVED TOKEN ===== ${_storageService.accessToken}"
-      );
-
-
-      // UPDATE FCM AFTER TOKEN EXISTS
-      final fcmToken =
-      await FirebaseMessaging.instance.getToken();
-
-
-      if(fcmToken != null &&
-          fcmToken.isNotEmpty){
-
-        await updateFcmToken(
-          fcmToken,
-        );
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().checkLoginStatus();
       }
 
+      AppSnackbar.success(responseData["message"] ?? "Login Successful");
 
-      await Future.delayed(
-        const Duration(milliseconds: 300),
-      );
+      Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
+    } catch (e, st) {
+      print("GOOGLE USER LOGIN ERROR => $e");
 
-
-      await _storageService.setAccessToken(accessToken);
-      await _storageService.setRefreshToken(refreshToken);
-
-      print(
-          "ACCESS TOKEN SAVED => ${_storageService.accessToken}"
-      );
-
-      await Future.delayed(
-          const Duration(milliseconds: 300)
-      );
-
-      Get.offAllNamed(
-          AppRoutes.USER_BOTTOM_NAV
-      );
-
-
-      AppSnackbar.success(
-        "Login Successful",
-      );
-
-
-    } catch(e,st){
-
-      print("GOOGLE LOGIN ERROR $e");
       print(st);
 
-      AppSnackbar.error(
-        "Something went wrong",
-      );
-
+      AppSnackbar.error("Something went wrong during Google login");
     } finally {
-
-      loading.value=false;
-
+      loading.value = false;
     }
   }
 
@@ -269,12 +262,14 @@ class UserLoginController extends GetxController {
           }
 
           /// CONNECT SOCKET
-          if (!Get.isRegistered<SocketService>()) {
-            await Get.putAsync(
-              () => SocketService().connect(userId),
-              permanent: true,
-            );
+          if (Get.isRegistered<SocketService>()) {
+            await Get.delete<SocketService>();
           }
+
+          await Get.putAsync(
+            () => SocketService().connect(userId),
+            permanent: true,
+          );
 
           AppSnackbar.success(message);
 

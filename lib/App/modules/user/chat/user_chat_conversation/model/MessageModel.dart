@@ -1,10 +1,10 @@
 class MessageModel {
   final String id;
-  final String senderId;
+  final String? senderId;
   final String senderName;
   final String receiverId;
   final String receiverName;
-  final String text;
+  final String? text;
   final String image;
   final String status;
   final DateTime createdAt;

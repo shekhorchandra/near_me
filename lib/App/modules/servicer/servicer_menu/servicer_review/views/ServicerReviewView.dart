@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
 
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../controller/ServicerReviewController.dart';
 import '../model/ServicerReviewModel.dart';
 
@@ -19,8 +20,14 @@ class ManageReviewsScreen extends StatelessWidget {
         title: 'Manage Reviews',
       ),
       body: Obx(() {
+        /// ✅ SKELETON LOADER
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SkeletonLoader.list(
+              itemCount: 8,
+            ),
+          );
         }
 
         return RefreshIndicator(

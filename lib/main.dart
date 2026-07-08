@@ -7,38 +7,24 @@ import 'package:near_me/firebase_options.dart';
 import 'App/core/theme/checkbox_theme.dart';
 import 'App/core/values/app_strings.dart';
 import 'App/data/network/dio_client.dart';
-import 'App/data/services/deep_link_service.dart';
 import 'App/data/services/notification_service.dart';
 import 'App/data/services/socket_service.dart';
 import 'App/data/services/storage_service.dart';
-import 'App/modules/auth/internet/controller/internet_controller.dart';
 import 'App/routes/app_pages.dart';
 import 'App/routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // Firebase initialization
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final storageService = StorageService();
   await storageService.init();
   Get.put<StorageService>(storageService, permanent: true);
 
-  // Firebase initialization
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService().initialize();
   await dotenv.load(fileName: ".env");
   print(dotenv.env['GOOGLE_MAPS_API_KEY']);
   //  INIT STORAGE
-
-
-
-  // Get.put(InternetController(), permanent: true);
-  // Clear login data every app launch
-  // await storageService.clear();
-
-  // Deep Link Initialization
-  // DeepLinkService().init();
-
-
 
   await NotificationService().setupInteractedMessage();
   // Handle FCM messages while in background
@@ -48,7 +34,18 @@ void main() async {
   Get.put<DioClient>(DioClient(), permanent: true);
 
   // Register SocketService
-  Get.put<SocketService>(SocketService(), permanent: true);
+  // Get.put<SocketService>(SocketService(), permanent: true);
+  // Register SocketService
+  final socketService = SocketService();
+
+  Get.put<SocketService>(socketService, permanent: true);
+
+  // Connect socket after storage initialization
+  final userId = storageService.userId;
+
+  if (userId != null && userId.isNotEmpty) {
+    await socketService.connect(userId);
+  }
 
   runApp(const NearMeeApp());
 }

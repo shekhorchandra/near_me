@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../../../../../routes/app_routes.dart';
 import '../controller/chat_controller.dart';
 import '../helper/TimeFormatter.dart';
@@ -149,18 +150,25 @@ class ChatView extends GetView<ChatController> {
         //     ),
         //   );
         // }
+        /// ✅ SKELETON LOADER
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SkeletonLoader.list(
+              itemCount: 8,
+            ),
+          );
         }
 
         return Column(
           children: [
             if (controller.chats.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: CustomTextField(
-                  hint: "Search Chats...",
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
+                child: CustomTextField(hint: "Search Chats..."),
               ),
 
             Expanded(
@@ -171,73 +179,77 @@ class ChatView extends GetView<ChatController> {
                 },
                 child: controller.chats.isEmpty
                     ? ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.75,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.chat_bubble_outline,
-                              size: 70,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-
-                            const Text(
-                              "Login Required",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            const Text(
-                              "Please sign in to access your chats and start messaging.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            SizedBox(
-                              width: 220,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Get.toNamed(AppRoutes.USER_LOGIN);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.75,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.chat_bubble_outline,
+                                    size: 70,
+                                    color: Colors.grey,
                                   ),
-                                ),
-                                child: const Text("Login"),
+                                  const SizedBox(height: 16),
+
+                                  const Text(
+                                    "Login Required",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  const Text(
+                                    "Please sign in to access your chats and start messaging.",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 24),
+
+                                  SizedBox(
+                                    width: 220,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Get.toNamed(AppRoutes.USER_LOGIN);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text("Login"),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                          ),
+                        ],
+                      )
                     : ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: controller.chats.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    return chatItem(controller.chats[index]);
-                  },
-                ),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: controller.chats.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          return chatItem(controller.chats[index]);
+                        },
+                      ),
               ),
             ),
           ],

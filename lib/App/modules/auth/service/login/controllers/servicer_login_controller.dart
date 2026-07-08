@@ -145,19 +145,24 @@ class ServicerLoginController extends GetxController {
         //   );
         // }
 
+
         final userId = data?["user"]?["_id"];
         final serviceId = data?["user"]?["service"];
 
         await _storageService.setUserId(userId ?? "");
         await _storageService.setServiceId(serviceId ?? "");
 
+        if (Get.isRegistered<SocketService>()) {
+          await Get.delete<SocketService>();
+        }
+
         await Get.putAsync(
-          () => SocketService().connect(userId ?? ""),
+              () => SocketService().connect(userId ?? ""),
           permanent: true,
         );
 
         print("✅ SAVED TOKEN: $accessToken");
-        print("✅ STORED TOKEN: ${StorageService().accessToken}");
+        print("✅ STORED TOKEN: ${_storageService.accessToken}");
 
         // ✅ ROLE CHECK
         if (selectedRole == "PROVIDER" && role != "PROVIDER") {
@@ -290,12 +295,15 @@ class ServicerLoginController extends GetxController {
         await _storageService.write("loggedIn", true);
 
         if (userId != null && userId.isNotEmpty) {
-          if (!Get.isRegistered<SocketService>()) {
-            await Get.putAsync(
-              () => SocketService().connect(userId),
-              permanent: true,
-            );
+          if (Get.isRegistered<SocketService>()) {
+            await Get.delete<SocketService>();
           }
+
+
+          await Get.putAsync(
+                () => SocketService().connect(userId),
+            permanent: true,
+          );
         }
 
         AppSnackbar.success(responseData["message"] ?? "Login successful");

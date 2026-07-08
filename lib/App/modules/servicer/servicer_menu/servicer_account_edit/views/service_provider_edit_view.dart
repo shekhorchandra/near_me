@@ -3,10 +3,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../../../../core/widgets/skeleton_loader.dart';
 import '../../../../../routes/app_routes.dart';
-import '../../servicer_preview/binding/ServicePreviewBinding.dart';
-import '../../servicer_preview/view/PreviewServicePreviewProvider.dart';
-import '../../servicer_preview/view/ServicePreviewProvider.dart';
 import '../controller/service_provider_edit_controller.dart';
 import '../../../../../core/widgets/App_button.dart';
 import '../../../../../core/widgets/SectionLabelWithEdit.dart';
@@ -26,8 +24,14 @@ class ServiceProviderEditView extends GetView<ServiceProviderEditController> {
       ),
       body: SafeArea(
         child: Obx(() {
+          /// ✅ SKELETON LOADER
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SkeletonLoader.list(
+                itemCount: 8,
+              ),
+            );
           }
 
           return SingleChildScrollView(

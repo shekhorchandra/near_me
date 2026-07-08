@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../../../../data/services/socket_service.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../user_chat/services/ChatApiService.dart';
@@ -7,80 +8,174 @@ import '../model/MessageModel.dart';
 
 class ConversationController extends GetxController {
   final ChatApiService apiService = Get.find();
-  final StorageService storage = StorageService();
+  final StorageService storage = Get.find<StorageService>();
   final SocketService socketService = Get.find<SocketService>();
+
+  final ScrollController scrollController = ScrollController();
 
   final TextEditingController messageController = TextEditingController();
 
-  final messages = <MessageModel>[].obs;
-  final isLoading = false.obs;
-  final isTyping = false.obs;
+  final RxList<MessageModel> messages = <MessageModel>[].obs;
+
+  final RxBool isLoading = false.obs;
+
+  final RxBool isTyping = false.obs;
+
+  late String myId;
 
   late String userId;
   late String userName;
   late String userImage;
-  late bool isOnline;
+
+  late Function(dynamic) messageListener;
+  late Function(dynamic) typingListener;
+  late Function(dynamic) seenListener;
 
   @override
   void onInit() {
     super.onInit();
 
+    initChat();
+  }
+
+  Future<void> initChat() async {
+    print("SOCKET CONNECTED => ${socketService.connected}");
+
     final args = (Get.arguments ?? {}) as Map<String, dynamic>;
 
-    print("ARGS => $args");
-
-    final myId = storage.userId ?? "";
+    myId = storage.userId ?? "";
 
     userId = (args["userId"] ?? args["serviceId"] ?? args["senderId"] ?? "")
         .toString();
 
-    userName = (args["name"] ?? args["title"] ?? "Chat").toString();
+    userName = (args["name"] ?? "Chat").toString();
 
     userImage = (args["image"] ?? "").toString();
-    //
-    isOnline = args["isOnline"] ?? false;
 
-    print("MY ID = $myId");
-    print("OTHER USER = $userId");
+    print("MY ID => $myId");
+    print("CHAT USER => $userId");
 
-    socketService.offEvent("direct_message");
+    // connect socket first
+    if (!socketService.connected) {
+      await socketService.connect(myId);
+    }
 
-    socketService.onEvent("direct_message", (data) {
-      final msg = MessageModel.fromSocket(data);
+    // register after socket ready
+    registerSocketEvents();
 
-      if ((msg.senderId == myId && msg.receiverId == userId) ||
-          (msg.senderId == userId && msg.receiverId == myId)) {
-        if (!messages.any((m) => m.id == msg.id)) {
-          messages.insert(0, msg);
+    fetchMessages();
+  }
+
+  void registerSocketEvents() {
+    messageListener = (data) {
+      print("======================");
+      print("🔥 DIRECT MESSAGE RECEIVED");
+      print(data);
+      print("======================");
+
+      try {
+        final msg = MessageModel.fromSocket(Map<String, dynamic>.from(data));
+
+        print("MESSAGE => ${msg.text}");
+        print("FROM => ${msg.senderId}");
+        print("TO => ${msg.receiverId}");
+
+        print("==========================");
+        print("MY ID       => $myId");
+        print("CHAT USER   => $userId");
+        print("SENDER ID   => ${msg.senderId}");
+        print("RECEIVER ID => ${msg.receiverId}");
+        print("==========================");
+
+        final isSameChat =
+            (msg.senderId == myId && msg.receiverId == userId) ||
+            (msg.senderId == userId && msg.receiverId == myId);
+
+        if (!isSameChat) {
+          print("❌ MESSAGE NOT FOR THIS CHAT");
+          return;
         }
-      }
-    });
 
-    socketService.onEvent("typing", (data) {
-      if (data["from"] == userId) {
+        if (!isSameChat) {
+          print("❌ MESSAGE NOT FOR THIS CHAT");
+          return;
+        }
+
+        final exists = messages.any((m) => m.id == msg.id);
+
+        if (exists) {
+          print("⚠ DUPLICATE MESSAGE");
+
+          return;
+        }
+
+        messages.add(msg);
+
+        // messages.insert(0,msg);
+        print("ADDING MESSAGE TO UI");
+        print(msg.text);
+
+        messages.refresh();
+        Future.delayed(
+          const Duration(milliseconds: 100),
+              (){
+            scrollToBottom();
+          },
+        );
+
+        print("✅ TOTAL MESSAGE => ${messages.length}");
+      } catch (e) {
+        print("SOCKET MESSAGE ERROR => $e");
+      }
+    };
+
+    socketService.onEvent("direct_message", messageListener);
+
+    typingListener = (data) {
+      print("TYPING => $data");
+
+      if (data["from"]?.toString() == userId) {
         isTyping.value = true;
 
         Future.delayed(const Duration(seconds: 2), () {
           isTyping.value = false;
         });
       }
-    });
+    };
 
-    socketService.onEvent("messages_seen", (data) {
+    socketService.onEvent("typing", typingListener);
+
+    seenListener = (data) {
       print("SEEN => $data");
-    });
+    };
 
-    fetchMessages();
+    socketService.onEvent("messages_seen", seenListener);
   }
 
   Future<void> fetchMessages() async {
     try {
       isLoading.value = true;
 
-      final token = storage.accessToken!;
-      final result = await apiService.getMessages(token: token, userId: userId);
+      final result = await apiService.getMessages(
+        token: storage.accessToken!,
+        userId: userId,
+      );
 
-      messages.assignAll(result.reversed.toList());
+      for (final msg in result) {
+        final exists = messages.any((m) => m.id == msg.id);
+
+        if (!exists) {
+          messages.add(msg);
+        }
+      }
+
+      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+      messages.refresh();
+
+      Future.delayed(const Duration(milliseconds: 100), () {
+        scrollToBottom();
+      });
     } catch (e) {
       print("FETCH ERROR => $e");
     } finally {
@@ -88,18 +183,33 @@ class ConversationController extends GetxController {
     }
   }
 
+  void scrollToBottom() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+
+        duration: const Duration(milliseconds: 300),
+
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   Future<void> sendMessage() async {
     final text = messageController.text.trim();
-    if (text.isEmpty) return;
+
+    if (text.isEmpty) {
+      return;
+    }
 
     messageController.clear();
 
     try {
-      final token = storage.accessToken!;
-
       await apiService.sendMessage(
-        token: token,
+        token: storage.accessToken!,
+
         receiverId: userId,
+
         text: text,
       );
     } catch (e) {
@@ -107,13 +217,22 @@ class ConversationController extends GetxController {
     }
   }
 
+  void sendTyping() {
+    socketService.emit("typing", {"toUserId": userId});
+  }
+
   @override
   void onClose() {
-    socketService.offEvent("direct_message");
-    socketService.offEvent("typing");
-    socketService.offEvent("messages_seen");
+    socketService.offEvent("direct_message", messageListener);
+
+    socketService.offEvent("typing", typingListener);
+
+    socketService.offEvent("messages_seen", seenListener);
+
+    scrollController.dispose();
 
     messageController.dispose();
+
     super.onClose();
   }
 }

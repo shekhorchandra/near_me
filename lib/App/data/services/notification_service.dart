@@ -155,9 +155,6 @@ class NotificationService {
     print("SHOW FINISHED");
   }
 
-
-
-
   void _handlePayload(String payload) {
     print("PAYLOAD => $payload");
 
