@@ -9,12 +9,44 @@ class ChatController extends GetxController {
 
   ChatController({required this.apiService});
 
-  var isLoading = false.obs;
+  final isLoading = false.obs;
   final chats = <ChatModel>[].obs;
-  // final socketService = Get.find<SocketService>();
+
+  final RxBool isLoggedIn = false.obs;
+  final isLoginRequired = false.obs;
 
   SocketService? socketService;
-  final isLoginRequired = false.obs;
+
+  final storage = StorageService();
+
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    checkLoginStatus();
+
+    if (isLoggedIn.value) {
+      fetchChats();
+    } else {
+
+    }
+
+
+    if (Get.isRegistered<SocketService>()) {
+      socketService = Get.find<SocketService>();
+    }
+  }
+
+
+  void checkLoginStatus() {
+    final token = storage.accessToken;
+
+    print("LOGIN TOKEN => $token");
+
+    isLoggedIn.value = token != null && token.isNotEmpty;
+  }
+
 
   bool isUserOnline(String userId) {
     if (socketService == null) return false;
@@ -22,19 +54,6 @@ class ChatController extends GetxController {
     return socketService!.onlineUsers.contains(userId);
   }
 
-  final storage = StorageService();
-
-  @override
-  void onInit() {
-    super.onInit();
-
-    if (Get.isRegistered<SocketService>()) {
-      socketService = Get.find<SocketService>();
-      fetchChats();
-    } else {
-      isLoginRequired.value = true;
-    }
-  }
 
   Future<void> fetchChats() async {
     try {
@@ -42,16 +61,21 @@ class ChatController extends GetxController {
 
       final token = storage.accessToken;
 
-      print("🔐 TOKEN: $token"); // DEBUG
+      print("CHAT TOKEN => $token");
 
       if (token == null || token.isEmpty) {
-        print("❌ Token missing");
+
         return;
       }
 
+
       final data = await apiService.getConversations(token);
 
-      chats.value = data.map((e) => ChatModel.fromJson(e)).toList();
+      chats.value = data
+          .map((e) => ChatModel.fromJson(e))
+          .toList();
+
+
     } catch (e) {
       print("❌ Chat API error: $e");
     } finally {

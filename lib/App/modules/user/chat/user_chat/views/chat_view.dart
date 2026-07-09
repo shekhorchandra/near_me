@@ -177,84 +177,102 @@ class ChatView extends GetView<ChatController> {
                 onRefresh: () async {
                   await controller.fetchChats();
                 },
-                child: controller.chats.isEmpty
-                    ? ListView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.75,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.chat_bubble_outline,
-                                    size: 70,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  const Text(
-                                    "Login Required",
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  const Text(
-                                    "Please sign in to access your chats and start messaging.",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 24),
-
-                                  SizedBox(
-                                    width: 220,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        Get.toNamed(AppRoutes.USER_LOGIN);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                      ),
-                                      child: const Text("Login"),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                child: !controller.isLoggedIn.value
+                    ? _loginRequired(context)
+                    : controller.chats.isEmpty
+                    ? _emptyChats(context)
                     : ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: controller.chats.length,
-                        separatorBuilder: (_, __) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          return chatItem(controller.chats[index]);
-                        },
-                      ),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: controller.chats.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    return chatItem(controller.chats[index]);
+                  },
+                ),
               ),
             ),
           ],
         );
       }),
+    );
+  }
+
+  Widget _loginRequired(BuildContext context) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.chat_bubble_outline,
+                  size: 70,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Login Required",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Please sign in to access your chats.",
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.USER_LOGIN);
+                  },
+                  child: const Text("Login"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _emptyChats(BuildContext context) {
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.chat_bubble_outline,
+                  size: 70,
+                  color: Colors.grey,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "No Conversations Yet",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Start chatting with providers to see your messages here.",
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
