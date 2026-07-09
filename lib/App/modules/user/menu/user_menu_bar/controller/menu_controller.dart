@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -24,6 +25,7 @@ class UserMenuController extends GetxController {
   RxString profileImageUrl = "".obs;
   RxBool isEditing = false.obs;
   RxBool isUpdating = false.obs;
+  final StorageService storage = Get.find();
 
 
   final TextEditingController nameController = TextEditingController();
@@ -179,6 +181,114 @@ class UserMenuController extends GetxController {
   void onTermsTap() => Get.toNamed(AppRoutes.TERMS_CONDITION);
   void onRateAppTap() {}
   void onInviteFriendsTap() {}
+
+
+  Future<void> deleteAccount() async {
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.red,
+              size: 28,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              "Delete Account",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          "Are you sure you want to permanently delete your account?\n\n"
+              "This action cannot be undone and all your data will be removed.",
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.only(
+          right: 16,
+          bottom: 12,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () => Get.back(result: true),
+            child: const Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+    try {
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        barrierDismissible: false,
+      );
+      print(storage.accessToken);
+      final response = await Dio().delete(
+        "${ApiConstants.baseUrl}/api/v1/user/delete-me",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer ${storage.accessToken}",
+          },
+        ),
+      );
+
+      Get.back(); // close loader
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        Get.snackbar(
+          "Success",
+          response.data["message"] ?? "Account deleted successfully",
+        );
+
+        // Clear local storage
+        await StorageService().clear();
+
+        // Navigate to login
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
+      }
+    } on DioException catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      Get.snackbar(
+        "Error",
+        e.response?.data["message"] ?? "Failed to delete account",
+      );
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      Get.snackbar("Error", e.toString());
+    }
+  }
 
   Future<void> onLogoutTap() async {
     try {

@@ -40,6 +40,8 @@ void main() async {
 
   Get.put<SocketService>(socketService, permanent: true);
 
+  await storageService.clear();
+
   // Connect socket after storage initialization
   final userId = storageService.userId;
 

@@ -26,7 +26,7 @@ class MenuView extends GetView<UserMenuController> {
               children: [
                 /// Profile Image
                 Obx(
-                      () => Stack(
+                  () => Stack(
                     alignment: Alignment.bottomRight,
                     children: [
                       CircleAvatar(
@@ -36,8 +36,9 @@ class MenuView extends GetView<UserMenuController> {
                             : controller.profileImageUrl.value.isNotEmpty
                             ? NetworkImage(controller.profileImageUrl.value)
                             : const NetworkImage(
-                          "https://img.favpng.com/20/11/12/computer-icons-user-profile-png-favpng-0UAKKCpRRsMj5NaiELzw1pV7L.jpg",
-                        ) as ImageProvider,
+                                    "https://img.favpng.com/20/11/12/computer-icons-user-profile-png-favpng-0UAKKCpRRsMj5NaiELzw1pV7L.jpg",
+                                  )
+                                  as ImageProvider,
                       ),
 
                       InkWell(
@@ -56,8 +57,6 @@ class MenuView extends GetView<UserMenuController> {
                   ),
                 ),
 
-
-
                 /// Name + Edit + Save
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -65,7 +64,7 @@ class MenuView extends GetView<UserMenuController> {
                     children: [
                       Expanded(
                         child: Obx(
-                              () => TextField(
+                          () => TextField(
                             controller: controller.nameController,
                             enabled: controller.isEditing.value,
                             decoration: const InputDecoration(
@@ -82,7 +81,7 @@ class MenuView extends GetView<UserMenuController> {
 
                       /// Edit Icon
                       Obx(
-                            () => IconButton(
+                        () => IconButton(
                           onPressed: () {
                             controller.isEditing.toggle();
                           },
@@ -96,23 +95,23 @@ class MenuView extends GetView<UserMenuController> {
 
                       /// Save Icon
                       Obx(
-                            () => controller.isUpdating.value
+                        () => controller.isUpdating.value
                             ? const SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            color: Colors.black,
-                          ),
-                        )
+                                width: 30,
+                                height: 30,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  color: Colors.black,
+                                ),
+                              )
                             : IconButton(
-                          onPressed: controller.updateProfile,
-                          icon: const Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 30,
-                          ),
-                        ),
+                                onPressed: controller.updateProfile,
+                                icon: const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                  size: 30,
+                                ),
+                              ),
                       ),
                     ],
                   ),
@@ -178,6 +177,12 @@ class MenuView extends GetView<UserMenuController> {
                       "Invite Friends",
                       controller.onInviteFriendsTap,
                     ),
+                    _menuItem(
+                      Icons.delete_forever,
+                      "Delete User Account",
+                      controller.deleteAccount,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
@@ -209,17 +214,37 @@ class MenuView extends GetView<UserMenuController> {
     );
   }
 
-  Widget _menuItem(IconData icon, String title, VoidCallback onTap) {
+  Widget _menuItem(
+      IconData icon,
+      String title,
+      VoidCallback onTap, {
+        Color? color,
+      }) {
     return Column(
       children: [
         ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: Icon(icon, color: AppColor.neutral.s400),
-          title: Text(title, style: AppText.textTheme.titleSmall),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+          leading: Icon(
+            icon,
+            color: color ?? AppColor.neutral.s400,
+          ),
+          title: Text(
+            title,
+            style: AppText.textTheme.titleSmall?.copyWith(
+              color: color,
+            ),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 12,
+            color: color ?? AppColor.neutral.s400,
+          ),
           onTap: onTap,
         ),
-        const Divider(height: 0, thickness: 0.1),
+        const Divider(
+          height: 0,
+          thickness: 0.1,
+        ),
       ],
     );
   }

@@ -221,6 +221,12 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                       "Terms & Condition",
                       controller.onTermsTap,
                     ),
+
+                    _menuItem(
+                      Icons.delete_forever,
+                      "Delete Provider Account",
+                      controller.deleteProviderAccount,
+                    ),
                     // _menuItem(
                     //   Icons.star_rate_outlined,
                     //   "Rate the App",
@@ -252,15 +258,32 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
   }
 
   Widget _menuItem(IconData icon, String title, VoidCallback onTap) {
+    final isDelete = icon == Icons.delete_forever;
+
     return Column(
       children: [
         ListTile(
-          leading: Icon(icon),
-          title: Text(title, style: AppText.body2.semiBold),
-          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+          leading: Icon(
+            icon,
+            color: isDelete ? Colors.red : null,
+          ),
+          title: Text(
+            title,
+            style: AppText.body2.semiBold.copyWith(
+              color: isDelete ? Colors.red : null,
+            ),
+          ),
+          trailing: Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 14,
+            color: isDelete ? Colors.red : null,
+          ),
           onTap: onTap,
         ),
-        Divider(color: Color(0xFFE0E0E0), height: 0),
+        const Divider(
+          color: Color(0xFFE0E0E0),
+          height: 0,
+        ),
       ],
     );
   }

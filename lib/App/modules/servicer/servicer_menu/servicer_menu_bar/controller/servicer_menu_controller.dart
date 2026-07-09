@@ -1,20 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
 import '../../../../services/contants/api_constants.dart';
 import '../../../../services/utils/helpers/HttpStatusHandler.dart';
 import '../../../../services/utils/helpers/app_snackbar.dart';
 import '../../../Servicer_bottom_nav_bar/controllers/servicer_bottom_nav_controller.dart';
 
-
 class ServicerMenuController extends GetxController {
   late final ServicerNavigationBarController navController;
   final box = GetStorage();
+  final StorageService storage = Get.find();
 
   final serviceName = ''.obs;
   final providerEmail = ''.obs;
@@ -51,11 +53,9 @@ class ServicerMenuController extends GetxController {
       return;
     }
 
-    Get.toNamed(
-      AppRoutes.manageReviews,
-      arguments: serviceId,
-    );
+    Get.toNamed(AppRoutes.manageReviews, arguments: serviceId);
   }
+
   void goToAbout() => Get.toNamed(AppRoutes.SERVICER_ABOUT);
   void onAdvertiseTap() => Get.toNamed(AppRoutes.SERVICER_LOGIN);
   void onContactUsTap() => Get.toNamed(AppRoutes.SERVICER_CONTACT_US);
@@ -69,6 +69,113 @@ class ServicerMenuController extends GetxController {
   //   Get.offAllNamed(AppRoutes.SERVICER_LOGIN);
   // }
 
+  Future<void> deleteProviderAccount() async {
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.red,
+              size: 28,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              "Delete Account",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          "Are you sure you want to permanently delete your account?\n\n"
+              "This action cannot be undone and all your data will be removed.",
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.only(
+          right: 16,
+          bottom: 12,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () => Get.back(result: true),
+            child: const Text(
+              "Delete",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+    try {
+      Get.dialog(
+        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        barrierDismissible: false,
+      );
+      print(storage.accessToken);
+      final response = await Dio().delete(
+        "${ApiConstants.baseUrl}/api/v1/user/delete-me",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer ${storage.accessToken}",
+          },
+        ),
+      );
+
+      Get.back(); // close loader
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        Get.snackbar(
+          "Success",
+          response.data["message"] ?? "Account deleted successfully",
+        );
+
+        // Clear local storage
+        await StorageService().clear();
+
+        // Navigate to login
+        Get.offAllNamed(AppRoutes.SERVICER_LOGIN);
+      }
+    } on DioException catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      Get.snackbar(
+        "Error",
+        e.response?.data["message"] ?? "Failed to delete account",
+      );
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      Get.snackbar("Error", e.toString());
+    }
+  }
+
   Future<void> fetchServiceProfile() async {
     try {
       isLoading.value = true;
@@ -77,9 +184,7 @@ class ServicerMenuController extends GetxController {
       final token = box.read("accessToken");
       final response = await http.get(
         Uri.parse("${ApiConstants.baseUrl}/api/v1/service/$serviceId"),
-        headers: {
-          "Authorization": "Bearer $token",
-        },
+        headers: {"Authorization": "Bearer $token"},
       );
 
       final data = jsonDecode(response.body);
@@ -94,11 +199,11 @@ class ServicerMenuController extends GetxController {
       } else {
         AppSnackbar.error(data["message"] ?? "Failed to load service");
       }
-    }catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       print("ERROR: $e");
       print(stackTrace);
       AppSnackbar.error(e.toString());
-    }finally {
+    } finally {
       isLoading.value = false;
     }
   }
@@ -110,9 +215,7 @@ class ServicerMenuController extends GetxController {
 
       final response = await http.post(
         Uri.parse(ApiConstants.user_logout),
-        headers: {
-          "Authorization": "Bearer $token",
-        },
+        headers: {"Authorization": "Bearer $token"},
       );
 
       final data = jsonDecode(response.body);

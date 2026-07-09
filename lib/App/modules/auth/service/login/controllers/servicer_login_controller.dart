@@ -145,7 +145,6 @@ class ServicerLoginController extends GetxController {
         //   );
         // }
 
-
         final userId = data?["user"]?["_id"];
         final serviceId = data?["user"]?["service"];
 
@@ -157,7 +156,7 @@ class ServicerLoginController extends GetxController {
         }
 
         await Get.putAsync(
-              () => SocketService().connect(userId ?? ""),
+          () => SocketService().connect(userId ?? ""),
           permanent: true,
         );
 
@@ -299,9 +298,8 @@ class ServicerLoginController extends GetxController {
             await Get.delete<SocketService>();
           }
 
-
           await Get.putAsync(
-                () => SocketService().connect(userId),
+            () => SocketService().connect(userId),
             permanent: true,
           );
         }

@@ -31,7 +31,7 @@ class UserLoginController extends GetxController {
   // final passwordController = TextEditingController();
 
   final emailController = TextEditingController(
-    text: "mdmontasirrahmans7@gmail.com",
+    text: "shekhorsaha058@gmail.com",
   );
   final passwordController = TextEditingController(text: "Test1234@");
 
