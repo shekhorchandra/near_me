@@ -65,6 +65,8 @@ import '../modules/servicer/servicer_menu/servicer_privacy_policy/privacy_policy
 import '../modules/servicer/servicer_menu/servicer_review/binding/servicer_review_binding.dart';
 import '../modules/servicer/servicer_menu/servicer_review/views/ServicerReviewView.dart';
 import '../modules/servicer/servicer_menu/servicer_terms_condition/terms_condition_view/Terms_Condition_View.dart';
+import '../modules/subscription/binding/subscription_binding.dart';
+import '../modules/subscription/view/subscription_view.dart';
 import '../modules/user/User_bottom_nav_bar/bindings/user_navigation_bar_binding.dart';
 import '../modules/user/User_bottom_nav_bar/views/bottom_nav_view.dart';
 import '../modules/user/category/user_category_details/bindings/user_category_details_binding.dart';
@@ -393,11 +395,18 @@ class AppPages {
       page: () => const ServiceProviderEditView(),
       binding: ServiceProviderEditBinding(),
     ),
-/// servicer review
+
+    /// servicer review
     GetPage(
       name: AppRoutes.manageReviews,
       page: () => ManageReviewsScreen(),
       binding: ServicerReviewBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.subscription,
+      page: () => const SubscriptionView(),
+      binding: SubscriptionBinding(),
     ),
   ];
 }

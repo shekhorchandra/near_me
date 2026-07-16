@@ -68,10 +68,7 @@ class AuthApiService {
     try {
       final response = await _dio.post(
         ApiConstants.googleAuthentication,
-        data: {
-          "id_token": idToken,
-          "role": role,
-        },
+        data: {"id_token": idToken, "role": role},
         options: Options(
           validateStatus: (status) => status != null && status < 500,
         ),

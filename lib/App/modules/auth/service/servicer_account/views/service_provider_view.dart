@@ -143,6 +143,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                 ],
               ),
 
+              const SizedBox(height: 12),
+
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

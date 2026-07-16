@@ -30,13 +30,13 @@ class ServicerLoginController extends GetxController {
   final AuthApiService _authApiService = Get.find<AuthApiService>();
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController(
-    text: "shekhorchandrasaha@gmail.com",
-  );
-  final passwordController = TextEditingController(text: "Test1234@");
+  // final emailController = TextEditingController(
+  //   text: "shekhorchandrasaha@gmail.com",
+  // );
+  // final passwordController = TextEditingController(text: "Test1234@");
 
-  // final emailController = TextEditingController();
-  // final passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   final isLoading = false.obs;
 
@@ -75,14 +75,6 @@ class ServicerLoginController extends GetxController {
 
       final responseData = result["data"];
 
-      // final prettyJson =
-      // const JsonEncoder.withIndent('    ').convert(responseData);
-      //
-      // log(
-      //   prettyJson,
-      //   name: "REGISTER_API_RESPONSE",
-      // );
-
       // PRETTY JSON RESPONSE
       final prettyJson = const JsonEncoder.withIndent(
         '    ',
@@ -112,31 +104,35 @@ class ServicerLoginController extends GetxController {
           return;
         }
 
-        // 🔥 CLEAR OLD TOKEN FIRST
+        // Clear previous session
         await _storageService.clear();
 
-        // 🔥 SAVE NEW TOKEN
+        // Save tokens
         await _storageService.setAccessToken(accessToken);
         await _storageService.setRefreshToken(refreshToken ?? "");
-        // await _storageService.setServiceId(serviceId ?? "");
         await _storageService.setUserId(data?["user"]?["_id"] ?? "");
 
-        // Wait a little so Dio reads the latest token from storage
+        // Verify storage
+        print("========== TOKEN CHECK ==========");
+        print("Access Token = ${_storageService.accessToken}");
+        print("Refresh Token = ${_storageService.refreshToken}");
+
+        // Wait briefly
         await Future.delayed(const Duration(milliseconds: 200));
 
+        // Get Firebase token
         final fcmToken = await FirebaseMessaging.instance.getToken();
-
-        if (fcmToken != null && fcmToken.isNotEmpty) {
-          await updateFcmToken(fcmToken);
-        }
 
         print("========== FCM TOKEN ==========");
         print(fcmToken);
 
-        print("USER ID SAVED => ${_storageService.userId}");
+        // Update backend only if token exists
+        if (fcmToken != null && fcmToken.isNotEmpty) {
+          print("Calling updateFcmToken()");
+          print("Current Access Token: ${_storageService.accessToken}");
 
-        print("✅ STORED TOKEN: ${StorageService().accessToken}");
-        print("FCM TOKEN => $fcmToken");
+          await updateFcmToken(fcmToken);
+        }
 
         // if (!Get.isRegistered<SocketService>()) {
         //   await Get.putAsync(
@@ -210,7 +206,9 @@ class ServicerLoginController extends GetxController {
       print("Access Token => ${StorageService().accessToken}");
       print("FCM Token => $token");
 
-      final response = await DioClient().client.patch(
+      final dioClient = Get.find<DioClient>();
+
+      final response = await dioClient.client.patch(
         ApiConstants.update_fcm,
         data: {"fcmToken": token},
       );
@@ -292,6 +290,16 @@ class ServicerLoginController extends GetxController {
         await _storageService.setUserId(userId ?? "");
         await _storageService.setServiceId(serviceId ?? "");
         await _storageService.write("loggedIn", true);
+
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        print("FCM TOKEN => $fcmToken");
+
+        if (fcmToken != null && fcmToken.isNotEmpty) {
+          await updateFcmToken(fcmToken);
+        }
 
         if (userId != null && userId.isNotEmpty) {
           if (Get.isRegistered<SocketService>()) {

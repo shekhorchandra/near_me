@@ -113,7 +113,9 @@ class NotificationService {
       }
 
       try {
-        await DioClient().client.patch(
+        final dioClient = Get.find<DioClient>();
+
+        await dioClient.client.patch(
           ApiConstants.update_fcm,
           data: {
             "fcmToken": newToken,

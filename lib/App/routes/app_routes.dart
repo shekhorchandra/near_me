@@ -108,4 +108,6 @@ abstract class AppRoutes {
   static const servicePreview = '/service-preview';
 
   static const NOTIFICATIONS = '/notifications';
+
+  static const subscription = "/subscription";
 }

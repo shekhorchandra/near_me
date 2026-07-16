@@ -40,23 +40,19 @@ class DioClient {
 
           final token = _storageService.accessToken;
 
-          debugPrint("========= DIO REQUEST =========");
-          debugPrint("PATH: ${options.path}");
-          debugPrint("TOKEN: $token");
+          debugPrint("====================================");
+          debugPrint("REQUEST : ${options.method}");
+          debugPrint("PATH    : ${options.path}");
+          debugPrint("TOKEN   : $token");
 
           if (!_isAuthEndpoint(options.path) &&
               token != null &&
               token.isNotEmpty) {
-
-            // If your backend expects Bearer, keep this.
             options.headers["Authorization"] = "Bearer $token";
-
-            // If your backend expects raw JWT instead,
-            // comment the line above and use this:
-            // options.headers["Authorization"] = token;
           }
 
-          debugPrint("HEADERS => ${options.headers}");
+          debugPrint("HEADERS : ${options.headers}");
+          debugPrint("====================================");
 
           handler.next(options);
         },
@@ -80,8 +76,8 @@ class DioClient {
           // Unauthorized / token expired
           final isUnauthorized =
               error.response?.statusCode == 401 ||
-              error.response?.statusCode == 403 ||
-              (error.response?.data is Map && error.response?.data['message'] == "jwt expired");
+                  (error.response?.data is Map &&
+                      error.response?.data['message'] == "jwt expired");
 
           // Prevent infinite loops
           final alreadyRetried = requestOptions.extra['retried'] == true;
@@ -182,20 +178,7 @@ class DioClient {
   }
 
   Future<void> _handleLogout() async {
-    try {
-      // Optional: Clear FCM token on backend if your backend expects this.
-      await _dio.patch(
-        ApiConstants.update_fcm,
-        data: {
-          "fcmToken": "",
-        },
-      );
-    } catch (e) {
-      log("Failed to clear FCM token: $e");
-    }
-
     await _storageService.clear();
-
     Get.offAllNamed(AppRoutes.USER_BOTTOM_NAV);
   }
 }

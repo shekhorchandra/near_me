@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:logger/logger.dart';
-
 import '../../../../../data/network/dio_client.dart';
 import '../../../../../data/services/GoogleAuthService.dart';
 import '../../../../../data/services/auth_api_service.dart';
@@ -27,13 +26,13 @@ class UserLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  // final emailController = TextEditingController();
-  // final passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
-  final emailController = TextEditingController(
-    text: "shekhorsaha058@gmail.com",
-  );
-  final passwordController = TextEditingController(text: "Test1234@");
+  // final emailController = TextEditingController(
+  //   text: "shekhorsaha058@gmail.com",
+  // );
+  // final passwordController = TextEditingController(text: "Test1234@");
 
   final isLoading = false.obs;
 
@@ -295,7 +294,9 @@ class UserLoginController extends GetxController {
       print("Access Token => ${StorageService().accessToken}");
       print("FCM Token => $token");
 
-      final response = await DioClient().client.patch(
+      final dioClient = Get.find<DioClient>();
+
+      final response = await dioClient.client.patch(
         ApiConstants.update_fcm,
         data: {"fcmToken": token},
       );

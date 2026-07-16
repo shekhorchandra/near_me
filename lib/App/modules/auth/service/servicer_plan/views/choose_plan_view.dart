@@ -170,7 +170,7 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                     );
                   } else {
                     Get.toNamed(
-                      AppRoutes.PAYMENT_METHOD,
+                      AppRoutes.subscription,
                       // arguments: {
                       //   "planId": plan.id,
                       //   "name": plan.name,

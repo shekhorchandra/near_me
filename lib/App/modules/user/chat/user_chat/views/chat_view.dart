@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/core/widgets/App_button.dart';
 import '../../../../../core/widgets/common_app_bar.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/skeleton_loader.dart';
@@ -226,11 +227,12 @@ class ChatView extends GetView<ChatController> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
+                AppButton(
+                  width: 200,
                   onPressed: () {
                     Get.toNamed(AppRoutes.USER_LOGIN);
                   },
-                  child: const Text("Login"),
+                  text: 'Login',
                 ),
               ],
             ),
