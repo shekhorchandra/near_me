@@ -1,33 +1,34 @@
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
+import '../../../data/network/dio_client.dart';
+import '../../services/contants/api_constants.dart';
 
 class SubscriptionRepository {
-  final Dio dio;
+  final DioClient _dioClient = Get.find<DioClient>();
 
-  SubscriptionRepository(this.dio);
-
-  Future verifyPurchase({
+  Future<dynamic> verifyPurchase({
     required String userId,
     required String productId,
     required String token,
   }) async {
-    final response = await dio.post(
-      "/subscription/verify",
+    final body = {
+      "userId": userId,
+      "productId": productId,
+      "source": "google",
+      "purchaseToken": token,
+      "packageName": "com.app.near_me",
+      "subscriptionId": productId,
+    };
 
-      data: {
-        "userId": userId,
+    try {
+      final response = await _dioClient.client.post(
+        ApiConstants.verifypurchase,
+        data: body,
+      );
 
-        "productId": productId,
-
-        "source": "google",
-
-        "purchaseToken": token,
-
-        "packageName": "com.app.near_me",
-
-        "subscriptionId": productId,
-      },
-    );
-
-    return response.data;
+      return response.data;
+    } on DioException catch (e) {
+      rethrow;
+    }
   }
 }

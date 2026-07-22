@@ -22,6 +22,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CommonAppBar(title: 'Service Provider Account', showBack: true),
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -192,6 +193,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
                   CustomTextField(
                     controller: controller.websiteController,
+                    focusNode: controller.websiteFocusNode,
                     hint: 'Example: https://www.airbnb.com/',
                     icon: Icons.link,
                   ),
@@ -288,61 +290,87 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                     Positioned(
                       top: 10,
                       left: 10,
-                      right: 60,
-                      child: GooglePlaceAutoCompleteTextField(
-                        textEditingController: controller.searchController,
-                        googleAPIKey: dotenv.env['GOOGLE_MAPS_API_KEY']!,
+                      right: 80,
+                      child: Material(
+                        elevation: 3,
+                        borderRadius: BorderRadius.circular(16),
+                        child: GooglePlaceAutoCompleteTextField(
+                          textEditingController: controller.searchController,
+                          focusNode: controller.locationSearchFocus,
+                          googleAPIKey: dotenv.env['GOOGLE_MAPS_API_KEY']!,
 
-                        inputDecoration: InputDecoration(
-                          hintText: "Search location",
-                          prefixIcon: const Icon(Icons.search),
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-
-                        debounceTime: 600,
-                        isLatLngRequired: true,
-
-                        itemClick: (prediction) {
-                          controller.searchController.text =
-                              prediction.description!;
-                        },
-
-                        getPlaceDetailWithLatLng: (prediction) async {
-                          final lat = double.parse(prediction.lat!);
-                          final lng = double.parse(prediction.lng!);
-
-                          controller.latitude.value = lat;
-                          controller.longitude.value = lng;
-
-                          controller.selectedAddress.value =
-                              prediction.description!;
-                          controller.addressController.text =
-                              prediction.description!;
-
-                          controller.mapController?.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: LatLng(lat, lng),
-                                zoom: 16,
-                              ),
+                          inputDecoration: InputDecoration(
+                            hintText: 'Search location',
+                            prefixIcon: const Icon(Icons.search),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
                             ),
-                          );
-                        },
+                          ),
+
+                          debounceTime: 600,
+                          isLatLngRequired: true,
+                          isCrossBtnShown: true,
+
+                          itemClick: (prediction) async {
+                            // keep text in search field
+                            controller.searchController.text =
+                                prediction.description ?? '';
+
+                            // close keyboard
+                            FocusScope.of(context).unfocus();
+                          },
+
+                          getPlaceDetailWithLatLng: (prediction) async {
+                            // SAFE NULL CHECK
+                            if (prediction.lat == null || prediction.lng == null) {
+                              Get.snackbar(
+                                'Location Error',
+                                'Could not get coordinates for this place',
+                              );
+                              return;
+                            }
+
+                            final lat = double.tryParse(prediction.lat!);
+                            final lng = double.tryParse(prediction.lng!);
+
+                            // SAFE PARSE CHECK
+                            if (lat == null || lng == null) {
+                              Get.snackbar(
+                                'Location Error',
+                                'Invalid coordinates received',
+                              );
+                              return;
+                            }
+
+                            // update map
+                            controller.latitude.value = lat;
+                            controller.longitude.value = lng;
+
+                            controller.selectedAddress.value =
+                                prediction.description ?? '';
+
+                            controller.addressController.text =
+                                prediction.description ?? '';
+
+                            // move camera
+                            await controller.mapController?.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: LatLng(lat, lng),
+                                  zoom: 16,
+                                ),
+                              ),
+                            );
+
+                            // remove focus completely
+                            controller.locationSearchFocus.unfocus();
+                          },
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),

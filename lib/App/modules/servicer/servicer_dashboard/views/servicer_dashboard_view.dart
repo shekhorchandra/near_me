@@ -1,14 +1,19 @@
+import 'dart:ui' as ui;
+import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:near_me/App/core/values/app_assets.dart';
-import 'package:near_me/App/core/widgets/App_button.dart';
-import 'package:near_me/App/core/widgets/common_app_bar.dart';
+import '../../../../core/values/app_assets.dart';
+import '../../../../core/widgets/App_button.dart';
+import '../../../../core/widgets/common_app_bar.dart';
+import '../../../../data/network/dio_client.dart';
 import '../../../../data/services/storage_service.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../services/contants/api_constants.dart';
+import '../../notification/controllers/notification_controller.dart';
 import '../controller/servicer_dashboard_controller.dart';
+import 'dashboard_chart_item.dart';
 
 class ServiceDashboardView extends GetView<ServiceDashboardController> {
   const ServiceDashboardView({super.key});
@@ -18,218 +23,241 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     return Scaffold(
       appBar: CommonAppBar(title: 'Service Dashboard', showBack: false),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// Profile Header
-              Row(
-                children: [
-                  // Profile info
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(
-                            "https://i.pravatar.cc/150?img=3",
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Obx(
-                            () => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "${controller.greeting.value} ${controller.userName.value}",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const Text(
-                                  "Welcome back!\nHere is your profile overview",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Notification Icon with Badge
-                  Obx(() {
-                    final unread = controller.notificationController.unreadCount.value;
-
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            final token = StorageService().accessToken;
-
-                            if (token == null || token.isEmpty) {
-                              Get.snackbar(
-                                "Login Required",
-                                "Please login first.",
-                              );
-                              return;
-                            }
-
-                            final userId = StorageService().userId;
-
-                            Get.toNamed(
-                              AppRoutes.NOTIFICATIONS,
-                              parameters: {
-                                "userId": userId ?? "",
-                              },
-                            );
-                          },
-                          icon: const Icon(Icons.notifications),
-                        ),
-
-                        if (unread > 0)
-                          Positioned(
-                            right: 4,
-                            top: 4,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              constraints: const BoxConstraints(
-                                minWidth: 18,
-                                minHeight: 18,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  unread > 99 ? "99+" : unread.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  })
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              /// Plan Info Card
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.green.shade50,
-                ),
-                child: Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// Row with Icon + Text
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: RefreshIndicator(
+          onRefresh: controller.fetchUserProfile,
+          color: Colors.black,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Profile Header
+                Row(
+                  children: [
+                    // Profile info
+                    Expanded(
+                      child: Row(
                         children: [
-                          SvgPicture.asset(
-                            AppAssets.crown,
-                            height: 40,
-                            width: 40,
+                          const CircleAvatar(
+                            radius: 30,
+                            backgroundImage: NetworkImage(
+                              "https://cdn.vectorstock.com/i/500p/38/92/user-profile-icon-person-circle-figure-vector-62363892.jpg",
+                            ),
                           ),
-                          const SizedBox(width: 8),
-
-                          /// Wrap text with Expanded to avoid overflow
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: Text(
-                              "You are currently using the ${controller.planName.value} (${controller.planPrice.value}). "
-                              "Your plan renews on ${controller.renewDate.value}.",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
+                            child: Obx(
+                              () => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${controller.greeting.value} ${controller.userName.value}",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Welcome back!\nHere is your profile overview",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
+                    ),
 
-                      const SizedBox(height: 12),
+                    // Notification Icon with Badge
+                    Obx(() {
+                      final unread =
+                          controller.notificationController.unreadCount.value;
 
-                      /// Upgrade Button
-                      AppButton(
-                        height: 30,
-                        backgroundColor: Colors.green,
-                        onPressed: () {},
-                        text: 'Upgrade Plan',
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              final token = StorageService().accessToken;
+
+                              if (token == null || token.isEmpty) {
+                                Get.snackbar(
+                                  "Login Required",
+                                  "Please login first.",
+                                );
+                                return;
+                              }
+
+                              final userId = StorageService().userId;
+
+                              Get.toNamed(
+                                AppRoutes.NOTIFICATIONS,
+                                parameters: {"userId": userId ?? ""},
+                              );
+                            },
+                            icon: const Icon(Icons.notifications),
+                          ),
+
+                          if (unread > 0)
+                            Positioned(
+                              right: 4,
+                              top: 4,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                constraints: const BoxConstraints(
+                                  minWidth: 18,
+                                  minHeight: 18,
+                                ),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    unread > 99 ? "99+" : unread.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                /// Plan Info Card
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.green.shade50,
+                  ),
+                  child: Obx(
+                    () => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Row with Icon + Text
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SvgPicture.asset(
+                              AppAssets.crown,
+                              height: 40,
+                              width: 40,
+                            ),
+                            const SizedBox(width: 8),
+
+                            /// Wrap text with Expanded to avoid overflow
+                            Expanded(
+                              child: Text(
+                                controller.subscriptionMessage,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        /// Upgrade Button
+                        AppButton(
+                          height: 30,
+                          backgroundColor: Colors.green,
+                          onPressed: () {
+                            Get.toNamed(AppRoutes.SERVICE_CHOOSE_PLAN);
+                          },
+                          text: 'Upgrade Plan',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// Stats Cards Row
+                Obx(() {
+                  if (controller.isProfileLoading.value) {
+                    return const SizedBox(
+                      height: 90,
+                      child: Center(child: CircularProgressIndicator(color: Colors.black,)),
+                    );
+                  }
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: _lockedAnalyticsPart(
+                          isLocked: controller.shouldLockImpressions,
+                          message: "Upgrade your plan to see impressions",
+                          child: _statCard(
+                            title: "Total Impressions",
+                            value: controller.totalImpressions,
+                            iconPath: AppAssets.impression,
+                            color: Colors.grey[100]!,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _lockedAnalyticsPart(
+                          isLocked: controller.shouldLockViews,
+                          message: "Upgrade your plan to see views",
+                          child: _statCard(
+                            title: "Total Views",
+                            value: controller.totalViews,
+                            iconPath: AppAssets.views,
+                            color: Colors.grey[100]!,
+                          ),
+                        ),
                       ),
                     ],
-                  ),
-                ),
-              ),
+                  );
+                }),
 
-              const SizedBox(height: 12),
+                const SizedBox(height: 20),
 
-              /// Stats Cards Row
-              Row(
-                children: [
-                  Expanded(
-                    child: _statCard(
-                      title: "Total Impressions",
-                      value: controller.totalImpressions,
-                      iconPath: AppAssets.impression,
-                      color: Colors.grey[100]!,
+                /// Impression Overview
+                Obx(
+                  () => _lockedAnalyticsPart(
+                    isLocked: controller.shouldLockImpressions,
+                    message: "Upgrade your plan to unlock impression analytics",
+                    child: _graphSection(
+                      title: "Impression Overview",
+                      selected: controller.selectedImpressionFilter,
+                      onChange: controller.changeImpressionFilter,
+                      data: controller.impressionChart,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _statCard(
-                      title: "Total Views",
-                      value: controller.totalViews,
-                      iconPath: AppAssets.views,
-                      color: Colors.grey[100]!,
+                ),
+
+                const SizedBox(height: 20),
+
+                Obx(
+                  () => _lockedAnalyticsPart(
+                    isLocked: controller.shouldLockViews,
+                    message: "Upgrade your plan to unlock views analytics",
+                    child: _graphSection(
+                      title: "Views Overview",
+                      selected: controller.selectedViewsFilter,
+                      onChange: controller.changeViewsFilter,
+                      data: controller.viewChart,
                     ),
                   ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              ///  Impression Overview
-              _graphSection(
-                title: "Impression Overview",
-                selected: controller.selectedImpressionFilter,
-                onChange: controller.changeImpressionFilter,
-                data: controller.impressionData,
-                onPrevious: () => controller.goToPrevious(
-                  controller.selectedImpressionFilter.value,
                 ),
-                onNext: () => controller.goToNext(
-                  controller.selectedImpressionFilter.value,
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              _graphSection(
-                title: "Views Overview",
-                selected: controller.selectedViewsFilter,
-                onChange: controller.changeViewsFilter,
-                data: controller.viewsData,
-                onPrevious: () => controller.goToPrevious(
-                  controller.selectedViewsFilter.value,
-                ),
-                onNext: () =>
-                    controller.goToNext(controller.selectedViewsFilter.value),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -249,29 +277,28 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     }
   }
 
-  String _getBottomTitle(int index, String filter) {
-    if (filter == "Week") {
-      const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-      return index < days.length ? days[index] : "";
-    } else if (filter == "Month") {
-      return "${index + 1}";
-    } else {
-      const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      return index < months.length ? months[index] : "";
+  double _calculateMaxY(double highestValue) {
+    if (highestValue <= 10) {
+      return 10;
     }
+
+    return (highestValue * 1.25).ceilToDouble();
+  }
+
+  double _calculateHorizontalInterval(double maxY) {
+    if (maxY <= 10) {
+      return 2;
+    }
+
+    if (maxY <= 50) {
+      return 10;
+    }
+
+    if (maxY <= 100) {
+      return 20;
+    }
+
+    return (maxY / 5).ceilToDouble();
   }
 
   ///  Stat Card Widget
@@ -322,13 +349,69 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
   }
 
   ///  Graph Section
+  Widget _lockedAnalyticsPart({
+    required bool isLocked,
+    required String message,
+    required Widget child,
+  }) {
+    if (!isLocked) {
+      return child;
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          IgnorePointer(
+            ignoring: true,
+            child: ImageFiltered(
+              imageFilter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Opacity(opacity: 0.55, child: child),
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.white.withOpacity(0.45)),
+          ),
+          Container(
+            margin: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.10),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.lock_outline, size: 26),
+                const SizedBox(height: 6),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _graphSection({
     required String title,
     required RxString selected,
-    required Function(String) onChange,
-    required RxList<double> data,
-    required VoidCallback onPrevious,
-    required VoidCallback onNext,
+    required Future<void> Function(String) onChange,
+    required RxList<DashboardChartItem> data,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,14 +422,19 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
         ),
         const SizedBox(height: 10),
 
-        ///  Filters
         Obx(
           () => Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ["Week", "Month", "Year"].map((e) {
-              final isSelected = selected.value == e;
+            children: ["Week", "Month", "Year"].map((filter) {
+              final isSelected = selected.value == filter;
+              final isLoading = controller.isAnalyticsLoading.value;
+
               return GestureDetector(
-                onTap: () => onChange(e),
+                onTap: isLoading
+                    ? null
+                    : () {
+                        onChange(filter);
+                      },
                 child: Container(
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(
@@ -358,7 +446,7 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    e,
+                    filter,
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.black,
                     ),
@@ -369,74 +457,88 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
           ),
         ),
 
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: onPrevious,
-                icon: const Icon(Icons.arrow_back_ios, size: 18),
-              ),
+        const SizedBox(height: 16),
 
-              Obx(
-                () => Text(
-                  controller.getDisplayRange(selected.value),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
+        Obx(() {
+          if (controller.isAnalyticsLoading.value) {
+            return const SizedBox(
+              height: 220,
+              child: Center(child: CircularProgressIndicator(color: Colors.black,)),
+            );
+          }
 
-              IconButton(
-                onPressed: onNext,
-                icon: const Icon(Icons.arrow_forward_ios, size: 18),
-              ),
-            ],
-          ),
-        ),
+          final List<DashboardChartItem> chartData =
+              List<DashboardChartItem>.from(data);
 
-        const SizedBox(height: 12),
+          if (chartData.isEmpty) {
+            return const SizedBox(
+              height: 220,
+              child: Center(child: Text("No analytics data available")),
+            );
+          }
 
-        /// Chart
-        SizedBox(
-          height: 220,
-          child: Obx(
-            () => LineChart(
+          double highestValue = 0;
+
+          for (final item in chartData) {
+            if (item.count > highestValue) {
+              highestValue = item.count;
+            }
+          }
+
+          final maxY = _calculateMaxY(highestValue);
+          final horizontalInterval = _calculateHorizontalInterval(maxY);
+
+          return SizedBox(
+            height: 220,
+            child: LineChart(
               LineChartData(
+                minX: 0,
+                maxX: (chartData.length - 1).toDouble(),
+                minY: 0,
+                maxY: maxY,
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
                   drawHorizontalLine: true,
                   verticalInterval: _getInterval(selected.value),
-                  horizontalInterval: 50,
-                  getDrawingHorizontalLine: (value) =>
-                      FlLine(color: Colors.grey.shade300, strokeWidth: 1),
-                  getDrawingVerticalLine: (value) =>
-                      FlLine(color: Colors.grey.shade300, strokeWidth: 1),
+                  horizontalInterval: horizontalInterval,
+                  getDrawingHorizontalLine: (_) {
+                    return FlLine(color: Colors.grey.shade300, strokeWidth: 1);
+                  },
+                  getDrawingVerticalLine: (_) {
+                    return FlLine(color: Colors.grey.shade300, strokeWidth: 1);
+                  },
                 ),
                 borderData: FlBorderData(
                   show: true,
                   border: const Border(
-                    left: BorderSide(color: Colors.black, width: 1),
-                    bottom: BorderSide(color: Colors.black, width: 1),
+                    left: BorderSide(color: Colors.black),
+                    bottom: BorderSide(color: Colors.black),
                   ),
                 ),
-
-                /// Axis Labels
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       interval: _getInterval(selected.value),
+                      reservedSize: 35,
                       getTitlesWidget: (value, meta) {
-                        return Text(
-                          _getBottomTitle(value.toInt(), selected.value),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                        final index = value.toInt();
+
+                        if (value != index.toDouble() ||
+                            index < 0 ||
+                            index >= chartData.length) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            chartData[index].label,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         );
                       },
@@ -445,59 +547,57 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: 50, // adjust based on your data
+                      interval: horizontalInterval,
                       reservedSize: 40,
                       getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            value.toInt().toString(),
+                            style: const TextStyle(fontSize: 11),
                           ),
                         );
                       },
                     ),
                   ),
-                  topTitles: AxisTitles(
+                  topTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  rightTitles: AxisTitles(
+                  rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
                 ),
-
                 lineBarsData: [
                   LineChartBarData(
                     spots: List.generate(
-                      data.length,
-                      (i) => FlSpot(i.toDouble(), data[i]),
+                      chartData.length,
+                      (index) =>
+                          FlSpot(index.toDouble(), chartData[index].count),
                     ),
                     isCurved: true,
                     barWidth: 3,
-                    color: Colors.black, // Line color
+                    color: Colors.black,
                     dotData: FlDotData(
                       show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                          FlDotCirclePainter(
-                            radius: 3,
-                            color: Colors.grey, // Dot color
-                            strokeWidth: 1,
-                            strokeColor: Colors.black,
-                          ),
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 3,
+                          color: Colors.grey,
+                          strokeWidth: 1,
+                          strokeColor: Colors.black,
+                        );
+                      },
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.blue.shade100.withOpacity(
-                        0.3,
-                      ), // Gradient fill
+                      color: Colors.blue.shade100.withOpacity(0.3),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ],
     );
   }

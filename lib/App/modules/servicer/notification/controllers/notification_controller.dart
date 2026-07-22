@@ -7,7 +7,10 @@ import '../../../../data/services/storage_service.dart';
 import '../../../services/contants/api_constants.dart';
 
 class NotificationController extends GetxController {
-  final DioClient _dioClient = DioClient();
+  NotificationController() {
+    print("🔥 NotificationController CREATED");
+  }
+  final DioClient _dioClient = Get.find<DioClient>();
   final StorageService storage = Get.find<StorageService>();
 
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
@@ -32,38 +35,48 @@ class NotificationController extends GetxController {
     });
   }
 
+  // @override
+  // void onReady() {
+  //   super.onReady();
+  //
+  //   loadNotificationsAfterLogin();
+  // }
+
   @override
   void onReady() {
     super.onReady();
-
-    loadNotificationsAfterLogin();
   }
 
-  Future<void> loadNotificationsAfterLogin() async {
-    // wait until storage gets token
-    int retry = 0;
-
-    while ((storage.accessToken == null || storage.accessToken!.isEmpty) &&
-        retry < 10) {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      retry++;
-    }
-
-    final token = storage.accessToken;
-
-    if (token == null || token.isEmpty) {
-      print("Notification skipped: No access token");
-
-      return;
-    }
-
-    print("Notification Token Found");
-
-    await fetchNotifications();
-  }
+  // Future<void> loadNotificationsAfterLogin() async {
+  //   // wait until storage gets token
+  //   int retry = 0;
+  //
+  //   while ((storage.accessToken == null || storage.accessToken!.isEmpty) &&
+  //       retry < 10) {
+  //     await Future.delayed(const Duration(milliseconds: 300));
+  //
+  //     retry++;
+  //   }
+  //
+  //   final token = storage.accessToken;
+  //
+  //   if (token == null || token.isEmpty) {
+  //     print("Notification skipped: No access token");
+  //
+  //     return;
+  //   }
+  //
+  //   print("Notification Token Found");
+  //
+  //   await fetchNotifications();
+  // }
 
   Future<void> fetchNotifications({bool isLoadMore = false}) async {
+
+
+    print("🔥🔥 fetchNotifications called");
+
+    debugPrint(StackTrace.current.toString());
     if (isLoading.value) return;
 
     final token = storage.accessToken;

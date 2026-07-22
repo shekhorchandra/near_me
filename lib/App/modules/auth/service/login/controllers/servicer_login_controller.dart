@@ -30,13 +30,13 @@ class ServicerLoginController extends GetxController {
   final AuthApiService _authApiService = Get.find<AuthApiService>();
   final StorageService _storageService = StorageService();
 
-  // final emailController = TextEditingController(
-  //   text: "shekhorchandrasaha@gmail.com",
-  // );
-  // final passwordController = TextEditingController(text: "Test1234@");
+  final emailController = TextEditingController(
+    text: "shekhorchandrasaha@gmail.com",
+  );
+  final passwordController = TextEditingController(text: "Test@#123");
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  // final emailController = TextEditingController();
+  // final passwordController = TextEditingController();
 
   final isLoading = false.obs;
 

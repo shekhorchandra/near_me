@@ -24,6 +24,9 @@ class ApiConstants {
   /// get me
   static const String user_me = "$baseUrl/api/v1/user/me";
 
+  ///
+  static const String analyticsDashboard = "$baseUrl/api/v1/analytics/dashboard";
+
   /// user profile update
   static const String user_info = "$baseUrl/api/v1/user/info";
 
@@ -83,4 +86,9 @@ class ApiConstants {
 
   /// DELETE
   static String deleteNotification(String id) => '/api/v1/notification/$id';
+
+  ///verify purchase
+  static const String verifypurchase = "/api/v1/payments/verify-purchase";
+
+
 }

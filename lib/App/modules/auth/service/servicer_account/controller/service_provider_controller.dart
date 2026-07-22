@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import '../../../../../data/services/storage_service.dart';
 import '../../../../../routes/app_routes.dart';
+import '../../../../servicer/servicer_menu/servicer_menu_bar/controller/servicer_menu_controller.dart';
 import '../../../../services/contants/api_constants.dart';
 import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
@@ -26,6 +27,9 @@ class ServiceProviderController extends GetxController {
   final customServiceController = TextEditingController();
   final searchController = TextEditingController();
 
+  final FocusNode locationFocusNode = FocusNode();
+  final FocusNode websiteFocusNode = FocusNode();
+  final FocusNode locationSearchFocus = FocusNode();
 
   final latitude = 23.8103.obs;
   final longitude = 90.4125.obs;
@@ -46,7 +50,6 @@ class ServiceProviderController extends GetxController {
   final selectedAddress = ''.obs;
 
   final isLoading = false.obs;
-
 
   var is24Hours = false.obs;
 
@@ -70,10 +73,7 @@ class ServiceProviderController extends GetxController {
   void onInit() {
     super.onInit();
 
-    getAddressFromLatLng(
-      latitude.value,
-      longitude.value,
-    );
+    getAddressFromLatLng(latitude.value, longitude.value);
 
     fetchCategories();
 
@@ -120,10 +120,7 @@ class ServiceProviderController extends GetxController {
   }
 
   /// dragable adress
-  Future<void> getAddressFromLatLng(
-      double latitude,
-      double longitude,
-      ) async {
+  Future<void> getAddressFromLatLng(double latitude, double longitude) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         latitude,
@@ -247,18 +244,28 @@ class ServiceProviderController extends GetxController {
 
   Future<void> submitService() async {
     try {
-      final token = StorageService().accessToken;
-      if (token == null || token.isEmpty) return;
+      isLoading.value = true;
+
+      final storage = StorageService();
+      final token = storage.accessToken;
+
+      if (token == null || token.trim().isEmpty) {
+        Get.snackbar("Error", "Access token not found");
+        return;
+      }
 
       final plan = selectedPlan.value;
 
-      // ✅ correct validation
       if (plan.planId.isEmpty) {
         Get.snackbar("Error", "Plan ID is missing");
         return;
       }
 
-      // ✅ ADD THIS VALIDATION BLOCK HERE
+      if (selectedCategoryId.value.isEmpty) {
+        Get.snackbar("Error", "Please select category");
+        return;
+      }
+
       if (selectedSubCategoryId.value.isEmpty) {
         Get.snackbar("Error", "Please select sub category");
         return;
@@ -269,112 +276,165 @@ class ServiceProviderController extends GetxController {
         return;
       }
 
-      // ----------------- JSON PAYLOAD -----------------
+      if (serviceNameController.text.trim().isEmpty) {
+        Get.snackbar("Error", "Service name is required");
+        return;
+      }
+
+      if (logo.value.isEmpty) {
+        Get.snackbar("Error", "Company logo is required");
+        return;
+      }
+
       final payload = {
         "planId": plan.planId,
         "service_name": serviceNameController.text.trim(),
         "service_category": selectedCategoryId.value,
-
-        // ✅ ADD THESE TWO FIELDS
         "service_subCategory": selectedSubCategoryId.value,
         "service_childCategory": selectedChildCategoryId.value,
-
         "offer_services": selectedServiceIds.toList(),
         "phone": contactController.text.replaceAll('+', '').trim(),
         "service_address": addressController.text.trim(),
         "about": aboutController.text.trim(),
         "website_link": websiteController.text.trim(),
         "openingTime":
-        "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
+            "${openingTime.value.hour.toString().padLeft(2, '0')}:"
+            "${openingTime.value.minute.toString().padLeft(2, '0')}",
         "closingTime":
-        "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
+            "${closingTime.value.hour.toString().padLeft(2, '0')}:"
+            "${closingTime.value.minute.toString().padLeft(2, '0')}",
         "allTimeAvailability": isOpen24_7.value,
         "location": {
           "type": "Point",
-          "coordinates": [
-            longitude.value, // longitude first
-            latitude.value,  // latitude second
-          ],
+          "coordinates": [longitude.value, latitude.value],
           "address": addressController.text.trim(),
         },
       };
 
-      print("------------ JSON PAYLOAD ------------");
-      print(jsonEncode(payload));
-      print("-------------------------------------");
+      logger.i("Create service payload: ${jsonEncode(payload)}");
 
-      print("SUB:----------------------------------- ${selectedSubCategoryId.value}");
-      print("CHILD:-----------------------------------  ${selectedChildCategoryId.value}");
-
-      // ----------------- MULTIPART REQUEST -----------------
       final request = http.MultipartRequest(
         'POST',
         Uri.parse(ApiConstants.createService),
       );
 
-      // AUTH HEADER
       request.headers['Authorization'] = token.startsWith("Bearer ")
           ? token
-          : 'Bearer $token';
+          : "Bearer $token";
 
-      // ✅ FIX: PLAN ID SENT SEPARATELY (THIS FIXES YOUR ERROR)
+      request.headers['Accept'] = "application/json";
 
-      // JSON payload
       request.fields['data'] = jsonEncode(payload);
 
-      // ----------------- LOGO -----------------
-      if (logo.value.isNotEmpty) {
-        final logoFile = File(logo.value);
+      final logoFile = File(logo.value);
 
-        request.files.add(
-          await http.MultipartFile.fromPath('company_logo', logoFile.path),
-        );
-      } else {
-        Get.snackbar("Error", "Company logo is required");
+      if (!await logoFile.exists()) {
+        Get.snackbar("Error", "Selected logo file was not found");
         return;
       }
 
-      // ----------------- MEDIA -----------------
-      for (var imgPath in images) {
+      request.files.add(
+        await http.MultipartFile.fromPath('company_logo', logoFile.path),
+      );
+
+      for (final imgPath in images) {
         final imgFile = File(imgPath);
 
-        request.files.add(
-          await http.MultipartFile.fromPath('media', imgFile.path),
-        );
+        if (await imgFile.exists()) {
+          request.files.add(
+            await http.MultipartFile.fromPath('media', imgFile.path),
+          );
+        }
       }
 
-      // ----------------- DEBUG -----------------
-      print("------------ MULTIPART FIELDS ------------");
-      request.fields.forEach((key, value) => print("$key: $value"));
-
-      request.files.forEach(
-        (file) => print("Field: ${file.field}, Filename: ${file.filename}"),
-      );
-      print("-----------------------------------------");
-
-      // ----------------- SEND -----------------
       final response = await request.send();
       final body = await response.stream.bytesToString();
 
-      print("STATUS: ${response.statusCode}");
-      print("BODY: $body");
+      logger.i("Create status: ${response.statusCode}");
+      logger.i("Create response: $body");
 
-      final responseJson = body.isNotEmpty ? jsonDecode(body) : {};
-
-      final prettyJson = const JsonEncoder.withIndent(
-        '  ',
-      ).convert(responseJson);
-      logger.i(prettyJson);
-
-      if (response.statusCode == 201 && responseJson['success'] == true) {
-        Get.snackbar("Success", "Service created successfully");
-        Get.offAllNamed(AppRoutes.SERVICER_BOTTOM_NAV);
-      } else {
-        Get.snackbar("Error", responseJson['message'] ?? "Unknown error");
+      if (body.trim().isEmpty) {
+        Get.snackbar("Error", "Empty response from server");
+        return;
       }
-    } catch (e) {
-      print("🔥 SUBMIT ERROR: $e");
-      Get.snackbar("Error", e.toString());
+
+      final dynamic decodedResponse = jsonDecode(body);
+
+      if (decodedResponse is! Map<String, dynamic>) {
+        Get.snackbar("Error", "Invalid response from server");
+        return;
+      }
+
+      final Map<String, dynamic> responseJson = decodedResponse;
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          responseJson['success'] == true) {
+        final dynamic responseData = responseJson['data'];
+
+        if (responseData is! Map<String, dynamic>) {
+          Get.snackbar("Error", "Invalid service response");
+          return;
+        }
+
+        String serviceId = responseData['serviceId']?.toString().trim() ?? '';
+
+        // Fallback to data.service._id
+        if (serviceId.isEmpty) {
+          final dynamic service = responseData['service'];
+
+          if (service is Map<String, dynamic>) {
+            serviceId = service['_id']?.toString().trim() ?? '';
+          }
+        }
+
+        if (serviceId.isEmpty) {
+          logger.e("Service ID missing: $responseJson");
+
+          Get.snackbar("Error", "Service ID was not returned");
+          return;
+        }
+
+        final StorageService storage = StorageService();
+
+        // Save before navigating.
+        await storage.setServiceId(serviceId);
+
+        final String? savedId = storage.serviceId;
+
+        logger.i("Created Service ID: $serviceId");
+        logger.i("Stored Service ID: $savedId");
+
+        if (savedId == null || savedId.isEmpty) {
+          Get.snackbar("Error", "Service ID could not be saved");
+          return;
+        }
+
+        // Refresh the existing menu controller if it was created earlier.
+        if (Get.isRegistered<ServicerMenuController>()) {
+          await Get.find<ServicerMenuController>().fetchServiceProfile();
+        }
+
+        Get.snackbar("Success", "Service created successfully");
+
+        Get.offAllNamed(
+          AppRoutes.SERVICER_BOTTOM_NAV,
+          arguments: {"serviceId": serviceId},
+        );
+      } else {
+        Get.snackbar(
+          "Error",
+          responseJson['message']?.toString() ?? "Failed to create service",
+        );
+      }
+    } on FormatException catch (error) {
+      logger.e("JSON error: $error");
+      Get.snackbar("Error", "Invalid server response");
+    } catch (error, stackTrace) {
+      logger.e("Submit service error", error: error, stackTrace: stackTrace);
+
+      Get.snackbar("Error", error.toString());
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -404,7 +464,7 @@ class ServiceProviderController extends GetxController {
   Future<void> setLogo() async {
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80, // compress
+      imageQuality: 80,
     );
 
     if (pickedFile != null) {
@@ -412,39 +472,45 @@ class ServiceProviderController extends GetxController {
       final extension = pickedFile.name.split('.').last.toLowerCase();
       final sizeInMb = file.lengthSync() / (1024 * 1024);
 
-      if (extension != "jpg" && extension != "jpeg" && extension != "png") {
-        Get.snackbar("Error", "Only JPG or PNG files are allowed");
+      if (extension != 'jpg' && extension != 'jpeg' && extension != 'png') {
+        Get.snackbar('Error', 'Only JPG or PNG files are allowed');
         return;
       }
 
       if (sizeInMb > 10) {
-        Get.snackbar("Error", "File size must be less than 10 MB");
+        Get.snackbar('Error', 'File size must be less than 10 MB');
         return;
       }
 
       logo.value = pickedFile.path;
     }
+  }
 
-    /// Set subscription plan
-    void setPlan(String planName, double price, String planId) {
-      selectedPlan.update((p) {
-        if (p != null) {
-          p.planId = planId; // 🔥 IMPORTANT
-          p.subscriptionPlan = planName;
-          p.subscriptionPrice = price;
-        }
-      });
-    }
-    @override
-    void onClose() {
-      searchController.dispose();
-      serviceNameController.dispose();
-      contactController.dispose();
-      aboutController.dispose();
-      addressController.dispose();
-      websiteController.dispose();
-      customServiceController.dispose();
-      super.onClose();
-    }
+  // OUTSIDE setLogo()
+  void setPlan(String planName, double price, String planId) {
+    selectedPlan.update((p) {
+      if (p != null) {
+        p.planId = planId;
+        p.subscriptionPlan = planName;
+        p.subscriptionPrice = price;
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    locationFocusNode.dispose();
+    websiteFocusNode.dispose();
+    locationSearchFocus.dispose();
+
+    searchController.dispose();
+    serviceNameController.dispose();
+    contactController.dispose();
+    aboutController.dispose();
+    addressController.dispose();
+    websiteController.dispose();
+    customServiceController.dispose();
+
+    super.onClose();
   }
 }

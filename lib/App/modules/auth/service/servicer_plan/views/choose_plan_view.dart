@@ -134,7 +134,7 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                 // ✅ IMPORTANT FIX
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator(color: Colors.black,));
                   }
 
                   return GridView.count(

@@ -96,7 +96,7 @@ class HomeController extends GetxController
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      notificationController.fetchNotifications();
+      loadNearestServices();
     }
   }
 

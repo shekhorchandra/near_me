@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:near_me/App/core/widgets/common_app_bar.dart';
 
 import '../controller/subscription_controller.dart';
 
@@ -9,7 +10,7 @@ class SubscriptionView extends GetView<SubscriptionController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Premium Plans")),
+      appBar: CommonAppBar(title: 'Premium Plans',),
 
       body: Obx(
         () => ListView.builder(

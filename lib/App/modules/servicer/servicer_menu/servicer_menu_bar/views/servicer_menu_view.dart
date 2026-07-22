@@ -15,190 +15,195 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: "Servicer Menu", showBack: false),
-      body: RefreshIndicator(
-        color: AppColor.primary,
-        onRefresh: () async {
-          await controller.fetchServiceProfile();
-        },
-        child: SafeArea(
-          child: Column(
-            children: [
-              // ===== Fixed avatar =====
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: GestureDetector(
-                  onTap: controller.goToaccountedit,
-        
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Obx(() {
-                          return CircleAvatar(
-                            radius: 30,
-                            backgroundColor: AppColor.primary.withOpacity(0.1),
-                            backgroundImage:
-                                controller.companyLogo.value.isNotEmpty
-                                ? NetworkImage(controller.companyLogo.value)
-                                : null,
-                            child: controller.companyLogo.value.isEmpty
-                                ? Image.asset(
-                                    AppAssets.usercat,
-                                    height: 60,
-                                    width: 60,
-                                    fit: BoxFit.contain,
-                                  )
-                                : null,
-                          );
-                        }),
-        
-                        const SizedBox(width: 12),
-                        Obx(() {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                controller.serviceName.value,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                controller.providerEmail.value,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          );
-                        }),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward_ios, size: 16),
-                      ],
-                    ),
-                  ),
-                ),
+      appBar: const CommonAppBar(
+        title: "Servicer Menu",
+        showBack: false,
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value &&
+            controller.serviceName.value.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.black,),
+          );
+        }
+
+        return RefreshIndicator(
+          color: AppColor.primary,
+          onRefresh: controller.fetchServiceProfile,
+          child: SafeArea(
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 16,
               ),
-              const SizedBox(height: 12),
-        
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: GestureDetector(
-                  onTap: controller.review,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+              children: [
+                // ================= Profile Card =================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: GestureDetector(
+                    onTap: controller.goToaccountedit,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Obx(() {
+                            final String logo =
+                            controller.companyLogo.value.trim();
+
+                            return CircleAvatar(
+                              radius: 30,
+                              backgroundColor:
+                              AppColor.primary.withOpacity(0.1),
+                              backgroundImage: logo.isNotEmpty
+                                  ? NetworkImage(logo)
+                                  : null,
+                              child: logo.isEmpty
+                                  ? Image.asset(
+                                AppAssets.usercat,
+                                height: 60,
+                                width: 60,
+                                fit: BoxFit.contain,
+                              )
+                                  : null,
+                            );
+                          }),
+                          const SizedBox(width: 12),
+
+                          // Prevents long name/email overflow.
+                          Expanded(
+                            child: Obx(() {
+                              final String serviceName =
+                              controller.serviceName.value.trim();
+                              final String email =
+                              controller.providerEmail.value.trim();
+
+                              return Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    "★ Reviews",
-                                    style: TextStyle(
+                                  Text(
+                                    serviceName.isNotEmpty
+                                        ? serviceName
+                                        : "Service Profile",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const Spacer(),
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        radius: 10,
-                                        backgroundImage: NetworkImage(
-                                          "https://i.pravatar.cc/150?img=5",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      CircleAvatar(
-                                        radius: 10,
-                                        backgroundImage: NetworkImage(
-                                          "https://i.pravatar.cc/150?img=6",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      CircleAvatar(
-                                        radius: 10,
-                                        backgroundImage: NetworkImage(
-                                          "https://i.pravatar.cc/150?img=7",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      CircleAvatar(
-                                        radius: 10,
-                                        backgroundImage: NetworkImage(
-                                          "https://i.pravatar.cc/150?img=8",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      CircleAvatar(
-                                        radius: 10,
-                                        backgroundImage: NetworkImage(
-                                          "https://i.pravatar.cc/150?img=9",
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                    ],
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    email.isNotEmpty
+                                        ? email
+                                        : "Email not available",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 ],
-                              ),
-                            ],
+                              );
+                            }),
                           ),
-                        ),
-                        const Icon(Icons.arrow_forward_ios, size: 16),
-                      ],
+
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              // ===== Scrollable menu =====
-              Expanded(
-                child: SingleChildScrollView(
+
+                const SizedBox(height: 12),
+
+                // ================= Reviews Card =================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: GestureDetector(
+                    onTap: controller.review,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              "★ Reviews",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const _ReviewAvatars(),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ================= Settings =================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    "Settings",
+                    style: AppText.textTheme.headlineSmall,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Settings", style: AppText.textTheme.headlineSmall),
-                      const SizedBox(height: 12),
                       _menuItem(
                         Icons.key,
                         "Change Password",
                         controller.changePassword,
                       ),
                       KMenuItem(
-                        title: 'Payment Methods',
+                        title: "Payment Methods",
                         icon: Icons.credit_card_rounded,
-                        onTap: () => Get.toNamed(AppRoutes.PAYMENT_METHOD),
+                        onTap: () {
+                          Get.toNamed(AppRoutes.PAYMENT_METHOD);
+                        },
                       ),
                       _menuItem(
                         Icons.info_outline,
@@ -215,7 +220,9 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                         "Help & Support",
                         controller.onHelpSupportTap,
                       ),
+
                       const SizedBox(height: 24),
+
                       _menuItem(
                         Icons.privacy_tip_outlined,
                         "Privacy Policy",
@@ -226,40 +233,32 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                         "Terms & Condition",
                         controller.onTermsTap,
                       ),
-        
                       _menuItem(
                         Icons.delete_forever,
                         "Delete Provider Account",
                         controller.deleteProviderAccount,
                       ),
-                      // _menuItem(
-                      //   Icons.star_rate_outlined,
-                      //   "Rate the App",
-                      //   controller.onRateAppTap,
-                      // ),
-                      // _menuItem(
-                      //   Icons.share_outlined,
-                      //   "Invite Friends",
-                      //   controller.onInviteFriendsTap,
-                      // ),
+
                       const SizedBox(height: 24),
+
                       SizedBox(
                         width: double.infinity,
                         height: 52,
                         child: AppButton(
-                          text: 'Logout',
+                          text: "Logout",
                           onPressed: controller.serviceronLogoutTap,
                         ),
                       ),
+
                       const SizedBox(height: 16),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -291,6 +290,41 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
           height: 0,
         ),
       ],
+    );
+  }
+}
+
+class _ReviewAvatars extends StatelessWidget {
+  const _ReviewAvatars();
+
+  @override
+  Widget build(BuildContext context) {
+    const images = [
+      "https://i.pravatar.cc/150?img=5",
+      "https://i.pravatar.cc/150?img=6",
+      "https://i.pravatar.cc/150?img=7",
+      "https://i.pravatar.cc/150?img=8",
+      "https://i.pravatar.cc/150?img=9",
+    ];
+
+    return SizedBox(
+      width: 76,
+      height: 24,
+      child: Stack(
+        children: List.generate(images.length, (index) {
+          return Positioned(
+            left: index * 13,
+            child: CircleAvatar(
+              radius: 11,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 9.5,
+                backgroundImage: NetworkImage(images[index]),
+              ),
+            ),
+          );
+        }),
+      ),
     );
   }
 }

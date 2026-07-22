@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class ServicerMenuController extends GetxController {
   late final ServicerNavigationBarController navController;
   final box = GetStorage();
   final StorageService storage = Get.find();
+  // final StorageService storage = StorageService();
 
   final serviceName = ''.obs;
   final providerEmail = ''.obs;
@@ -176,33 +178,101 @@ class ServicerMenuController extends GetxController {
     }
   }
 
+
+
   Future<void> fetchServiceProfile() async {
     try {
       isLoading.value = true;
 
-      final serviceId = box.read("serviceId");
-      final token = box.read("accessToken");
-      final response = await http.get(
-        Uri.parse("${ApiConstants.baseUrl}/api/v1/service/$serviceId"),
-        headers: {"Authorization": "Bearer $token"},
+      final String? serviceId = storage.serviceId;
+      final String? token = storage.accessToken;
+
+      log("Stored Service ID: $serviceId");
+      log("Token available: ${token?.isNotEmpty == true}");
+
+      if (serviceId == null || serviceId.trim().isEmpty) {
+        AppSnackbar.error(
+          "Service ID not found. Please create a service first.",
+        );
+        return;
+      }
+
+      if (token == null || token.trim().isEmpty) {
+        AppSnackbar.error(
+          "Access token not found. Please log in again.",
+        );
+        return;
+      }
+
+      final Uri url = Uri.parse(
+        "${ApiConstants.baseUrl}/api/v1/service/$serviceId",
       );
 
-      final data = jsonDecode(response.body);
+      log("Request URL: $url");
 
-      if (response.statusCode == 200 && data["success"] == true) {
-        final result = data["data"];
+      final http.Response response = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
 
-        companyLogo.value = result["company_logo"] ?? "";
+      log("Status code: ${response.statusCode}");
+      log("Response body: ${response.body}");
 
-        serviceName.value = result["service_name"] ?? "";
-        providerEmail.value = result["provider"]?["email"] ?? "";
-      } else {
-        AppSnackbar.error(data["message"] ?? "Failed to load service");
+      final dynamic decodedResponse = jsonDecode(response.body);
+
+      if (decodedResponse is! Map<String, dynamic>) {
+        AppSnackbar.error("Invalid server response");
+        return;
       }
-    } catch (e, stackTrace) {
-      print("ERROR: $e");
-      print(stackTrace);
-      AppSnackbar.error(e.toString());
+
+      final Map<String, dynamic> responseData = decodedResponse;
+
+      if (response.statusCode == 200 &&
+          responseData["success"] == true) {
+        final dynamic serviceData = responseData["data"];
+
+        if (serviceData is! Map<String, dynamic>) {
+          AppSnackbar.error("Service data not found");
+          return;
+        }
+
+        companyLogo.value =
+            serviceData["company_logo"]?.toString() ?? "";
+
+        serviceName.value =
+            serviceData["service_name"]?.toString() ?? "";
+
+        final dynamic provider = serviceData["provider"];
+
+        if (provider is Map<String, dynamic>) {
+          providerEmail.value =
+              provider["email"]?.toString() ?? "";
+        } else {
+          providerEmail.value = "";
+        }
+
+        log("Loaded service name: ${serviceName.value}");
+        log("Loaded company logo: ${companyLogo.value}");
+        log("Loaded provider email: ${providerEmail.value}");
+      } else {
+        AppSnackbar.error(
+          responseData["message"]?.toString() ??
+              "Failed to load service profile",
+        );
+      }
+    } on FormatException catch (error, stackTrace) {
+      log("JSON parsing error: $error");
+      log(stackTrace.toString());
+
+      AppSnackbar.error("Invalid response from server");
+    } catch (error, stackTrace) {
+      log("fetchServiceProfile error: $error");
+      log(stackTrace.toString());
+
+      AppSnackbar.error("Unable to load service profile");
     } finally {
       isLoading.value = false;
     }

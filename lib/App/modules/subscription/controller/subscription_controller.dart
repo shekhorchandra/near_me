@@ -47,71 +47,64 @@ class SubscriptionController extends GetxController {
   }
 
   Future verifyPurchase(PurchaseDetails purchase) async {
-
     try {
 
-      final token =
-          purchase.verificationData.serverVerificationData;
+      final token = purchase.verificationData.serverVerificationData;
 
+      final userId = StorageService().userId;
 
-      final userId =
-          StorageService().userId;
-
-
-      if(userId == null || userId.isEmpty){
-
+      if (userId == null || userId.isEmpty) {
         Get.snackbar(
           "Error",
           "User ID not found. Please login again",
         );
-
         return;
       }
 
+      // ================= DEBUG PRINTS START =================
+      print("========================================");
+      print("PURCHASE DEBUG");
+      print("========================================");
 
-      print("SUBSCRIPTION USER ID => $userId");
+      print("USER ID => $userId");
       print("PRODUCT ID => ${purchase.productID}");
+      print("PURCHASE STATUS => ${purchase.status}");
+      print("PENDING COMPLETE => ${purchase.pendingCompletePurchase}");
+
+      // Google Play specific token
       print("PURCHASE TOKEN => $token");
 
+      // Raw verification data
+      print("SOURCE => ${purchase.verificationData.source}");
+      print("LOCAL DATA => ${purchase.verificationData.localVerificationData}");
+      print("SERVER DATA => ${purchase.verificationData.serverVerificationData}");
+
+      print("========================================");
+      // ================= DEBUG PRINTS END =================
 
       await repository.verifyPurchase(
-
         userId: userId,
-
         productId: purchase.productID,
-
         token: token,
-
       );
 
-
-      if(purchase.pendingCompletePurchase){
-
-        await InAppPurchase.instance
-            .completePurchase(purchase);
-
+      if (purchase.pendingCompletePurchase) {
+        await InAppPurchase.instance.completePurchase(purchase);
       }
-
 
       Get.snackbar(
         "Success",
         "Subscription Activated",
       );
 
+    } catch (e) {
 
-    } catch(e){
-
-      print(
-          "SUBSCRIPTION ERROR => $e"
-      );
-
+      print("SUBSCRIPTION ERROR => $e");
 
       Get.snackbar(
         "Purchase Failed",
         e.toString(),
       );
-
     }
-
   }
 }
