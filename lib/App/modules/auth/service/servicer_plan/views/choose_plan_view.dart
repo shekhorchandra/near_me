@@ -101,17 +101,17 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                           ),
                         ),
 
-                        const SizedBox(height: 8),
-
-                        // Button
-                        AppButton(
-                          height: 34,
-                          onPressed: () => controller.selectPlan(plan),
-                          text: 'Select Plan',
-                          backgroundColor: isSelected
-                              ? plan.color
-                              : Colors.grey,
-                        ),
+                        // const SizedBox(height: 8),
+                        //
+                        // // Button
+                        // AppButton(
+                        //   height: 34,
+                        //   onPressed: () => controller.selectPlan(plan),
+                        //   text: 'Select Plan',
+                        //   backgroundColor: isSelected
+                        //       ? plan.color
+                        //       : Colors.grey,
+                        // ),
                       ],
                     ),
                   ),
@@ -124,7 +124,10 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
     }
 
     return Scaffold(
-      appBar: CommonAppBar(title: 'Choose Your Plan', showBack: false),
+      appBar: CommonAppBar(
+        title: 'Plan Details for Subscription',
+        showBack: false,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -134,7 +137,9 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                 // ✅ IMPORTANT FIX
                 child: Obx(() {
                   if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.black,));
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    );
                   }
 
                   return GridView.count(
@@ -151,8 +156,9 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                 onPressed: () {
                   final plan = controller.selectedPlan.value;
 
+                  // No plan selected: navigate to subscription page
                   if (plan == null) {
-                    Get.snackbar("Error", "Please select a plan first");
+                    Get.toNamed(AppRoutes.subscription);
                     return;
                   }
 
@@ -171,11 +177,11 @@ class ChoosePlanView extends GetView<ChoosePlanController> {
                   } else {
                     Get.toNamed(
                       AppRoutes.subscription,
-                      // arguments: {
-                      //   "planId": plan.id,
-                      //   "name": plan.name,
-                      //   "price": plan.price,
-                      // },
+                      arguments: {
+                        "planId": plan.id,
+                        "name": plan.name,
+                        "price": plan.price,
+                      },
                     );
                   }
                 },

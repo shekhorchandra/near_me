@@ -184,20 +184,41 @@ class UserMenuController extends GetxController {
 
 
   Future<void> deleteAccount() async {
+    final storage = StorageService();
+    final token = storage.accessToken?.trim();
+
+    // Check whether the user is logged in
+    if (token == null || token.isEmpty) {
+      Get.snackbar(
+        "Login Required",
+        "Please log in before deleting your account.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade900,
+        icon: const Icon(
+          Icons.login_rounded,
+          color: Colors.red,
+        ),
+        margin: const EdgeInsets.all(16),
+        borderRadius: 10,
+      );
+      return;
+    }
+
     final confirm = await Get.dialog<bool>(
       AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(
+            Icon(
               Icons.warning_amber_rounded,
               color: Colors.red,
               size: 28,
             ),
-            const SizedBox(width: 10),
-            const Text(
+            SizedBox(width: 10),
+            Text(
               "Delete Account",
               style: TextStyle(
                 fontWeight: FontWeight.w700,
@@ -222,9 +243,7 @@ class UserMenuController extends GetxController {
             onPressed: () => Get.back(result: false),
             child: const Text(
               "Cancel",
-              style: TextStyle(
-                color: Colors.grey,
-              ),
+              style: TextStyle(color: Colors.grey),
             ),
           ),
           ElevatedButton(
@@ -237,9 +256,7 @@ class UserMenuController extends GetxController {
             onPressed: () => Get.back(result: true),
             child: const Text(
               "Delete",
-              style: TextStyle(
-                color: Colors.white,
-              ),
+              style: TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -247,46 +264,77 @@ class UserMenuController extends GetxController {
     );
 
     if (confirm != true) return;
+
     try {
       Get.dialog(
-        const Center(child: CircularProgressIndicator(color: Colors.black)),
+        const Center(
+          child: CircularProgressIndicator(color: Colors.black),
+        ),
         barrierDismissible: false,
       );
-      print(storage.accessToken);
+
       final response = await Dio().delete(
         "${ApiConstants.baseUrl}/api/v1/user/delete-me",
         options: Options(
           headers: {
-            "Authorization": "Bearer ${storage.accessToken}",
+            "Authorization": "Bearer $token",
           },
         ),
       );
 
-      Get.back(); // close loader
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
 
-      if (response.statusCode == 200 && response.data["success"] == true) {
+      if (response.statusCode == 200 &&
+          response.data["success"] == true) {
+        await storage.clear();
+
         Get.snackbar(
-          "Success",
-          response.data["message"] ?? "Account deleted successfully",
+          "Account Deleted",
+          response.data["message"] ??
+              "Your account has been deleted successfully.",
+          snackPosition: SnackPosition.BOTTOM,
         );
 
-        // Clear local storage
-        await StorageService().clear();
-
-        // Navigate to login
         Get.offAllNamed(AppRoutes.USER_LOGIN);
       }
     } on DioException catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back();
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      final statusCode = e.response?.statusCode;
+
+      if (statusCode == 401 || statusCode == 403) {
+        await storage.clear();
+
+        Get.snackbar(
+          "Session Expired",
+          "Please log in again to continue.",
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+        Get.offAllNamed(AppRoutes.USER_LOGIN);
+        return;
+      }
 
       Get.snackbar(
-        "Error",
-        e.response?.data["message"] ?? "Failed to delete account",
+        "Delete Failed",
+        e.response?.data?["message"] ??
+            "Failed to delete your account.",
+        snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
-      if (Get.isDialogOpen ?? false) Get.back();
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
 
-      Get.snackbar("Error", e.toString());
+      Get.snackbar(
+        "Something Went Wrong",
+        "Unable to delete your account. Please try again.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 

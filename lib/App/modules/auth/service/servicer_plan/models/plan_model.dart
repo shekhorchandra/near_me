@@ -62,13 +62,13 @@ class Plan {
   static Color _getColor(String name) {
     switch (name) {
       case "free":
-        return const Color(0xFF3612FF);
+        return const Color(0xFF4CAF50);
       case "basic":
-        return const Color(0xFF61FD9D);
+        return const Color(0xFF2196F3);
       case "pro":
-        return const Color(0xFFFFA600);
+        return const Color(0xFF9C27B0);
       case "elite":
-        return const Color(0xFF7161AA);
+        return const Color(0xFFFF9800);
       default:
         return Colors.grey;
     }

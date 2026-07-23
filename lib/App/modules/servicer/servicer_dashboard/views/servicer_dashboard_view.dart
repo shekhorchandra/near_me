@@ -39,25 +39,63 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                     Expanded(
                       child: Row(
                         children: [
-                          const CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(
-                              "https://cdn.vectorstock.com/i/500p/38/92/user-profile-icon-person-circle-figure-vector-62363892.jpg",
-                            ),
-                          ),
+                          Obx(() {
+                            final planName = controller.planName.value;
+
+                            return SizedBox(
+                              width: 70,
+                              height: 72,
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.center,
+                                children: [
+                                  const Positioned(
+                                    top: 0,
+                                    child: CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(
+                                        "https://cdn.vectorstock.com/i/500p/38/92/"
+                                        "user-profile-icon-person-circle-figure-vector-62363892.jpg",
+                                      ),
+                                    ),
+                                  ),
+
+                                  Positioned(
+                                    bottom: 0,
+                                    child: _profilePlanBadge(planName),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Obx(
                               () => Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "${controller.greeting.value} ${controller.userName.value}",
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          "${controller.greeting.value} ${controller.userName.value}",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      _planBadge(controller.planName.value),
+                                    ],
                                   ),
+
+                                  const SizedBox(height: 4),
+
                                   const Text(
                                     "Welcome back!\nHere is your profile overview",
                                     style: TextStyle(color: Colors.grey),
@@ -191,7 +229,9 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
                   if (controller.isProfileLoading.value) {
                     return const SizedBox(
                       height: 90,
-                      child: Center(child: CircularProgressIndicator(color: Colors.black,)),
+                      child: Center(
+                        child: CircularProgressIndicator(color: Colors.black),
+                      ),
                     );
                   }
 
@@ -407,6 +447,66 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
     );
   }
 
+  Widget _planBadge(String planName) {
+    final plan = planName.trim().toLowerCase();
+
+    late final String label;
+    late final Color backgroundColor;
+    late final Color textColor;
+    late final IconData icon;
+
+    switch (plan) {
+      case 'elite':
+        label = 'ELITE';
+        backgroundColor = const Color(0xFFFFE8A3);
+        textColor = const Color(0xFF8A6200);
+        icon = Icons.workspace_premium_rounded;
+        break;
+
+      case 'pro':
+        label = 'PRO';
+        backgroundColor = const Color(0xFFE3D9FF);
+        textColor = const Color(0xFF5F36B5);
+        icon = Icons.diamond_rounded;
+        break;
+
+      case 'basic':
+        label = 'BASIC';
+        backgroundColor = const Color(0xFFE5E7EB);
+        textColor = const Color(0xFF4B5563);
+        icon = Icons.verified_outlined;
+        break;
+
+      default:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: textColor.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: textColor),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _graphSection({
     required String title,
     required RxString selected,
@@ -463,7 +563,9 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
           if (controller.isAnalyticsLoading.value) {
             return const SizedBox(
               height: 220,
-              child: Center(child: CircularProgressIndicator(color: Colors.black,)),
+              child: Center(
+                child: CircularProgressIndicator(color: Colors.black),
+              ),
             );
           }
 
@@ -599,6 +701,66 @@ class ServiceDashboardView extends GetView<ServiceDashboardController> {
           );
         }),
       ],
+    );
+  }
+
+  Widget _profilePlanBadge(String value) {
+    final planName = value.trim().toLowerCase();
+
+    String title;
+    Color backgroundColor;
+    Color textColor;
+    IconData icon;
+
+    if (planName.contains('free')) {
+      title = 'FREE';
+      backgroundColor = const Color(0xFFE8F5E9);
+      textColor = const Color(0xFF2E7D32);
+      icon = Icons.card_giftcard_rounded;
+    } else if (planName.contains('elite')) {
+      title = 'ELITE';
+      backgroundColor = const Color(0xFFFFC107);
+      textColor = Colors.black;
+      icon = Icons.workspace_premium_rounded;
+    } else if (planName.contains('pro')) {
+      title = 'PRO';
+      backgroundColor = const Color(0xFF7C3AED);
+      textColor = Colors.white;
+      icon = Icons.diamond_rounded;
+    } else if (planName.contains('basic')) {
+      title = 'BASIC';
+      backgroundColor = const Color(0xFF6B7280);
+      textColor = Colors.white;
+      icon = Icons.verified_rounded;
+    } else {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: const [
+          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: textColor),
+          const SizedBox(width: 3),
+          Text(
+            title,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

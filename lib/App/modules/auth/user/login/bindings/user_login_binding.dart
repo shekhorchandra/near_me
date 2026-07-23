@@ -14,9 +14,6 @@ class UserLoginBinding extends Bindings {
       Get.lazyPut<AuthApiService>(() => AuthApiService(), fenix: true);
     }
 
-    Get.lazyPut<UserLoginController>(
-          () => UserLoginController(),
-      fenix: true,
-    );
+    Get.lazyPut<UserLoginController>(() => UserLoginController());
   }
 }

@@ -177,7 +177,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                     controller: controller.aboutController,
                     maxLines: 5,
                     maxLength: 50,
-                    hint: 'Tell us about you or your services',
+                    hint: 'Tell us about you or your services (Min 10 characters)',
                   ),
                 ],
               ),
@@ -325,7 +325,8 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
                           getPlaceDetailWithLatLng: (prediction) async {
                             // SAFE NULL CHECK
-                            if (prediction.lat == null || prediction.lng == null) {
+                            if (prediction.lat == null ||
+                                prediction.lng == null) {
                               Get.snackbar(
                                 'Location Error',
                                 'Could not get coordinates for this place',
@@ -370,7 +371,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                           },
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -710,16 +711,20 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              const Text(
+              Text(
                 "Subscription Plan",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
-              const SizedBox(height: 6),
-
-              Text(
-                "You have selected the £${controller.selectedPlan.value.subscriptionPrice.toStringAsFixed(2)}/month Plan. You can continue using the platform with this plan or upgrade anytime for additional features.",
-                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              Obx(
+                () => Text(
+                  "You have selected the "
+                  "${controller.selectedPlan.value?.subscriptionPlan ?? ''} "
+                  "£${controller.selectedPlan.value?.subscriptionPrice.toStringAsFixed(2) ?? '0.00'}/month Plan. "
+                  "You can continue using the platform with this plan or upgrade anytime "
+                  "for additional features.",
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -763,10 +768,14 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
               ),
               const SizedBox(height: 20),
 
-              AppButton(
-                onPressed: controller.submitService,
-                loading: controller.isLoading.value,
-                text: 'Continue to Payment',
+              Obx(
+                    () => AppButton(
+                  onPressed: controller.submitService,
+                  loading: controller.isLoading.value,
+                  text: controller.isLoading.value
+                      ? 'Creating Service...'
+                      : 'Continue to Payment',
+                ),
               ),
               SizedBox(height: 40),
             ],

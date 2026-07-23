@@ -70,6 +70,7 @@ class ServiceProviderController extends GetxController {
   final ImagePicker _picker = ImagePicker();
 
   @override
+  @override
   void onInit() {
     super.onInit();
 
@@ -77,20 +78,48 @@ class ServiceProviderController extends GetxController {
 
     fetchCategories();
 
-    final args = Get.arguments;
+    final dynamic receivedArguments = Get.arguments;
 
-    if (args != null) {
-      selectedPlan.update((val) {
-        if (val != null) {
-          val.planId = args["planId"]; // 🔥 REQUIRED
-          val.subscriptionPlan = args["name"] ?? '';
-          val.subscriptionPrice =
-              double.tryParse(args["price"].toString()) ?? 0;
-        }
-      });
-    } else {
-      logger.e("Plan arguments is null");
+    if (receivedArguments is! Map) {
+      logger.e("Plan arguments are null or invalid");
+      return;
     }
+
+    final Map<String, dynamic> args = Map<String, dynamic>.from(
+      receivedArguments,
+    );
+
+    final String planId = args["planId"]?.toString() ?? '';
+
+    final String planName =
+        args["planName"]?.toString() ?? args["name"]?.toString() ?? '';
+
+    final String formattedPlanCost = args["planCost"]?.toString() ?? '';
+
+    final double subscriptionPrice =
+        (args["rawPrice"] as num?)?.toDouble() ??
+        double.tryParse(args["price"]?.toString() ?? '') ??
+        0.0;
+
+    final String currencyCode = args["currencyCode"]?.toString() ?? '';
+
+    selectedPlan.update((plan) {
+      if (plan == null) return;
+
+      plan.planId = planId;
+      plan.subscriptionPlan = planName;
+      plan.subscriptionPrice = subscriptionPrice;
+
+      // Add these fields to your model only if they exist:
+      // plan.formattedPrice = formattedPlanCost;
+      // plan.currencyCode = currencyCode;
+    });
+
+    logger.i("Plan ID: $planId");
+    logger.i("Plan name: $planName");
+    logger.i("Plan cost: $formattedPlanCost");
+    logger.i("Raw price: $subscriptionPrice");
+    logger.i("Currency: $currencyCode");
   }
 
   Future<void> fetchCategories() async {
@@ -243,6 +272,7 @@ class ServiceProviderController extends GetxController {
   }
 
   Future<void> submitService() async {
+    if (isLoading.value) return;
     try {
       isLoading.value = true;
 
