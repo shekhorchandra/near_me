@@ -17,7 +17,10 @@ class ReviewsController extends GetxController {
 
   RxList<ReviewModel> reviews = <ReviewModel>[].obs;
 
-  bool get isLoggedIn => storage.accessToken?.isNotEmpty == true;
+  bool get isLoggedIn {
+    final token = storage.accessToken?.trim();
+    return token != null && token.isNotEmpty;
+  }
 
   final tabs = ["All", "★★★★★", "★★★★", "★★★", "★★", "★"];
   final isPreview = false.obs;

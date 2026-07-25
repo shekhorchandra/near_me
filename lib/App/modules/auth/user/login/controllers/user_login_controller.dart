@@ -26,13 +26,13 @@ class UserLoginController extends GetxController {
 
   final StorageService _storageService = StorageService();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  // final emailController = TextEditingController();
+  // final passwordController = TextEditingController();
 
-  // final emailController = TextEditingController(
-  //   text: "shekhorsaha058@gmail.com",
-  // );
-  // final passwordController = TextEditingController(text: "Test1234@");
+  final emailController = TextEditingController(
+    text: "shekhorsaha058@gmail.com",
+  );
+  final passwordController = TextEditingController(text: "Test@#123");
 
   final isLoading = false.obs;
 

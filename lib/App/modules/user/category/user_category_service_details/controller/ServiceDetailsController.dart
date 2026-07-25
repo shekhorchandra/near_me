@@ -15,6 +15,11 @@ class ServiceDetailsController extends GetxController {
   final Dio dio = Dio();
   final StorageService storage = Get.find<StorageService>();
 
+  bool get isLoggedIn {
+    final token = storage.accessToken?.trim();
+    return token != null && token.isNotEmpty;
+  }
+
   RxBool isLoading = false.obs;
 
   late String serviceId;
@@ -72,19 +77,53 @@ class ServiceDetailsController extends GetxController {
   ///  whether login or not
   Future<bool> checkLogin() async {
     try {
-      final token = storage.accessToken;
+      final token = storage.accessToken?.trim();
+
+      debugPrint("🔐 Stored token: $token");
 
       if (token == null || token.isEmpty) {
+        debugPrint("❌ Access token is missing");
         return false;
       }
 
       final response = await dio.get(
         "${ApiConstants.baseUrl}/api/v1/user/me",
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
       );
 
-      return response.data["success"] == true;
-    } catch (_) {
+      debugPrint("👤 User/me status: ${response.statusCode}");
+      debugPrint("👤 User/me response: ${response.data}");
+
+      if (response.statusCode == 200 &&
+          response.data is Map &&
+          response.data["success"] == true) {
+        return true;
+      }
+
+      if (response.statusCode == 401) {
+        debugPrint("❌ Token expired or invalid");
+      }
+
+      return false;
+    } on DioException catch (e) {
+      debugPrint("❌ Login-check Dio error: ${e.type}");
+      debugPrint("❌ Status: ${e.response?.statusCode}");
+      debugPrint("❌ Response: ${e.response?.data}");
+      debugPrint("❌ Message: ${e.message}");
+
+      return false;
+    } catch (e, stackTrace) {
+      debugPrint("❌ Login-check error: $e");
+      debugPrintStack(stackTrace: stackTrace);
+
       return false;
     }
   }

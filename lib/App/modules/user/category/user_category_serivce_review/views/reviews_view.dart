@@ -36,7 +36,7 @@ class ReviewsView extends GetView<ReviewsController> {
 
       body: Obx(() {
         if (controller.isLoading.value)
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.black,));
         if (controller.filteredReviews.isEmpty)
           return const Center(child: Text("No Reviews Found"));
 

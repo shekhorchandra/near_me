@@ -137,11 +137,9 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
         // ================= BODY =================
         body: controller.isLoading.value
             ? Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SkeletonLoader.list(
-            itemCount: 8,
-          ),
-        )
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: SkeletonLoader.list(itemCount: 8),
+              )
             : RefreshIndicator(
                 color: Colors.black,
                 onRefresh: () async {
@@ -614,35 +612,21 @@ class ServiceDetailsView extends GetView<ServiceDetailsController> {
                                             ),
                                           ),
                                           TextButton(
-                                            onPressed: () async {
-                                              final isLoggedIn =
-                                                  await controller.checkLogin();
-
-                                              if (!isLoggedIn) {
+                                            onPressed: () {
+                                              if (controller.serviceId.trim().isEmpty) {
                                                 Get.snackbar(
-                                                  "Login Required",
-                                                  "Please login first to view reviews",
-                                                  snackPosition:
-                                                      SnackPosition.TOP,
+                                                  "Error",
+                                                  "Service information is unavailable",
+                                                  snackPosition: SnackPosition.TOP,
                                                 );
-
-                                                Future.delayed(
-                                                  const Duration(seconds: 2),
-                                                  () {
-                                                    Get.toNamed(
-                                                      AppRoutes.USER_LOGIN,
-                                                    );
-                                                  },
-                                                );
-
                                                 return;
                                               }
 
                                               Get.toNamed(
                                                 AppRoutes.REVIEWS,
                                                 arguments: {
-                                                  "serviceId":
-                                                      controller.serviceId,
+                                                  "serviceId": controller.serviceId,
+                                                  "preview": !controller.isLoggedIn,
                                                 },
                                               );
                                             },

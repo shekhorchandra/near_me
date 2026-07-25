@@ -22,17 +22,39 @@ class ReplyDialogView extends StatefulWidget {
 }
 
 class _ReplyDialogViewState extends State<ReplyDialogView> {
-  final text = TextEditingController();
+  final TextEditingController text = TextEditingController();
+
   int rating = 5;
+  bool isSubmitting = false;
 
   Future<void> submit() async {
+    // Prevent duplicate requests
+    if (isSubmitting) return;
+
+    final comment = text.text.trim();
+
+    if (comment.isEmpty) {
+      Get.snackbar(
+        "Required",
+        widget.isReview
+            ? "Please write your review"
+            : "Please write your reply",
+      );
+      return;
+    }
+
+    setState(() {
+      isSubmitting = true;
+    });
+
     try {
       final dio = Dio();
       final storage = Get.find<StorageService>();
+
       final token = storage.accessToken;
       final userId = storage.userId;
 
-      if (token == null || token.isEmpty) {
+      if (token == null || token.trim().isEmpty) {
         Get.snackbar("Error", "Please login first");
         return;
       }
@@ -42,9 +64,10 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
         data: {
           "user": userId,
           "service": widget.serviceId,
-          "comment": text.text,
+          "comment": comment,
           if (widget.isReview) "rating": rating,
-          if (widget.parentId != null) "parentReview": widget.parentId,
+          if (widget.parentId != null)
+            "parentReview": widget.parentId,
         },
         options: Options(
           headers: {
@@ -54,29 +77,47 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
         ),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // ✅ FORCE REFRESH REVIEWS
+      if (response.statusCode == 200 ||
+          response.statusCode == 201) {
         if (Get.isRegistered<ReviewsController>()) {
           await Get.find<ReviewsController>().fetchReviews();
         }
 
         Get.back();
 
-        Get.snackbar("Success", "Submitted successfully");
-      }
-    } catch (e) {
-      if (e is DioException) {
-        String msg =
-            e.response?.data['message'] ?? "Failed to submit";
-
         Get.snackbar(
-          "Error",
-          msg,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
+          "Success",
+          widget.isReview
+              ? "Review submitted successfully"
+              : "Reply submitted successfully",
         );
-      } else {
-        Get.snackbar("Error", "Unexpected error");
+      }
+    } on DioException catch (e) {
+      final dynamic responseData = e.response?.data;
+
+      final String message = responseData is Map
+          ? responseData["message"]?.toString() ??
+          "Failed to submit"
+          : "Failed to submit";
+
+      Get.snackbar(
+        "Error",
+        message,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Unexpected error",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
       }
     }
   }
@@ -155,7 +196,7 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       actions: [
         TextButton(
-          onPressed: () => Get.back(),
+          onPressed: isSubmitting ? null : () => Get.back(),
           child: const Text(
             "Cancel",
             style: TextStyle(
@@ -167,13 +208,25 @@ class _ReplyDialogViewState extends State<ReplyDialogView> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.black,
+            disabledBackgroundColor: Colors.grey.shade400,
             foregroundColor: Colors.white,
+            disabledForegroundColor: Colors.white,
+            minimumSize: const Size(90, 44),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          onPressed: submit,
-          child: const Text("Send"),
+          onPressed: isSubmitting ? null : submit,
+          child: isSubmitting
+              ? const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.white,
+            ),
+          )
+              : const Text("Send"),
         ),
       ],
     );
