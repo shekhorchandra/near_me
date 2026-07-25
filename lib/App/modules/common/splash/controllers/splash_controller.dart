@@ -9,7 +9,7 @@ class SplashController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    Timer(const Duration(seconds: 2), _checkFirstLaunch);
+    Timer(const Duration(seconds: 3), _checkFirstLaunch);
   }
 
   Future<void> _checkFirstLaunch() async {
