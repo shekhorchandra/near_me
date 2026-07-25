@@ -61,7 +61,6 @@ class ServiceProviderController extends GetxController {
   var isOpen24_7 = false.obs;
 
   final logger = Logger();
-
   // Selected subscription plan
   var selectedPlan = Rx<ServiceProviderModel>(
     ServiceProviderModel(subscriptionPlan: 'Free Plan', subscriptionPrice: 0.0),
@@ -270,7 +269,6 @@ class ServiceProviderController extends GetxController {
 
     return result;
   }
-
   Future<void> submitService() async {
     if (isLoading.value) return;
     try {
