@@ -421,9 +421,27 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
 
               const SizedBox(height: 12),
 
-              const Text(
-                "Media (Max 3 Images)",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              Obx(
+                    () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Media (${controller.images.length}/${controller.maxImageLimit} Images)",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      "${controller.selectedPlan.value.subscriptionPlan} image allowance",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 10),
@@ -475,7 +493,7 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                     }),
 
                     /// ================= ADD BUTTON =================
-                    if (controller.images.length < 3)
+                    if (controller.canAddMoreImages)
                       GestureDetector(
                         onTap: () {
                           Get.bottomSheet(
@@ -773,8 +791,10 @@ class ServiceProviderView extends GetView<ServiceProviderController> {
                   onPressed: controller.submitService,
                   loading: controller.isLoading.value,
                   text: controller.isLoading.value
-                      ? 'Creating Service...'
-                      : 'Continue to Payment',
+                      ? "Creating Service..."
+                      : controller.isAdditionalService.value
+                      ? "Create Service"
+                      : "Continue to Payment",
                 ),
               ),
               SizedBox(height: 40),

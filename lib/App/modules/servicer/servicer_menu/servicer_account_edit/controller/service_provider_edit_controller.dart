@@ -59,15 +59,48 @@ class ServiceProviderEditController extends GetxController {
 
   GoogleMapController? mapController;
 
+  bool _isValidMongoId(String value) {
+    return RegExp(
+      r'^[a-fA-F0-9]{24}$',
+    ).hasMatch(value.trim());
+  }
+
   @override
   void onInit() {
     super.onInit();
+
+    _readArguments();
+
+    if (serviceId.value.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Service ID not found",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
     loadAll();
   }
 
   Future<void> loadAll() async {
     await fetchCategoryTree();
     await fetchService();
+  }
+
+  void _readArguments() {
+    final dynamic arguments = Get.arguments;
+
+    if (arguments is Map) {
+      serviceId.value =
+          arguments["serviceId"]?.toString().trim() ?? "";
+    } else if (arguments is String) {
+      serviceId.value = arguments.trim();
+    }
+
+    logger.i(
+      "SELECTED SERVICE ID => ${serviceId.value}",
+    );
   }
 
   ///
@@ -166,11 +199,22 @@ class ServiceProviderEditController extends GetxController {
   // ================= PHONE =================
 
   Future<void> fetchService() async {
+    final String currentServiceId = serviceId.value.trim();
+
+    if (currentServiceId.isEmpty) {
+      Get.snackbar(
+        "Error",
+        "Service ID not found",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
 
       final res = await dio.get(
-        "${ApiConstants.baseUrl}/api/v1/service/my-service",
+        "${ApiConstants.baseUrl}/api/v1/service/$currentServiceId",
         options: Options(
           headers: {
             "Authorization": "Bearer ${storage.accessToken}",
@@ -179,79 +223,181 @@ class ServiceProviderEditController extends GetxController {
         ),
       );
 
-      logger.i("FETCH SERVICE => ${res.data}");
+      logger.i("FETCH SELECTED SERVICE => ${res.data}");
 
-      final data = res.data["data"];
-      if (data["location"] != null && data["location"]["coordinates"] != null) {
-        final coordinates = data["location"]["coordinates"];
-
-        longitude.value = (coordinates[0] as num).toDouble();
-        latitude.value = (coordinates[1] as num).toDouble();
+      if (res.data is! Map) {
+        throw Exception("Invalid API response");
       }
 
-      // ✅ SAVE SERVICE ID
-      // IMPORTANT
-      await storage.setServiceId(data["_id"]);
+      final responseData = Map<String, dynamic>.from(
+        res.data as Map,
+      );
 
-      serviceId.value = data["_id"] ?? "";
+      if (responseData["success"] != true) {
+        throw Exception(
+          responseData["message"]?.toString() ??
+              "Failed to fetch service",
+        );
+      }
 
-      nameCtrl.text = data["service_name"] ?? "";
-      addressCtrl.text = data["service_address"] ?? "";
-      aboutCtrl.text = data["about"] ?? "";
-      websiteCtrl.text = data["website_link"] ?? "";
+      final dynamic rawService = responseData["data"];
 
-      address.value = data["service_address"] ?? "";
-      addressCtrl.text = address.value;
+      if (rawService is! Map) {
+        throw Exception("Service data not found");
+      }
+
+      final data = Map<String, dynamic>.from(rawService);
+
+      // Store selected ID only for compatibility.
+      await storage.setServiceId(currentServiceId);
+
+      serviceId.value =
+          data["_id"]?.toString() ?? currentServiceId;
+
+      nameCtrl.text =
+          data["service_name"]?.toString() ?? "";
+
+      addressCtrl.text =
+          data["service_address"]?.toString() ?? "";
+
+      aboutCtrl.text =
+          data["about"]?.toString() ?? "";
+
+      websiteCtrl.text =
+          data["website_link"]?.toString() ?? "";
+
+      address.value =
+          data["service_address"]?.toString() ?? "";
+
+      selectedAddress.value = address.value;
+
+      final String rawPhone =
+          data["phone"]?.toString() ?? "";
 
       contactCtrl.text = normalizeBdPhone(
-        data["phone"].toString().startsWith("8801")
-            ? "+${data["phone"]}"
-            : data["phone"].toString(),
+        rawPhone.startsWith("8801")
+            ? "+$rawPhone"
+            : rawPhone,
       );
 
-      selectedCategoryId.value =
-          data["service_category"]?["_id"]?.toString() ?? "";
-
-      selectedOfferServices.assignAll(
-        (data["offer_services"] as List?)
-                ?.map((e) => e["_id"].toString())
-                .toList() ??
-            [],
+      selectedCategoryId.value = _extractId(
+        data["service_category"],
       );
 
-      logoUrl.value = data["company_logo"] ?? "";
-
-      mediaUrls.assignAll(
-        (data["media"] as List?)?.map((e) => e.toString()).toSet().toList() ??
-            [],
+      selectedSubCategoryId.value = _extractId(
+        data["service_subCategory"],
       );
 
-      // opening time
-      if (data["openingTime"] != null) {
-        final parts = data["openingTime"].split(":");
+      selectedChildCategoryId.value = _extractId(
+        data["service_childCategory"],
+      );
 
-        openingTime.value = TimeOfDay(
-          hour: int.parse(parts[0]),
-          minute: int.parse(parts[1]),
+      final dynamic rawOfferServices =
+      data["offer_services"];
+
+      if (rawOfferServices is List) {
+        final List<String> offerServiceIds =
+        rawOfferServices
+            .map<String>(
+              (dynamic item) => _extractId(item),
+        )
+            .where(
+              (String id) => id.trim().isNotEmpty,
+        )
+            .toSet()
+            .toList();
+
+        selectedOfferServices.assignAll(
+          offerServiceIds,
         );
+      } else {
+        selectedOfferServices.clear();
       }
 
-      // closing time
-      if (data["closingTime"] != null) {
-        final parts = data["closingTime"].split(":");
+      logoUrl.value =
+          data["company_logo"]?.toString() ?? "";
 
-        closingTime.value = TimeOfDay(
-          hour: int.parse(parts[0]),
-          minute: int.parse(parts[1]),
+      final dynamic rawMedia = data["media"];
+
+      if (rawMedia is List) {
+        mediaUrls.assignAll(
+          rawMedia
+              .map((item) => item.toString())
+              .where((url) => url.isNotEmpty)
+              .toSet()
+              .toList(),
         );
+      } else {
+        mediaUrls.clear();
+      }
+
+      isOpen24_7.value =
+          data["allTimeAvailability"] == true;
+
+      _setTimeFromApi(
+        data["openingTime"]?.toString(),
+        isOpening: true,
+      );
+
+      _setTimeFromApi(
+        data["closingTime"]?.toString(),
+        isOpening: false,
+      );
+
+      final dynamic locationData = data["location"];
+
+      if (locationData is Map) {
+        final dynamic coordinates =
+        locationData["coordinates"];
+
+        if (coordinates is List &&
+            coordinates.length >= 2) {
+          longitude.value =
+              (coordinates[0] as num).toDouble();
+
+          latitude.value =
+              (coordinates[1] as num).toDouble();
+        }
       }
 
       mediaFiles.clear();
+      logoFile.value = null;
 
       update();
-    } catch (e) {
-      logger.e("FETCH SERVICE ERROR => $e");
-      Get.snackbar("Error", "Failed to fetch service");
+    } on DioException catch (error) {
+      logger.e(
+        "FETCH SERVICE DIO ERROR => "
+            "${error.response?.data}",
+      );
+
+      final dynamic errorData =
+          error.response?.data;
+
+      String message = "Failed to fetch service";
+
+      if (errorData is Map &&
+          errorData["message"] != null) {
+        message = errorData["message"].toString();
+      }
+
+      Get.snackbar(
+        "Error",
+        message,
+        snackPosition: SnackPosition.TOP,
+      );
+    } catch (error, stackTrace) {
+      logger.e(
+        "FETCH SERVICE ERROR => $error",
+        stackTrace: stackTrace,
+      );
+
+      Get.snackbar(
+        "Error",
+        error
+            .toString()
+            .replaceFirst("Exception: ", ""),
+        snackPosition: SnackPosition.TOP,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -308,134 +454,295 @@ class ServiceProviderEditController extends GetxController {
 
   // ================= UPDATE SERVICE =================
   Future<void> updateService() async {
+    if (isUpdating.value) return;
+
     try {
       isUpdating.value = true;
 
-      // ✅ ALWAYS GET FRESH SERVICE ID
-      final currentServiceId = storage.serviceId;
+      // Use the service selected from the service list.
+      final String currentServiceId = serviceId.value.trim();
 
-      logger.i("SERVICE ID => $currentServiceId");
+      logger.i("UPDATING SERVICE ID => $currentServiceId");
 
-      if (currentServiceId == null || currentServiceId.isEmpty) {
-        Get.snackbar("Error", "Service ID not found");
+      if (currentServiceId.isEmpty) {
+        Get.snackbar(
+          "Error",
+          "Service ID not found",
+          snackPosition: SnackPosition.TOP,
+        );
         return;
       }
 
-      // ✅ normalize first
-      final phone = normalizeBdPhone(contactCtrl.text);
+      final String serviceName = nameCtrl.text.trim();
+      final String phone = normalizeBdPhone(
+        contactCtrl.text,
+      );
+      final String serviceAddress =
+      addressCtrl.text.trim();
 
-      logger.i("PHONE AFTER NORMALIZE => $phone");
+      if (serviceName.isEmpty) {
+        Get.snackbar(
+          "Error",
+          "Service name is required",
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
 
-      // ✅ validate properly
+      if (selectedCategoryId.value.trim().isEmpty) {
+        Get.snackbar(
+          "Error",
+          "Please select a category",
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
       if (!isValidBdPhone(phone)) {
         Get.snackbar(
           "Error",
           "Invalid Bangladeshi number. Use 01XXXXXXXXX or +8801XXXXXXXXX",
+          snackPosition: SnackPosition.TOP,
         );
         return;
       }
 
-      // ✅ remove duplicates
-      final cleanOfferServices = selectedOfferServices.toSet().toList();
+      if (serviceAddress.isEmpty) {
+        Get.snackbar(
+          "Error",
+          "Service address is required",
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
 
-      final body = {
-        "service_name": nameCtrl.text.trim(),
-        "service_category": selectedCategoryId.value,
+      final List<String> cleanOfferServices =
+      selectedOfferServices
+          .where((id) => id.trim().isNotEmpty)
+          .toSet()
+          .toList();
+
+      final Map<String, dynamic> body = {
+        "service_name": serviceName,
+        "service_category":
+        selectedCategoryId.value.trim(),
+
+        // Include these when your backend supports them.
+        if (selectedSubCategoryId.value.trim().isNotEmpty)
+          "service_subCategory":
+          selectedSubCategoryId.value.trim(),
+
+        if (selectedChildCategoryId.value.trim().isNotEmpty)
+          "service_childCategory":
+          selectedChildCategoryId.value.trim(),
+
         "offer_services": cleanOfferServices,
         "phone": phone,
-        "service_address": addressCtrl.text.trim(),
+        "service_address": serviceAddress,
         "about": aboutCtrl.text.trim(),
         "website_link": websiteCtrl.text.trim(),
         "location": {
           "type": "Point",
-          "coordinates": [longitude.value, latitude.value],
-          "address": addressCtrl.text.trim(),
+          "coordinates": [
+            longitude.value,
+            latitude.value,
+          ],
+          "address": serviceAddress,
         },
-        "openingTime":
-            "${openingTime.value.hour.toString().padLeft(2, '0')}:${openingTime.value.minute.toString().padLeft(2, '0')}",
-
-        "closingTime":
-            "${closingTime.value.hour.toString().padLeft(2, '0')}:${closingTime.value.minute.toString().padLeft(2, '0')}",
-
-        "allTimeAvailability": false,
+        "openingTime": _formatTime(
+          openingTime.value,
+        ),
+        "closingTime": _formatTime(
+          closingTime.value,
+        ),
+        "allTimeAvailability":
+        isOpen24_7.value,
       };
 
-      logger.i("UPDATE BODY => ${jsonEncode(body)}");
+      logger.i(
+        "UPDATE BODY => ${jsonEncode(body)}",
+      );
 
-      final formData = FormData();
+      final FormData formData = FormData();
 
-      formData.fields.add(MapEntry("data", jsonEncode(body)));
+      formData.fields.add(
+        MapEntry(
+          "data",
+          jsonEncode(body),
+        ),
+      );
 
-      // ✅ logo
-      if (logoFile.value != null) {
+      // Add newly selected logo.
+      final File? selectedLogo = logoFile.value;
+
+      if (selectedLogo != null) {
         formData.files.add(
           MapEntry(
             "company_logo",
-            await MultipartFile.fromFile(logoFile.value!.path),
+            await MultipartFile.fromFile(
+              selectedLogo.path,
+              filename: selectedLogo.path.split("/").last,
+            ),
           ),
         );
       }
 
-      // ✅ old images
-      for (final url in mediaUrls) {
+      /*
+     * Preserve existing media.
+     *
+     * Your backend appears to expect existing images as uploaded files.
+     * Therefore, the existing network images are downloaded and attached.
+     */
+      for (int index = 0;
+      index < mediaUrls.length;
+      index++) {
+        final String url = mediaUrls[index].trim();
+
+        if (url.isEmpty) continue;
+
         try {
-          final response = await dio.get(
+          final response = await dio.get<List<int>>(
             url,
-            options: Options(responseType: ResponseType.bytes),
+            options: Options(
+              responseType: ResponseType.bytes,
+            ),
           );
+
+          final bytes = response.data;
+
+          if (bytes == null || bytes.isEmpty) {
+            continue;
+          }
 
           formData.files.add(
             MapEntry(
               "media",
               MultipartFile.fromBytes(
-                response.data,
-                filename: "old_${DateTime.now().millisecondsSinceEpoch}.jpg",
+                bytes,
+                filename:
+                "existing_media_${index + 1}.jpg",
               ),
             ),
           );
-        } catch (e) {
-          logger.w("Skipping image => $url");
+        } catch (error) {
+          logger.w(
+            "Unable to preserve media: $url, error: $error",
+          );
         }
       }
 
-      // ✅ new images
-      for (final file in mediaFiles) {
+      // Add newly selected media.
+      for (final File file in mediaFiles) {
         formData.files.add(
-          MapEntry("media", await MultipartFile.fromFile(file.path)),
+          MapEntry(
+            "media",
+            await MultipartFile.fromFile(
+              file.path,
+              filename: file.path.split("/").last,
+            ),
+          ),
         );
       }
 
-      // ✅ PATCH API
-      final res = await dio.patch(
+      final response = await dio.patch(
         "${ApiConstants.baseUrl}/api/v1/service/$currentServiceId",
         data: formData,
         options: Options(
           headers: {
-            "Authorization": "Bearer ${storage.accessToken}",
+            "Authorization":
+            "Bearer ${storage.accessToken}",
             "accesstoken": storage.accessToken,
           },
-          validateStatus: (status) => status != null && status < 500,
+          contentType: "multipart/form-data",
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
         ),
       );
 
-      final prettyJson = const JsonEncoder.withIndent('    ').convert(res.data);
+      logger.i(
+        "UPDATE RESPONSE => "
+            "${const JsonEncoder.withIndent('  ').convert(response.data)}",
+      );
 
-      logger.i(prettyJson);
+      final dynamic responseData = response.data;
 
-      if (res.statusCode == 200 && res.data["success"] == true) {
-        Get.snackbar("Success", "Updated Successfully");
+      final bool isSuccess =
+          response.statusCode == 200 &&
+              responseData is Map &&
+              responseData["success"] == true;
 
+      if (isSuccess) {
         mediaFiles.clear();
         logoFile.value = null;
 
-        await fetchService();
-      } else {
-        Get.snackbar("Error", res.data["message"] ?? "Update failed");
-      }
-    } catch (e) {
-      logger.e("UPDATE ERROR => $e");
+        Get.snackbar(
+          "Success",
+          responseData["message"]?.toString() ??
+              "Service updated successfully",
+          snackPosition: SnackPosition.TOP,
+        );
 
-      Get.snackbar("Error", "Something went wrong");
+        // Return to My Services and refresh its list.
+        Get.back(result: true);
+        return;
+      }
+
+      String errorMessage = "Update failed";
+
+      if (responseData is Map &&
+          responseData["message"] != null) {
+        errorMessage =
+            responseData["message"].toString();
+      }
+
+      Get.snackbar(
+        "Error",
+        errorMessage,
+        snackPosition: SnackPosition.TOP,
+      );
+    } on DioException catch (error) {
+      logger.e(
+        "UPDATE DIO ERROR => ${error.response?.data}",
+      );
+
+      String message =
+          "Unable to update the service";
+
+      final dynamic errorData =
+          error.response?.data;
+
+      if (errorData is Map &&
+          errorData["message"] != null) {
+        message = errorData["message"].toString();
+      } else if (error.type ==
+          DioExceptionType.connectionError) {
+        message = "Please check your internet connection";
+      } else if (error.type ==
+          DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.sendTimeout ||
+          error.type ==
+              DioExceptionType.receiveTimeout) {
+        message =
+        "The request timed out. Please try again";
+      }
+
+      Get.snackbar(
+        "Error",
+        message,
+        snackPosition: SnackPosition.TOP,
+      );
+    } catch (error, stackTrace) {
+      logger.e(
+        "UPDATE ERROR => $error",
+        stackTrace: stackTrace,
+      );
+
+      Get.snackbar(
+        "Error",
+        "Something went wrong while updating the service",
+        snackPosition: SnackPosition.TOP,
+      );
     } finally {
       isUpdating.value = false;
     }
@@ -473,5 +780,62 @@ class ServiceProviderEditController extends GetxController {
     closingCtrl.dispose();
 
     super.onClose();
+  }
+
+  String _extractId(dynamic value) {
+    if (value == null) {
+      return "";
+    }
+
+    if (value is Map) {
+      return value["_id"]?.toString() ??
+          value["id"]?.toString() ??
+          "";
+    }
+
+    return value.toString();
+  }
+
+  void _setTimeFromApi(
+      String? value, {
+        required bool isOpening,
+      }) {
+    if (value == null || value.trim().isEmpty) {
+      return;
+    }
+
+    final parts = value.split(":");
+
+    if (parts.length < 2) {
+      return;
+    }
+
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+
+    if (hour == null || minute == null) {
+      return;
+    }
+
+    final time = TimeOfDay(
+      hour: hour,
+      minute: minute,
+    );
+
+    if (isOpening) {
+      openingTime.value = time;
+    } else {
+      closingTime.value = time;
+    }
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final String hour =
+    time.hour.toString().padLeft(2, "0");
+
+    final String minute =
+    time.minute.toString().padLeft(2, "0");
+
+    return "$hour:$minute";
   }
 }

@@ -11,6 +11,7 @@ class StorageService {
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'userId';
+  static const String _planIdKey = 'planId';
 
   static const String _serviceIdKey = 'serviceId';
 
@@ -21,6 +22,12 @@ class StorageService {
     await GetStorage.init();
     log('======= GetStorage Initialized =======');
   }
+
+  Future<void> setPlanId(String id) async {
+    await _box.write(_planIdKey, id);
+  }
+
+  String? get planId => _box.read<String>(_planIdKey);
 
   // Access token
   Future<void> setAccessToken(String token) async {

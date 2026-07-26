@@ -17,7 +17,10 @@ import '../models/category_model.dart';
 import '../models/service_provider_model.dart';
 
 class ServiceProviderController extends GetxController {
+  final StorageService storage = StorageService();
   final model = ServiceProviderModel().obs;
+
+  final RxBool isAdditionalService = false.obs;
 
   final serviceNameController = TextEditingController();
   final contactController = TextEditingController();
@@ -68,57 +71,139 @@ class ServiceProviderController extends GetxController {
 
   final ImagePicker _picker = ImagePicker();
 
-  @override
+
   @override
   void onInit() {
     super.onInit();
 
-    getAddressFromLatLng(latitude.value, longitude.value);
+    getAddressFromLatLng(
+      latitude.value,
+      longitude.value,
+    );
 
     fetchCategories();
 
+    _readRouteArguments();
+  }
+
+  Future<void> _readRouteArguments() async {
     final dynamic receivedArguments = Get.arguments;
 
-    if (receivedArguments is! Map) {
-      logger.e("Plan arguments are null or invalid");
-      return;
+    final Map<String, dynamic> args =
+    receivedArguments is Map
+        ? Map<String, dynamic>.from(
+      receivedArguments,
+    )
+        : <String, dynamic>{};
+
+    final String source =
+        args["source"]?.toString().trim() ?? "";
+
+    final String mode =
+        args["mode"]?.toString().trim() ?? "";
+
+    isAdditionalService.value =
+        source == "my-services" ||
+            mode == "additional-service";
+
+    final String argumentPlanId =
+        args["planId"]?.toString().trim() ?? "";
+
+    final String storedPlanId =
+        storage.planId?.trim() ?? "";
+
+    String resolvedPlanId = "";
+
+    if (_isValidMongoId(argumentPlanId)) {
+      resolvedPlanId = argumentPlanId;
+    } else if (_isValidMongoId(storedPlanId)) {
+      resolvedPlanId = storedPlanId;
     }
 
-    final Map<String, dynamic> args = Map<String, dynamic>.from(
-      receivedArguments,
-    );
+    final String argumentPlanName =
+        args["planName"]?.toString().trim() ??
+            args["name"]?.toString().trim() ??
+            "";
 
-    final String planId = args["planId"]?.toString() ?? '';
-
-    final String planName =
-        args["planName"]?.toString() ?? args["name"]?.toString() ?? '';
-
-    final String formattedPlanCost = args["planCost"]?.toString() ?? '';
+    final String resolvedPlanName =
+    argumentPlanName.isNotEmpty
+        ? argumentPlanName
+        : selectedPlan.value.subscriptionPlan.trim();
 
     final double subscriptionPrice =
-        (args["rawPrice"] as num?)?.toDouble() ??
-        double.tryParse(args["price"]?.toString() ?? '') ??
-        0.0;
-
-    final String currencyCode = args["currencyCode"]?.toString() ?? '';
+        _parseDouble(args["rawPrice"]) ??
+            _parseDouble(args["price"]) ??
+            selectedPlan.value.subscriptionPrice;
 
     selectedPlan.update((plan) {
       if (plan == null) return;
 
-      plan.planId = planId;
-      plan.subscriptionPlan = planName;
-      plan.subscriptionPrice = subscriptionPrice;
-
-      // Add these fields to your model only if they exist:
-      // plan.formattedPrice = formattedPlanCost;
-      // plan.currencyCode = currencyCode;
+      plan.planId = resolvedPlanId;
+      plan.subscriptionPlan =
+          resolvedPlanName;
+      plan.subscriptionPrice =
+          subscriptionPrice;
     });
 
-    logger.i("Plan ID: $planId");
-    logger.i("Plan name: $planName");
-    logger.i("Plan cost: $formattedPlanCost");
-    logger.i("Raw price: $subscriptionPrice");
-    logger.i("Currency: $currencyCode");
+    if (resolvedPlanId.isNotEmpty) {
+      await storage.setPlanId(
+        resolvedPlanId,
+      );
+    } else {
+      // Remove previously stored values such as elite_plan.
+      await storage.remove("planId");
+    }
+
+    logger.i(
+      "Additional service: ${isAdditionalService.value}",
+    );
+    logger.i("Argument plan ID: $argumentPlanId");
+    logger.i("Stored plan ID: $storedPlanId");
+    logger.i("Resolved plan ID: $resolvedPlanId");
+    logger.i("Plan name: $resolvedPlanName");
+  }
+
+  double? _parseDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+
+    return double.tryParse(
+      value?.toString() ?? "",
+    );
+  }
+
+
+  String get normalizedPlanName {
+    return selectedPlan.value.subscriptionPlan
+        .trim()
+        .toLowerCase()
+        .replaceAll(" plan", "");
+  }
+
+  int get maxImageLimit {
+    switch (normalizedPlanName) {
+      case "elite":
+      case "pro":
+        return 10;
+
+      case "basic":
+        return 5;
+
+      case "free":
+      default:
+        return 3;
+    }
+  }
+
+  bool get canAddMoreImages {
+    return images.length < maxImageLimit;
+  }
+
+  int get remainingImageCount {
+    final remaining = maxImageLimit - images.length;
+
+    return remaining < 0 ? 0 : remaining;
   }
 
   Future<void> fetchCategories() async {
@@ -244,14 +329,22 @@ class ServiceProviderController extends GetxController {
   }
 
   void addImage(String path) {
-    if (images.length < 3) {
-      images.add(path);
-    } else {
-      Get.snackbar('Limit', 'Max 3 images allowed');
+    if (images.length >= maxImageLimit) {
+      Get.snackbar(
+        "Image Limit Reached",
+        "Your ${selectedPlan.value.subscriptionPlan} allows up to "
+            "$maxImageLimit images.",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
     }
+
+    images.add(path);
   }
 
   void removeImage(int index) {
+    if (index < 0 || index >= images.length) return;
+
     images.removeAt(index);
   }
 
@@ -274,7 +367,7 @@ class ServiceProviderController extends GetxController {
     try {
       isLoading.value = true;
 
-      final storage = StorageService();
+      // final storage = StorageService();
       final token = storage.accessToken;
 
       if (token == null || token.trim().isEmpty) {
@@ -284,8 +377,37 @@ class ServiceProviderController extends GetxController {
 
       final plan = selectedPlan.value;
 
-      if (plan.planId.isEmpty) {
-        Get.snackbar("Error", "Plan ID is missing");
+
+      final String selectedPlanId =
+      plan.planId.trim();
+
+      final String storedPlanId =
+          storage.planId?.trim() ?? "";
+
+      String currentPlanId = "";
+
+      if (_isValidMongoId(selectedPlanId)) {
+        currentPlanId = selectedPlanId;
+      } else if (_isValidMongoId(storedPlanId)) {
+        currentPlanId = storedPlanId;
+      }
+
+      logger.i(
+        "Selected plan ID: $selectedPlanId",
+      );
+      logger.i(
+        "Stored plan ID: $storedPlanId",
+      );
+      logger.i(
+        "Submitting plan ID: $currentPlanId",
+      );
+
+      if (currentPlanId.isEmpty) {
+        Get.snackbar(
+          "Error",
+          "A valid active plan ID was not found.",
+          snackPosition: SnackPosition.TOP,
+        );
         return;
       }
 
@@ -314,8 +436,18 @@ class ServiceProviderController extends GetxController {
         return;
       }
 
+      if (images.length > maxImageLimit) {
+        Get.snackbar(
+          "Image Limit Exceeded",
+          "Your ${selectedPlan.value.subscriptionPlan} allows only "
+              "$maxImageLimit images.",
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
       final payload = {
-        "planId": plan.planId,
+        "planId": currentPlanId,
         "service_name": serviceNameController.text.trim(),
         "service_category": selectedCategoryId.value,
         "service_subCategory": selectedSubCategoryId.value,
@@ -399,59 +531,91 @@ class ServiceProviderController extends GetxController {
           responseJson['success'] == true) {
         final dynamic responseData = responseJson['data'];
 
-        if (responseData is! Map<String, dynamic>) {
-          Get.snackbar("Error", "Invalid service response");
-          return;
-        }
+        String serviceId = '';
 
-        String serviceId = responseData['serviceId']?.toString().trim() ?? '';
+        if (responseData is Map) {
+          serviceId =
+              responseData['serviceId']?.toString().trim() ?? '';
 
-        // Fallback to data.service._id
-        if (serviceId.isEmpty) {
-          final dynamic service = responseData['service'];
+          if (serviceId.isEmpty) {
+            final dynamic service = responseData['service'];
 
-          if (service is Map<String, dynamic>) {
-            serviceId = service['_id']?.toString().trim() ?? '';
+            if (service is Map) {
+              serviceId =
+                  service['_id']?.toString().trim() ?? '';
+            }
           }
         }
 
-        if (serviceId.isEmpty) {
-          logger.e("Service ID missing: $responseJson");
+        logger.i('Created Service ID: $serviceId');
 
-          Get.snackbar("Error", "Service ID was not returned");
+        // Additional service flow
+        if (isAdditionalService.value) {
+          Get.snackbar(
+            'Success',
+            responseJson['message']?.toString() ??
+                'New service created successfully',
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            margin: const EdgeInsets.all(12),
+            duration: const Duration(seconds: 3),
+            icon: const Icon(
+              Icons.check_circle,
+              color: Colors.white,
+            ),
+          );
+
+          Get.back(result: true);
           return;
         }
 
-        final StorageService storage = StorageService();
+        // First service flow
+        if (serviceId.isEmpty) {
+          Get.snackbar(
+            'Error',
+            'Service ID was not returned',
+            snackPosition: SnackPosition.TOP,
+          );
+          return;
+        }
 
-        // Save before navigating.
         await storage.setServiceId(serviceId);
 
-        final String? savedId = storage.serviceId;
-
-        logger.i("Created Service ID: $serviceId");
-        logger.i("Stored Service ID: $savedId");
-
-        if (savedId == null || savedId.isEmpty) {
-          Get.snackbar("Error", "Service ID could not be saved");
-          return;
-        }
-
-        // Refresh the existing menu controller if it was created earlier.
         if (Get.isRegistered<ServicerMenuController>()) {
-          await Get.find<ServicerMenuController>().fetchServiceProfile();
+          await Get.find<ServicerMenuController>()
+              .fetchServiceProfile();
         }
 
-        Get.snackbar("Success", "Service created successfully");
+        Get.snackbar(
+          'Success',
+          responseJson['message']?.toString() ??
+              'Service created successfully',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(12),
+          duration: const Duration(seconds: 3),
+          icon: const Icon(
+            Icons.check_circle,
+            color: Colors.white,
+          ),
+        );
 
         Get.offAllNamed(
           AppRoutes.SERVICER_BOTTOM_NAV,
-          arguments: {"serviceId": serviceId},
+          arguments: {
+            'serviceId': serviceId,
+          },
         );
       } else {
         Get.snackbar(
-          "Error",
-          responseJson['message']?.toString() ?? "Failed to create service",
+          'Error',
+          responseJson['message']?.toString() ??
+              'Failed to create service',
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
         );
       }
     } on FormatException catch (error) {
@@ -467,18 +631,33 @@ class ServiceProviderController extends GetxController {
   }
 
   Future<void> pickImage(ImageSource source) async {
+    if (!canAddMoreImages) {
+      Get.snackbar(
+        "Image Limit Reached",
+        "Your ${selectedPlan.value.subscriptionPlan} allows up to "
+            "$maxImageLimit images.",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
     final XFile? pickedFile = await _picker.pickImage(
       source: source,
       imageQuality: 80,
     );
 
-    if (pickedFile != null) {
-      if (images.length < 3) {
-        images.add(pickedFile.path);
-      } else {
-        Get.snackbar("Limit", "You can upload up to 3 images only");
-      }
+    if (pickedFile == null) return;
+
+    if (images.length >= maxImageLimit) {
+      Get.snackbar(
+        "Image Limit Reached",
+        "You can upload up to $maxImageLimit images only.",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
     }
+
+    images.add(pickedFile.path);
   }
 
   void setOpeningTime(TimeOfDay time) {
@@ -515,14 +694,44 @@ class ServiceProviderController extends GetxController {
   }
 
   // OUTSIDE setLogo()
-  void setPlan(String planName, double price, String planId) {
-    selectedPlan.update((p) {
-      if (p != null) {
-        p.planId = planId;
-        p.subscriptionPlan = planName;
-        p.subscriptionPrice = price;
-      }
+  Future<void> setPlan(
+      String planName,
+      double price,
+      String planId,
+      ) async {
+    final String cleanPlanId =
+    planId.trim();
+
+    final bool validPlanId =
+    RegExp(r'^[a-fA-F0-9]{24}$')
+        .hasMatch(cleanPlanId);
+
+    if (!validPlanId) {
+      logger.e(
+        "Invalid backend plan ID: $cleanPlanId",
+      );
+
+      Get.snackbar(
+        "Error",
+        "A valid plan ID was not received",
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    selectedPlan.update((plan) {
+      if (plan == null) return;
+
+      plan.planId = cleanPlanId;
+      plan.subscriptionPlan = planName;
+      plan.subscriptionPrice = price;
     });
+
+    await storage.setPlanId(cleanPlanId);
+
+    logger.i(
+      "Saved active plan ID: $cleanPlanId",
+    );
   }
 
   @override
@@ -540,5 +749,11 @@ class ServiceProviderController extends GetxController {
     customServiceController.dispose();
 
     super.onClose();
+  }
+
+  bool _isValidMongoId(String value) {
+    return RegExp(
+      r'^[a-fA-F0-9]{24}$',
+    ).hasMatch(value.trim());
   }
 }

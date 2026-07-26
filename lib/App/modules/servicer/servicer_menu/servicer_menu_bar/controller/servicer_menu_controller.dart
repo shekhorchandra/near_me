@@ -46,7 +46,8 @@ class ServicerMenuController extends GetxController {
   }
 
   void goToaccountedit() {
-    Get.toNamed(AppRoutes.SERVICE_PROVIDER_ACCOUNT_EDIT);
+    // Get.toNamed(AppRoutes.SERVICE_PROVIDER_ACCOUNT_EDIT);
+    Get.toNamed(AppRoutes.MY_SERVICES);
   }
 
   void review() {

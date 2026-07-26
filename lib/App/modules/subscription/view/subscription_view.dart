@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:near_me/App/core/widgets/App_button.dart';
 import 'package:near_me/App/core/widgets/common_app_bar.dart';
+import '../../../data/services/storage_service.dart';
 import '../../../routes/app_routes.dart';
 import '../controller/subscription_controller.dart';
 
@@ -242,52 +243,76 @@ class SubscriptionView extends GetView<SubscriptionController> {
                     height: 36,
                     text: 'Choose Free',
                     backgroundColor: planColor,
-                    onPressed: () {
+                    onPressed: () async {
                       final freePlan = controller.freePlan.value;
 
                       if (freePlan == null) {
                         Get.snackbar(
                           'Error',
                           'Free plan information was not found',
+                          snackPosition: SnackPosition.TOP,
                         );
                         return;
                       }
 
-                      final planId = freePlan['planId']?.toString() ?? '';
-                      final planName =
-                          freePlan['name']?.toString() ?? 'Free Plan';
+                      // Backend may return _id, id, or planId.
+                      final String planId =
+                          freePlan['_id']?.toString().trim() ??
+                              freePlan['id']?.toString().trim() ??
+                              freePlan['planId']?.toString().trim() ??
+                              '';
 
-                      final planPrice =
+                      final String planName =
+                          freePlan['title']?.toString().trim() ??
+                              freePlan['name']?.toString().trim() ??
+                              'Free Plan';
+
+                      final double planPrice =
                           (freePlan['price'] as num?)?.toDouble() ??
                               double.tryParse(
                                 freePlan['price']?.toString() ?? '',
                               ) ??
                               0.0;
 
-                      if (planId.isEmpty) {
+                      final bool isValidPlanId =
+                      RegExp(r'^[a-fA-F0-9]{24}$')
+                          .hasMatch(planId);
+
+                      if (!isValidPlanId) {
                         Get.snackbar(
                           'Error',
-                          'Free plan ID was not found',
+                          'A valid free plan ID was not found',
+                          snackPosition: SnackPosition.TOP,
                         );
+
+                        debugPrint(
+                          'INVALID FREE PLAN DATA => $freePlan',
+                        );
+                        debugPrint(
+                          'INVALID FREE PLAN ID => $planId',
+                        );
+
                         return;
                       }
 
-                      if (!RegExp(r'^[a-fA-F0-9]{24}$').hasMatch(planId)) {
-                        Get.snackbar(
-                          'Error',
-                          'Invalid free plan ID',
-                        );
+                      // Important: save the real backend MongoDB plan ID.
+                      final StorageService storage =
+                      StorageService();
 
-                        print('INVALID FREE PLAN ID => $planId');
-                        return;
-                      }
+                      await storage.setPlanId(planId);
+
+                      debugPrint(
+                        'FREE PLAN ID SAVED => ${storage.planId}',
+                      );
 
                       Get.toNamed(
                         AppRoutes.SERVICE_PROVIDER_ACCOUNT,
                         arguments: {
                           'planId': planId,
+                          'planName': planName,
                           'name': planName,
                           'price': planPrice,
+                          'rawPrice': planPrice,
                         },
                       );
                     },

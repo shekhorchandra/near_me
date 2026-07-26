@@ -113,7 +113,6 @@
 //   }
 // }
 
-
 import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:near_me/App/routes/app_routes.dart';
@@ -127,17 +126,14 @@ class SubscriptionController extends GetxController {
   final BillingService billingService;
   final SubscriptionRepository repository;
 
-  final Rxn<Map<String, dynamic>> freePlan =
-  Rxn<Map<String, dynamic>>();
+  final Rxn<Map<String, dynamic>> freePlan = Rxn<Map<String, dynamic>>();
 
-
-
-// Backend MongoDB plan information
+  // Backend MongoDB plan information
   final RxString backendPlanId = ''.obs;
   final RxString backendPlanName = ''.obs;
   final RxDouble backendPlanPrice = 0.0.obs;
 
-// Free plan information
+  // Free plan information
   final RxString freePlanId = ''.obs;
   final RxString freePlanName = 'Free Plan'.obs;
   final RxDouble freePlanPrice = 0.0.obs;
@@ -159,11 +155,8 @@ class SubscriptionController extends GetxController {
     _readPlanArguments();
     loadProducts();
 
-    billingService.listenPurchase(
-      onSuccess: verifyPurchase,
-    );
+    billingService.listenPurchase(onSuccess: verifyPurchase);
   }
-
 
   Future<void> loadProducts() async {
     loading.value = true;
@@ -172,10 +165,7 @@ class SubscriptionController extends GetxController {
       final result = await billingService.getProducts();
       products.assignAll(result);
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        e.toString(),
-      );
+      Get.snackbar("Error", e.toString());
     } finally {
       loading.value = false;
     }
@@ -190,10 +180,7 @@ class SubscriptionController extends GetxController {
     } catch (e) {
       selectedProduct.value = null;
 
-      Get.snackbar(
-        "Purchase Failed",
-        e.toString(),
-      );
+      Get.snackbar("Purchase Failed", e.toString());
     }
   }
 
@@ -213,35 +200,27 @@ class SubscriptionController extends GetxController {
 
   Future<void> verifyPurchase(PurchaseDetails purchase) async {
     try {
-      final token =
-          purchase.verificationData.serverVerificationData;
+      final token = purchase.verificationData.serverVerificationData;
 
       final userId = storageService.userId;
 
       if (userId == null || userId.isEmpty) {
-        Get.snackbar(
-          "Error",
-          "User ID not found. Please login again",
-        );
+        Get.snackbar("Error", "User ID not found. Please login again");
         return;
       }
 
       // Find purchased product details using product ID
       final purchasedProduct = _findProduct(purchase.productID);
 
-      final planName =
-          purchasedProduct?.title ?? purchase.productID;
+      final planName = purchasedProduct?.title ?? purchase.productID;
 
       // Localized formatted price, for example: $9.99
-      final planCost =
-          purchasedProduct?.price ?? '';
+      final planCost = purchasedProduct?.price ?? '';
 
       // Numeric price, for example: 9.99
-      final rawPrice =
-          purchasedProduct?.rawPrice ?? 0.0;
+      final rawPrice = purchasedProduct?.rawPrice ?? 0.0;
 
-      final currencyCode =
-          purchasedProduct?.currencyCode ?? '';
+      final currencyCode = purchasedProduct?.currencyCode ?? '';
 
       print("========================================");
       print("PURCHASE DEBUG");
@@ -255,20 +234,20 @@ class SubscriptionController extends GetxController {
       print("PURCHASE STATUS => ${purchase.status}");
       print(
         "PENDING COMPLETE => "
-            "${purchase.pendingCompletePurchase}",
+        "${purchase.pendingCompletePurchase}",
       );
       print("PURCHASE TOKEN => $token");
       print(
         "SOURCE => "
-            "${purchase.verificationData.source}",
+        "${purchase.verificationData.source}",
       );
       print(
         "LOCAL DATA => "
-            "${purchase.verificationData.localVerificationData}",
+        "${purchase.verificationData.localVerificationData}",
       );
       print(
         "SERVER DATA => "
-            "${purchase.verificationData.serverVerificationData}",
+        "${purchase.verificationData.serverVerificationData}",
       );
       print("========================================");
 
@@ -283,17 +262,14 @@ class SubscriptionController extends GetxController {
         await InAppPurchase.instance.completePurchase(purchase);
       }
 
-      Get.snackbar(
-        "Success",
-        "Subscription Activated",
-      );
+      Get.snackbar("Success", "Subscription Activated");
 
       selectedProduct.value = null;
 
       Get.offAllNamed(
         AppRoutes.SERVICE_PROVIDER_ACCOUNT,
         arguments: {
-          "planId": purchase.productID,
+          "planId": backendPlanId.value,
           "planName": planName,
           "planCost": planCost,
           "rawPrice": rawPrice,
@@ -304,10 +280,7 @@ class SubscriptionController extends GetxController {
       print("SUBSCRIPTION ERROR => $e");
       print("STACK TRACE => $stackTrace");
 
-      Get.snackbar(
-        "Purchase Failed",
-        e.toString(),
-      );
+      Get.snackbar("Purchase Failed", e.toString());
     }
   }
 
@@ -322,19 +295,19 @@ class SubscriptionController extends GetxController {
     final Map<String, dynamic> args =
     Map<String, dynamic>.from(receivedArguments);
 
-    // Supports both direct arguments and nested "freePlan" arguments
     final dynamic nestedPlan = args['freePlan'];
 
-    final Map<String, dynamic> planArgs = nestedPlan is Map
+    final Map<String, dynamic> planArgs =
+    nestedPlan is Map
         ? Map<String, dynamic>.from(nestedPlan)
         : args;
 
     final String planId =
-        planArgs['planId']?.toString() ?? '';
+        planArgs['planId']?.toString().trim() ?? '';
 
     final String planName =
-        planArgs['planName']?.toString() ??
-            planArgs['name']?.toString() ??
+        planArgs['planName']?.toString().trim() ??
+            planArgs['name']?.toString().trim() ??
             '';
 
     final double planPrice =
@@ -352,6 +325,10 @@ class SubscriptionController extends GetxController {
     final String currencyCode =
         planArgs['currencyCode']?.toString() ?? '';
 
+    backendPlanId.value = planId;
+    backendPlanName.value = planName;
+    backendPlanPrice.value = planPrice;
+
     freePlan.value = {
       'planId': planId,
       'name': planName,
@@ -361,11 +338,9 @@ class SubscriptionController extends GetxController {
     };
 
     print('===================================');
-    print('PLAN ID => $planId');
-    print('PLAN NAME => $planName');
-    print('PLAN PRICE => $planPrice');
-    print('PLAN COST => $planCost');
-    print('CURRENCY CODE => $currencyCode');
+    print('BACKEND PLAN ID => ${backendPlanId.value}');
+    print('PLAN NAME => ${backendPlanName.value}');
+    print('PLAN PRICE => ${backendPlanPrice.value}');
     print('===================================');
   }
 }
