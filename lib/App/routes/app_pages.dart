@@ -49,6 +49,8 @@ import '../modules/servicer/servicer_highlight/servicer_highlight_details/bindin
 import '../modules/servicer/servicer_highlight/servicer_highlight_details/views/service_highlights_details_page.dart';
 import '../modules/servicer/servicer_highlight/servicer_highlights_page/binding/servicer_highlight_binding.dart';
 import '../modules/servicer/servicer_highlight/servicer_highlights_page/views/servicer_highlight_view.dart';
+import '../modules/servicer/servicer_menu/my_services/binding/my_services_binding.dart';
+import '../modules/servicer/servicer_menu/my_services/views/my_services_view.dart';
 import '../modules/servicer/servicer_menu/payment_method/bindings/payment_method_binding.dart';
 import '../modules/servicer/servicer_menu/payment_method/view/add_new_card_view.dart';
 import '../modules/servicer/servicer_menu/payment_method/view/payment_methods_view.dart';
@@ -387,6 +389,13 @@ class AppPages {
       name: AppRoutes.SERVICE_PROVIDER_ACCOUNT,
       page: () => const ServiceProviderView(),
       binding: ServiceProviderBinding(),
+    ),
+
+    /// created service list
+    GetPage(
+      name: AppRoutes.MY_SERVICES,
+      page: () => const MyServicesView(),
+      binding: MyServicesBinding(),
     ),
 
     /// SERVICER PROVIDER ACCOUNT EDIT

@@ -99,6 +99,9 @@ abstract class AppRoutes {
   /// servicer provider account
   static const SERVICE_PROVIDER_ACCOUNT = '/service-provider';
 
+  /// created service list
+  static const MY_SERVICES = '/my-service';
+
   /// servicer provider account
   static const SERVICE_PROVIDER_ACCOUNT_EDIT = '/service-provider-edit';
 

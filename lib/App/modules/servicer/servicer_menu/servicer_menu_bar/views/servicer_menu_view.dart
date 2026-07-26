@@ -15,15 +15,12 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(
-        title: "Servicer Menu",
-        showBack: false,
-      ),
+      appBar: const CommonAppBar(title: "Servicer Menu", showBack: false),
       body: Obx(() {
         if (controller.isLoading.value &&
             controller.serviceName.value.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.black,),
+            child: CircularProgressIndicator(color: Colors.black),
           );
         }
 
@@ -33,10 +30,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
           child: SafeArea(
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(
-                top: 8,
-                bottom: 16,
-              ),
+              padding: const EdgeInsets.only(top: 8, bottom: 16),
               children: [
                 // ================= Profile Card =================
                 Padding(
@@ -59,24 +53,20 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                       child: Row(
                         children: [
                           Obx(() {
-                            final String logo =
-                            controller.companyLogo.value.trim();
+                            final String logo = controller.companyLogo.value
+                                .trim();
 
                             return CircleAvatar(
                               radius: 30,
-                              backgroundColor:
-                              AppColor.primary.withOpacity(0.1),
-                              backgroundImage: logo.isNotEmpty
-                                  ? NetworkImage(logo)
-                                  : null,
-                              child: logo.isEmpty
-                                  ? Image.asset(
-                                AppAssets.usercat,
-                                height: 60,
-                                width: 60,
-                                fit: BoxFit.contain,
-                              )
-                                  : null,
+                              backgroundColor: AppColor.primary.withOpacity(0.1),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  AppAssets.usercat,
+                                  height: 60,
+                                  width: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             );
                           }),
                           const SizedBox(width: 12),
@@ -84,22 +74,17 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                           // Prevents long name/email overflow.
                           Expanded(
                             child: Obx(() {
-                              final String serviceName =
-                              controller.serviceName.value.trim();
                               final String email =
                               controller.providerEmail.value.trim();
 
                               return Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    serviceName.isNotEmpty
-                                        ? serviceName
-                                        : "Service Profile",
+                                  const Text(
+                                    "All Created Service List",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -108,7 +93,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                                   Text(
                                     email.isNotEmpty
                                         ? email
-                                        : "Email not available",
+                                        : "View all your created services",
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -122,10 +107,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                           ),
 
                           const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                          ),
+                          const Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
                     ),
@@ -165,10 +147,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
                           ),
                           const _ReviewAvatars(),
                           const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 16,
-                          ),
+                          const Icon(Icons.arrow_forward_ios, size: 16),
                         ],
                       ),
                     ),
@@ -268,10 +247,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
     return Column(
       children: [
         ListTile(
-          leading: Icon(
-            icon,
-            color: isDelete ? Colors.red : null,
-          ),
+          leading: Icon(icon, color: isDelete ? Colors.red : null),
           title: Text(
             title,
             style: AppText.body2.semiBold.copyWith(
@@ -285,10 +261,7 @@ class ServicerMenuView extends GetView<ServicerMenuController> {
           ),
           onTap: onTap,
         ),
-        const Divider(
-          color: Color(0xFFE0E0E0),
-          height: 0,
-        ),
+        const Divider(color: Color(0xFFE0E0E0), height: 0),
       ],
     );
   }
